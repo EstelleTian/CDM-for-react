@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+</head>
+<body>
+    <script src="https://cdn.bootcss.com/jquery/3.3.1/jquery.min.js"></script>
+    <script>
+        //根据你的地址对应修改
+        //登录的接口
+//        var url = "http://192.168.243.120:8081/cdm-analysis/retrieve_user_property.action";
+        var url = "http://192.168.243.120:8081/cdm-analysis/retrieveFlights/ZUUU/201806150000/201806152359.action";
+
+        $.ajax({
+            url: url,
+            type: 'GET',
+            dataType: 'json',
+            success: function(data, status){
+                console.log(data, status)
+            },
+            error: function(xhr, status){
+                console.log(xhr, status)
+            }
+        })
+
+
+
+    </script>
+
+</body>
+</html>
