@@ -50,6 +50,10 @@ module.exports = {
                                 "text-color": "#fff",
                                 "text-color-secondary": "#fff",
                                 "input-bg": "rgba(0, 0, 0, 0)",
+                                "layout-body-background": "rgba(0, 0, 0, 0)",
+                                "layout-header-background ": "rgba(0, 0, 0, 0)",
+                                "layout-sider-background-light": "rgba(0, 0, 0, 0)",
+                                "component-background": "rgba(0, 0, 0, 0)",
                             }
                         }
                     }
