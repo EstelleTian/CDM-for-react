@@ -8,7 +8,7 @@ import "./Home.less";
 const { Content } = Layout;
 
 const Home = ( props ) => (
-    <Layout theme="dark" className="air-layout">
+    <Layout className="air-layout">
         <Head />
         <NavMenu />
         <Content>

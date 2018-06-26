@@ -145,7 +145,6 @@ class AirTable extends React.Component{
         return(
             <div className="air-table">
                 <Table
-                    theme="dark"
                     columns={columns}
                     dataSource={ tableDatas }
                     size="small"

@@ -16,7 +16,6 @@ class NavMenu extends React.Component{
                 onClick={this.handleClick}
                 selectedKeys={['mail']}
                 mode="horizontal"
-                theme="dark"
             >
                 <SubMenu title={<span>快速过滤</span>}>
                     <MenuItemGroup title="屏蔽">

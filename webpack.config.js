@@ -43,7 +43,15 @@ module.exports = {
                     {
                         loader:'less-loader',
                         options: {
-                            javascriptEnabled: true
+                            javascriptEnabled: true,
+                            modifyVars:{
+                                "primary-color":"rgba(0,0,0,.7)",
+                                "body-background ": "rgba(0,0,0,.65)",
+                                "heading-color": "#fff",
+                                "text-color": "#fff",
+                                "text-color-secondary": "#fff",
+                                "input-bg": "rgba(0,0,0,0)",
+                            }
                         }
                     }
                 ],
