@@ -33,7 +33,7 @@ module.exports = {
                 test: /\.less|css$/,
                 use: [{
                     loader:'style-loader'
-                },
+                    },
                     {
                         loader:'css-loader?#sourceMap'
                     },
@@ -45,12 +45,11 @@ module.exports = {
                         options: {
                             javascriptEnabled: true,
                             modifyVars:{
-                                "primary-color":"rgba(0,0,0,.7)",
-                                "body-background ": "rgba(0,0,0,.65)",
+                                "primary-color":"rgba(0, 0, 0, .7)",
                                 "heading-color": "#fff",
                                 "text-color": "#fff",
                                 "text-color-secondary": "#fff",
-                                "input-bg": "rgba(0,0,0,0)",
+                                "input-bg": "rgba(0, 0, 0, 0)",
                             }
                         }
                     }
@@ -59,6 +58,10 @@ module.exports = {
             {
                 test: /\.eot|woff|eot|ttf|svg$/,
                 use: ['file-loader']
+            },
+            {
+                test: /\.jpg|png$/,
+                use: ['url-loader']
             }
         ],
     },
