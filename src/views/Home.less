@@ -11,28 +11,37 @@
     }
   }
 
-
-
+  .all-flights{
+    max-height: 900px;
+  }
   .ant-layout-content{
     .display-flex(column);
     .flex-part();
+    overflow: hidden;
 
     .no-margin{
       margin-left: 0!important;
       margin-right: 0!important;
-      .display-flex();
       .flex-part();
+      overflow: hidden;
+    }
+    @media(min-width : 992px){
+      .no-margin{
+        .display-flex();
+      }
     }
 
     .card{
       .display-flex();
       .ant-card{
         .display-flex( column );
-        .flex-part();
         width: 100%;
+        background: @bc-black-20;
+        box-shadow: 0 0.083rem 0.5rem @bc-black-10;
+        border-radius: 0.25rem;
         .ant-card-body{
-          .flex-part();
           height: calc(~"100% - 40px");
+          padding: 0;
         }
       }
     }

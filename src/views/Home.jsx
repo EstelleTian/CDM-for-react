@@ -13,13 +13,15 @@ const Home = ( props ) => (
         <NavMenu/>
         <Content>
             <Row className="no-margin" gutter={16}>
-                <Col className="card" span={18}>
-                    <Card title="航班起飞排序" bordered={true}>
+                <Col className="card" xs={24} sm={24} md={24} lg={24} xl={18} xxl={18}>
+                    <Card title="航班起飞排序"
+                          className="all-flights"
+                    >
                         <AirTable />
                     </Card>
                 </Col>
-                <Col className="card" span={6}>
-                    <Card title="流控信息" bordered={true}>11111</Card>
+                <Col className="card"  xs={24} sm={24} md={24} lg={6} xl={6} xxl={6}>
+                    <Card title="流控信息">11111</Card>
                 </Col>
             </Row>
 

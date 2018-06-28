@@ -21,10 +21,13 @@ class AirTable extends React.Component{
         this.airportTimerId = '';
     }
 
-    refreshAirportsList( datas ){
+    refreshAirportsList( res ){
         const { updateTableDatas } = this.props;
         //表格数据
         let dataArr = [];
+
+        // const datas = res.result;
+        const datas = res;
 
         //遍历每个航班，并转化为表格数据
         for(var id in datas ){
@@ -36,10 +39,10 @@ class AirTable extends React.Component{
         //保存航班数据
         updateTableDatas( dataArr );
 
-        this.airportTimerId = setTimeout(() => {
-            //获取机场航班
-            requestGet( getAllAirportsUrl, this.refreshAirportsList );
-        },10*1000)
+        // this.airportTimerId = setTimeout(() => {
+        //     //获取机场航班
+        //     requestGet( getAllAirportsUrl, this.refreshAirportsList );
+        // },10*1000)
 
     }
     //转化用户配置信息
