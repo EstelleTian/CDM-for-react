@@ -1,5 +1,5 @@
 import React from 'react';
-import {Form, Icon, Input, Button, Alert} from 'antd'
+import {Form, Icon, Input, Button, Alert,Row, Col} from 'antd'
 import axios from 'axios'
 import './Form.less'
 
@@ -110,41 +110,46 @@ class Loginform extends React.Component{
         };
         return (
             <div className="login">
-                <div className="content">
-                    <Form className="login_form" onSubmit={this.handleSubmit}>
-                        <FormItem>
-                            <h3 className="title">CDM机场协同放行</h3>
-                        </FormItem>
-                        <FormItem>
-                            {
-                                (!loginUserInfo.loginStatus && loginUserInfo.errmsg != "")  ?  <Alert
-                                    message={ loginUserInfo.errmsg }
-                                    type="error"
-                                /> : ""
-                            }
+                <Row type="flex" justify="center" align="middle">
+                    <Col xs={{ span: 16}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 8}} >
+                        <div className="content">
+                            <Form className="login_form" onSubmit={this.handleSubmit}>
+                                <FormItem>
+                                    <h2 className="title">CDM机场协同放行</h2>
+                                </FormItem>
+                                <FormItem>
+                                    {
+                                        (!loginUserInfo.loginStatus && loginUserInfo.errmsg != "")  ?  <Alert
+                                            message={ loginUserInfo.errmsg }
+                                            type="error"
+                                        /> : ""
+                                    }
 
-                        </FormItem>
-                        <FormItem>
-                            {
-                                rulesGenerate.username(
-                                    <Input prefix={<Icon type="user" />} className="form_input"  placeholder="用户名"/>
-                                )
-                            }
-                        </FormItem>
-                        <FormItem>
-                            {
-                                rulesGenerate.password(
-                                    <Input prefix={<Icon type="lock" />} type="password" className="form_input" placeholder="密码"/>
-                                )
-                            }
-                        </FormItem>
-                        <FormItem>
-                            <Button type="primary" htmlType="submit" className="login_button">
-                                登录
-                            </Button>
-                        </FormItem>
-                    </Form>
-                </div>
+                                </FormItem>
+                                <FormItem>
+                                    {
+                                        rulesGenerate.username(
+                                            <Input prefix={<Icon type="user" />} className="form_input"  placeholder="用户名"/>
+                                        )
+                                    }
+                                </FormItem>
+                                <FormItem>
+                                    {
+                                        rulesGenerate.password(
+                                            <Input prefix={<Icon type="lock" />} type="password" className="form_input" placeholder="密码"/>
+                                        )
+                                    }
+                                </FormItem>
+                                <FormItem>
+                                    <Button type="primary" htmlType="submit" size={'large'} className="login_button">
+                                        登录
+                                    </Button>
+                                </FormItem>
+                            </Form>
+                        </div>
+                    </Col>
+                </Row>
+
             </div>
         )
     }
