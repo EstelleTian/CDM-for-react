@@ -10,7 +10,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const port = 3000;
 
 module.exports = {
-    devtool: 'source-map',
+    // devtool: 'source-map',
     entry: {
         bundle: './src/app.jsx',
         vendor: ['react', 'react-dom', 'jquery', 'react-router', 'redux'],
@@ -27,7 +27,12 @@ module.exports = {
         rules: [
             {
                 test: /\.(js|jsx)$/,
-                use: 'babel-loader',
+                use: [{
+                    loader: 'babel-loader',
+                    options: {
+                        cacheDirectory: true
+                    }
+                 }]
             },
             {
                 test: /\.less|css$/,
@@ -53,7 +58,7 @@ module.exports = {
                                 "layout-body-background": "rgba(0, 0, 0, 0)",
                                 "layout-header-background ": "rgba(0, 0, 0, 0)",
                                 "layout-sider-background-light": "rgba(0, 0, 0, 0)",
-                                "component-background": "rgba(0, 0, 0, 0)",
+                                "component-background": "rgba(0, 0, 0, 0)"
                             }
                         }
                     }

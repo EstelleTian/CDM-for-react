@@ -1,5 +1,6 @@
 import React from 'react';
-import { Table } from 'antd';
+import { Table, Row } from 'antd';
+import $ from 'jquery';
 import { requestGet } from '../../utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
 import { isValidObject, isValidVariable } from '../../utils/basic-verify';
@@ -12,6 +13,7 @@ class AirTable extends React.Component{
         super(props);
         this.convertUserProperty = this.convertUserProperty.bind(this);
         this.refreshAirportsList = this.refreshAirportsList.bind(this);
+        // this.resetTableHeight = this.resetTableHeight.bind(this);
         this.convertData = convertData.bind(this);
         this.getDisplayStyle = getDisplayStyle.bind(this);
         this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
@@ -111,54 +113,66 @@ class AirTable extends React.Component{
 
     };
 
-    componentWillMount(){
-        console.time('rendertable');
-    }
+    // componentWillMount(){
+    //     console.time('rendertable');
+    // }
 
     componentDidMount(){
         //获取用户配置
         requestGet( getUserPropertyUrl, this.convertUserProperty );
-        console.timeEnd('rendertable');
+
+
+        // console.timeEnd('rendertable');
     };
 
-    componentWillUpdate(){
-        console.log('will--updatetable');
-        console.time('updatetable');
-    }
+    // componentWillUpdate(){
+    //     console.log('will--updatetable');
+    //     console.time('updatetable');
+    // }
     componentDidUpdate(){
-        console.log('did---updatetable');
-        console.timeEnd('updatetable');
+        // console.log('did---updatetable');
+        // console.timeEnd('updatetable');
     }
     
     componentWillUnmount(){
         clearTimeout(this.airportTimerId);
     }
 
+    // resetTableHeight(){
+    //     const $antCardBody = $(".ant-card-body");
+    //     const cardBodyHeight = $antCardBody.height();
+    //     const operationHeight = $(".ant-card-body .operation").height();
+    //     let maxHeight = cardBodyHeight - operationHeight - 43;
+    //     $(".ant-table-body-inner").height(maxHeight+'px');
+    //     $(".ant-table-body").height(maxHeight+'px');
+    // }
+
+
     render(){
-        console.log("Table render~~~");
+        // console.log("Table render~~~");
         const { tableDatas, tableConfig } = this.props;
         const { colDisplay, colNames } = tableConfig;
         const columns = TableColumns( colDisplay, colNames );
+        const totalNum = tableDatas.length;
         const scrollX = columns.length * 100;
         //TODO 高度根据缩放自适应
+        // this.resetTableHeight();
 
         return(
-            <div className="air-table">
+            <div className="air-table bc-1">
+                <Row className="operation">
+                    <div className="total">总计{totalNum}条航班</div>
+                </Row>
                 <Table
                     columns={columns}
                     dataSource={ tableDatas }
                     size="small"
                     scroll={{
                         x: scrollX,
-                        y: 750
+                        y: '100%'
                     }}
                     bordered
-                    pagination={{
-                        defaultPageSize: 999,
-                        showTotal: ( total, range ) => (
-                            `总计 ${total} 条航班`
-                        )
-                    }}
+                    pagination = {false}
                 />
             </div>
         )

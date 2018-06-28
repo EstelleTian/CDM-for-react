@@ -4,8 +4,28 @@
  *  @date  2018-06-26
  */
 @import "./theme-color";
-
+*,html,body{
+  font-size: 12px;
+  line-height: 1;
+}
 body{
-  background: url('../images/4.jpg');
-  //background: url('../images/9.jpg');
+  .bc-image-4;
+}
+
+.display-flex( @direction : row ){
+  display: flex;
+  display: -webkit-flex;
+  display: -o-flex;
+  display: -moz-flex;
+  flex-direction: @direction;
+  -webkit-flex-direction: @direction;
+  -o-flex-direction: @direction;
+  -moz-flex-direction: @direction;
+}
+
+.flex-part( @part : 1 ){
+  flex: @part;
+  -webkit-flex: @part;
+  -o-flex: @part;
+  -moz-flex: @part;
 }

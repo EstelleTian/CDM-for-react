@@ -33,8 +33,14 @@ const handleStyleFunc = ( style ) => {
         styleObj[newKey] = value;
      }
      const backgroundColor = styleObj["backgroundColor"];
-    if( ( backgroundColor == '' || backgroundColor == "transparent" ) && styleObj["color"] == '#000000'){
-        styleObj["color"] = '#cccccc';
+
+
+    if( ( backgroundColor == '' || backgroundColor == "transparent" )){
+        // styleObj["backgroundColor"]  ==
+        if( styleObj["color"] == '#000000' ){
+            styleObj["color"] = '#cccccc';
+        }
+
     }
 
     return styleObj;

@@ -1,22 +1,88 @@
-.ant-table-small > .ant-table-content > .ant-table-header > table > .ant-table-thead > tr > th, .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-thead > tr > th, .ant-table-small > .ant-table-content > .ant-table-scroll > .ant-table-header > table > .ant-table-thead > tr > th, .ant-table-small > .ant-table-content > .ant-table-scroll > .ant-table-body > table > .ant-table-thead > tr > th, .ant-table-small > .ant-table-content > .ant-table-fixed-left > .ant-table-header > table > .ant-table-thead > tr > th, .ant-table-small > .ant-table-content > .ant-table-fixed-right > .ant-table-header > table > .ant-table-thead > tr > th, .ant-table-small > .ant-table-content > .ant-table-fixed-left > .ant-table-body-outer > .ant-table-body-inner > table > .ant-table-thead > tr > th, .ant-table-small > .ant-table-content > .ant-table-fixed-right > .ant-table-body-outer > .ant-table-body-inner > table > .ant-table-thead > tr > th, .ant-table-small > .ant-table-content > .ant-table-header > table > .ant-table-tbody > tr > td, .ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-tbody > tr > td, .ant-table-small > .ant-table-content > .ant-table-scroll > .ant-table-header > table > .ant-table-tbody > tr > td, .ant-table-small > .ant-table-content > .ant-table-scroll > .ant-table-body > table > .ant-table-tbody > tr > td, .ant-table-small > .ant-table-content > .ant-table-fixed-left > .ant-table-header > table > .ant-table-tbody > tr > td, .ant-table-small > .ant-table-content > .ant-table-fixed-right > .ant-table-header > table > .ant-table-tbody > tr > td, .ant-table-small > .ant-table-content > .ant-table-fixed-left > .ant-table-body-outer > .ant-table-body-inner > table > .ant-table-tbody > tr > td, .ant-table-small > .ant-table-content > .ant-table-fixed-right > .ant-table-body-outer > .ant-table-body-inner > table > .ant-table-tbody > tr > td{
-  padding: 6px;
-  //background-color: rgba(0, 0, 0, .9);
-  //color: #cccccc;
-}
-.ant-table-small.ant-table-bordered .ant-table-thead > tr > th:last-child, .ant-table-small.ant-table-bordered .ant-table-tbody > tr > td:last-child{
-  //border-right: 1px solid #e8e8e8;
-}
-.ant-table{
-  line-height: 1;
-}
-
+@import "../../style/theme-color";
+@import "../../style/base";
+//.ant-table-small > .ant-table-content > .ant-table-header > table > .ant-table-thead > tr > th,
+//.ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-thead > tr > th,
+//.ant-table-small > .ant-table-content > .ant-table-scroll > .ant-table-header > table > .ant-table-thead > tr > th,
+//.ant-table-small > .ant-table-content > .ant-table-scroll > .ant-table-body > table > .ant-table-thead > tr > th,
+//.ant-table-small > .ant-table-content > .ant-table-fixed-left > .ant-table-header > table > .ant-table-thead > tr > th,
+//.ant-table-small > .ant-table-content > .ant-table-fixed-right > .ant-table-header > table > .ant-table-thead > tr > th,
+//.ant-table-small > .ant-table-content > .ant-table-fixed-left > .ant-table-body-outer > .ant-table-body-inner > table > .ant-table-thead > tr > th,
+//.ant-table-small > .ant-table-content > .ant-table-fixed-right > .ant-table-body-outer > .ant-table-body-inner > table > .ant-table-thead > tr > th,
+//.ant-table-small > .ant-table-content > .ant-table-header > table > .ant-table-tbody > tr > td,
+//.ant-table-small > .ant-table-content > .ant-table-body > table > .ant-table-tbody > tr > td,
+//.ant-table-small > .ant-table-content > .ant-table-scroll > .ant-table-header > table > .ant-table-tbody > tr > td,
+//.ant-table-small > .ant-table-content > .ant-table-scroll > .ant-table-body > table > .ant-table-tbody > tr > td,
+//.ant-table-small > .ant-table-content > .ant-table-fixed-left > .ant-table-header > table > .ant-table-tbody > tr > td,
+//.ant-table-small > .ant-table-content > .ant-table-fixed-right > .ant-table-header > table > .ant-table-tbody > tr > td,
+//.ant-table-small > .ant-table-content > .ant-table-fixed-left > .ant-table-body-outer > .ant-table-body-inner > table > .ant-table-tbody > tr > td,
+//.ant-table-small > .ant-table-content > .ant-table-fixed-right > .ant-table-body-outer > .ant-table-body-inner > table > .ant-table-tbody > tr > td{
+//  padding: 0.5rem;
+//
+//}
 .air-table{
-  //background: rgba(0, 0, 0, .9);
-}
-.ant-pagination-total-text{
-  //color: #cccccc;
+  table{
+    tr{
+      td,th{
+        padding: 0.5rem!important;
+      }
+    }
+  }
+
+  .ant-table-fixed{
+    .ant-table-tbody,.ant-table-thead{
+      .bc-image-4;
+      background-size: cover;
+    }
+  }
 }
 
-.ant-table-column-sorter{
-  //color: #cccccc;
+
+
+//处理表格和容器自适应问题
+.air-table{
+  height: 100%;
+  .display-flex(column);
+
+  .operation{
+    height: 3rem;
+    line-height: 3rem;
+  }
+  .ant-table-wrapper{
+    .flex-part();
+    //64px为标题3rem+操作高度3rem，如果改变需要对应增加
+    height: calc(~"100% - 6rem");
+    .ant-spin-nested-loading{
+      height: 100%;
+      .ant-spin-container{
+        height: 100%;
+        .ant-table{
+          height: 100%;
+          .ant-table-content{
+            height: 100%;
+            .ant-table-scroll{
+              height: 100%;
+              .ant-table-body{
+                max-height: calc(~"100% - 40px")!important;
+              }
+
+            }
+            .ant-table-fixed-left{
+              height: 100%;
+              .ant-table-body-outer{
+                height: calc(~"100% - 40px");
+                .ant-table-body-inner{
+                  max-height: calc(~"100% - 40px");
+
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
 }
+
+
+
+
