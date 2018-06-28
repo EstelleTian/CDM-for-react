@@ -36,10 +36,10 @@ class AirTable extends React.Component{
         //保存航班数据
         updateTableDatas( dataArr );
 
-        this.airportTimerId = setTimeout(() => {
-            //获取机场航班
-            requestGet( getAllAirportsUrl, this.refreshAirportsList );
-        },10*1000)
+        // this.airportTimerId = setTimeout(() => {
+        //     //获取机场航班
+        //     requestGet( getAllAirportsUrl, this.refreshAirportsList );
+        // },10*1000)
 
     }
     //转化用户配置信息

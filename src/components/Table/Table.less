@@ -26,13 +26,14 @@
   .display-flex(column);
 
   .operation{
-    height: 3rem;
-    line-height: 3rem;
+    .total{
+      height: 3rem;
+      line-height: 3rem;
+    }
   }
   .ant-table-wrapper{
-    .flex-part();
-    //64px为标题3rem+操作高度3rem，如果改变需要对应增加
-    height: calc(~"100% - 6rem");
+    //.flex-part();
+    height: calc(~"100% - 2.5rem");
     .ant-spin-nested-loading{
       height: 100%;
       .ant-spin-container{
