@@ -109,7 +109,7 @@ class Loginform extends React.Component{
             }),
         };
         return (
-            <div className="login">
+            <div className="login bc-image-11">
                 <Row type="flex" justify="center" align="middle">
                     <Col xs={{ span: 16}}  md={{ span: 12}} lg={{ span: 10}}  xl={{ span: 8}} xxl={{ span: 6}} >
 
