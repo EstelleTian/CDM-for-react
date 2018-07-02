@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Row } from 'antd';
+import { Table, Row, Icon, Menu, Checkbox, Radio } from 'antd';
 import $ from 'jquery';
 import { requestGet } from '../../utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
@@ -7,6 +7,9 @@ import { isValidObject, isValidVariable } from '../../utils/basic-verify';
 import { TableColumns, ConvertToTableData, getColEdit } from "../../utils/table-config";
 import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "../../utils/flight-grid-table-data-util";
 import './Table.less';
+
+const SubMenu = Menu.SubMenu;
+const MenuItemGroup = Menu.ItemGroup;
 
 class AirTable extends React.Component{
     constructor( props ){
@@ -39,10 +42,10 @@ class AirTable extends React.Component{
         //保存航班数据
         updateTableDatas( dataArr );
 
-        // this.airportTimerId = setTimeout(() => {
-        //     //获取机场航班
-        //     requestGet( getAllAirportsUrl, this.refreshAirportsList );
-        // },10*1000)
+        this.airportTimerId = setTimeout(() => {
+            //获取机场航班
+            requestGet( getAllAirportsUrl, this.refreshAirportsList );
+        },10*1000)
 
     }
     //转化用户配置信息
@@ -164,6 +167,30 @@ class AirTable extends React.Component{
         return(
             <div className="air-table bc-1">
                 <Row className="operation">
+                    <div className="tools">
+                        <Icon type="reload" title="刷新"/>
+                        <Icon type="sync" title="重置"/>
+                        <Menu
+                            defaultSelectedKeys={['filter']}
+                            selectedKeys={['filter']}
+                            mode="horizontal"
+                            theme="dark"
+                        >
+                            <SubMenu
+                                key="filter"
+                                title={<Icon type="filter" title="过滤"/>}
+                            >
+                                <MenuItemGroup title="屏蔽">
+                                    <Menu.Item key="setting:1"><Checkbox>已起飞</Checkbox></Menu.Item>
+                                    <Menu.Item key="setting:2"><Checkbox>已落地</Checkbox></Menu.Item>
+                                </MenuItemGroup>
+                                <MenuItemGroup title="时间范围">
+                                    <Menu.Item key="setting:3"><Radio>30分钟</Radio></Menu.Item>
+                                    <Menu.Item key="setting:4"><Radio>60分钟</Radio></Menu.Item>
+                                </MenuItemGroup>
+                            </SubMenu>
+                        </Menu>
+                    </div>
                     <div className="total">总计{totalNum}条航班</div>
                 </Row>
                 <Table

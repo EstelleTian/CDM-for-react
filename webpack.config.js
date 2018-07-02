@@ -7,10 +7,12 @@ const path = require('path');
 const OpenBrowserPlugin = require('open-browser-webpack-plugin');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+//代码压缩用ParallelUglifyPlugin代替自带的 UglifyJsPlugin插件
+const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
 const port = 3000;
 
 module.exports = {
-    // devtool: 'source-map',
+    devtool: 'source-map',
     entry: {
         bundle: './src/app.jsx',
         vendor: ['react', 'react-dom', 'jquery', 'react-router', 'redux'],
@@ -90,7 +92,18 @@ module.exports = {
             //     collapseWhitespace:false    //删除空白符与换行符
             // }
         }),
-        new BundleAnalyzerPlugin() //代码分片
+        new BundleAnalyzerPlugin(), //代码分片
+        new ParallelUglifyPlugin({
+            cacheDir: '.cache/',
+            uglifyJS:{
+                output: {
+                    comments: false
+                },
+                compress: {
+                    warnings: false
+                }
+            }
+        })
     ],
     devServer: {
         compress: false, // 启用gzip压缩
