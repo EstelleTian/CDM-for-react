@@ -1,7 +1,9 @@
 import React from 'react';
 import {Form, Icon, Input, Button, Alert,Row, Col} from 'antd'
+import { Base64 } from 'js-base64';
 import axios from 'axios'
 import './Form.less'
+import { loginUrl } from '../../utils/request-urls';
 
 const FormItem = Form.Item;
 
@@ -32,51 +34,64 @@ class Loginform extends React.Component{
         e.preventDefault();
         const _form = this.props.form;
         const history = this.props.history;
-        // const { filterList, updateMultiFilter } = this.props;
         _form.validateFieldsAndScroll((err, values) => {
             //success
             if (!err) {
-                const userLogin = this.props.userLogin;
+                const updateUserInfo = this.props.updateUserInfo;
                 const username = values.username.trim();
-                const password = values.password.trim();
-                history.push('/home');
-                // axios.get(loginUrl,{
-                //     params: {
-                //         username: username,
-                //         password: password
-                //     },
-                //     withCredentials: true
-                // }).then( response => {
-                //     const json = response.data;
-                //     if( 200 == json.status*1 && json.hasOwnProperty("token")){
-                //         sessionStorage.setItem("UUMAToken", json.token)
-                //         //账户拥有的权限
-                //         let optsAuths = this.convertOptAuth( (json.authorityList || []))
-                //         let user = json.user
-                //         let params = {
-                //             username,
-                //             password,
-                //             optsAuths,
-                //             loginStatus: true,
-                //             user
-                //         }
-                //         userLogin(params);
-                //         //清除在线用户的自定义查询数据和多条件查询数据，以便于下次再登录后保留记录
-                //         filterList("all");
-                //         updateMultiFilter({});
-                //
-                //         history.push('/home');
-                //     }else if( 500 == json.status*1 && json.hasOwnProperty("error")  ){
-                //         const error = json.error.message ? json.error.message : "";
-                //         let param = {
-                //             errmsg: error
-                //         }
-                //         userLogin(param);
-                //         _form.resetFields();
-                //     }
-                // }).catch(err => {
-                //     console.error(err);
-                // })
+                // 对密码 base64编码 处理
+                // const password =  Base64.encode(values.password.trim());
+                const password =  values.password.trim();
+                // 发送请求
+                axios({
+                    method:"POST",
+                    url:loginUrl,
+                    data:{
+                        username:username,
+                        password:password
+                    },
+                    // 格式化处理数据
+                    transformRequest: [function (data) {
+                        let ret = ''
+                        for (let it in data) {
+                            ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                        }
+                        return ret
+                    }],
+                }).then( response => {
+                    const json = response.data;
+                    if( 200 == json.status*1 ){
+
+                        // let user = json.user
+                        let userid = json.user.id;
+                        let params = {
+                            username,
+                            password,
+                            loginStatus: true,
+                            userid,
+                        }
+                        updateUserInfo(params);
+                        // 跳转到主页面
+                        history.push('/home');
+                    }else if( 500 == json.status*1 && json.hasOwnProperty("error")  ){
+                        const error = json.error.message ? json.error.message : "";
+                        let param = {
+                            errmsg: error
+                        }
+                        updateUserInfo(param);
+                        // _form.resetFields();
+                        console.log(this.props.loginUserInfo)
+                    }else if( 400 == json.status*1 && json.hasOwnProperty("error") ){
+                        const error = json.error.message ? json.error.message : "";
+                        let param = {
+                            errmsg: error
+                        }
+                        updateUserInfo(param);
+                        // _form.resetFields();
+                    }
+                }).catch(err => {
+                    console.error(err);
+                })
             }else{
                 console.error(err);
             }
@@ -135,13 +150,13 @@ class Loginform extends React.Component{
                                     }
                                 </FormItem>
                                 <FormItem>
-                                    <a className="login-form-by-ip" href="">通过IP登录</a>
+                                    <a className="login-form-by-ip" href="javascript:;" onClick={this.handleLoginByIP.bind(this)}>通过IP登录</a>
                                     <Button type="primary" htmlType="submit" size={'large'} className="login_button">
                                         登录
                                     </Button>
 
                                 </FormItem>
-                                <FormItem>
+                                <FormItem className={((!loginUserInfo.loginStatus && loginUserInfo.errmsg != "") ? 'has-err' : '')}>
                                     {
                                         (!loginUserInfo.loginStatus && loginUserInfo.errmsg != "")  ?  <Alert
                                             message={ loginUserInfo.errmsg }
@@ -159,6 +174,65 @@ class Loginform extends React.Component{
 
             </div>
         )
+    }
+
+    handleLoginByIP(){
+        const updateUserInfo = this.props.updateUserInfo;
+        // 发送请求
+        axios({
+            method:"POST",
+            url:loginUrl,
+            // 设置用户名和密码均为空
+            data:{
+                username:'',
+                password:''
+            },
+            // 格式化处理数据
+            transformRequest: [function (data) {
+                let ret = ''
+                for (let it in data) {
+                    ret += encodeURIComponent(it) + '=' + encodeURIComponent(data[it]) + '&'
+                }
+                return ret
+            }],
+        }).then( response => {
+            const json = response.data;
+            // 200 成功
+            if( 200 == json.status*1 ){
+                // 用户信息
+                let user = json.user
+                let userID = json.id
+                let params = {
+                    username,
+                    password,
+                    optsAuths,
+                    loginStatus: true,
+                    user,
+                    userID
+                }
+                // 更新用户信息
+                updateUserInfo(params);
+                // 路由跳转
+                history.push('/home');
+
+            }else if( 500 == json.status*1 && json.hasOwnProperty("error")  ){ //    500 失败
+                // 错误信息
+                const error = json.error.message ? json.error.message : "";
+                let param = {
+                    errmsg: error
+                }
+                updateUserInfo(param);
+            }else if( 400 == json.status*1 && json.hasOwnProperty("error") ){ //    400 失败
+                // 错误信息
+                const error = json.error.message ? json.error.message : "";
+                let param = {
+                    errmsg: error
+                }
+                updateUserInfo(param);
+            }
+        }).catch(err => {
+            console.info(err);
+        })
     }
 }
 

@@ -1,4 +1,4 @@
-const host = "http://192.168.243.120:8081/cdm-analysis";
+const host = "http://192.168.243.187:8081/airportcdm_facade";
 
 //获取全部航班数据
 // const getAllAirportsUrl = `${host}/retrieveFlights/ZUUU/201806220900/201806222300.action`;
@@ -8,4 +8,7 @@ const getAllAirportsUrl = `${host}/retrieveFlights/ZUUU/201807020800/20180070212
 //获取用户配置数据
 const getUserPropertyUrl = `${host}/retrieve_user_property.action`;
 
-export { getAllAirportsUrl, getUserPropertyUrl };
+// 用户登录
+const loginUrl = `${host}/userLogon.bo`;
+
+export { getAllAirportsUrl, getUserPropertyUrl, loginUrl };

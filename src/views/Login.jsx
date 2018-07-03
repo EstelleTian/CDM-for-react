@@ -8,9 +8,9 @@ const mapStateToProps = ( state ) => ({
     loginUserInfo : state.loginUserInfo
 })
 
-const mapDispatchToProps = () => ({
-    updateUserInfo
-})
+const mapDispatchToProps = {
+    updateUserInfo,
+}
 
 const Login = connect(
     mapStateToProps,

@@ -8,21 +8,27 @@ const updateUserInfo = userObj => ({
     userObj
 })
 
+
 //reducer user info
 const obj = {
     username: '',
     password: '',
     loginStatus: false,
+    userid :'',
     errmsg: '',
 }
 const loginUserInfo = ( state = obj, action ) => {
     switch( action.type ){
-        case UPDATE_USERINFO:
+        case UPDATE_USERINFO:{
             return {
                 ...state,
                 username: action.userObj.username || '',
-                password: action.userObj.password || ''
-            };
+                password: action.userObj.password || '',
+                loginStatus: action.userObj.loginStatus || '',
+                userid : action.userObj.userid || '',
+                errmsg: action.userObj.errmsg || '',
+            }
+        }
         default:
             return state;
     }
