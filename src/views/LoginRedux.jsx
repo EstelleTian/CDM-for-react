@@ -8,6 +8,7 @@ const updateUserInfo = userObj => ({
     userObj
 })
 
+
 //reducer user info
 const obj = {
     username: '',

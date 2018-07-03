@@ -3,4 +3,7 @@ import ReactDOM from 'react-dom'
 import Routes from './routes/route'
 import './app.less';
 
-ReactDOM.render(<Routes />, document.body);
+const root = document.createElement('div');
+root.className = 'root';
+document.body.appendChild(root)
+ReactDOM.render(<Routes />, root);

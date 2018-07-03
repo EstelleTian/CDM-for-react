@@ -22,13 +22,11 @@ const HomePage = () => (
 const Routes = () => (
     <HashRouter>
         <Provider store={Store}>
-            <div>
-                <Switch>
-                    <Route exact path="/" component={ LoginPage } />
-                    <Route path="/home" component={ HomePage } />
-                    <Redirect to="/" />
-                </Switch>
-            </div>
+            <Switch>
+                <Route exact path="/" component={ LoginPage } />
+                <Route path="/home" component={ HomePage } />
+                <Redirect to="/" />
+            </Switch>
         </Provider>
     </HashRouter>
 )

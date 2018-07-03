@@ -3,11 +3,8 @@ import React from 'react';
 import {isValidObject, isValidVariable} from "./basic-verify";
 import { Icon, Input, Button, Checkbox } from 'antd';
 
-const ColumnsNames =  ["ID", "MULTI_OPERATE", "FLIGHTID", "PRIORITY", "REGNUM", "ACTYPE", "ACWAKES", "ACODE", "DEPAP", "ARRAP", "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "POSITION", "RUNWAY", "TAXI", "APPFIX", "CTO2", "ACCFIX", "CTO", "FORMER_FLIGHTID", "FORMER_DEP", "FORMER_ARR", "FORMER_CTOT", "QUALIFICATIONS", "STATUS", "POOL_STATUS", "SLOT_STATUS", "CLOSE_WAIT", "TAXI_WAIT", "DELAY", "DELAY_REASON", "FLOWCONTROL_STATUS", "FLOWCONTROL_POINT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT", "FLIGHT_ACC_POINT_PASSTIME", "DEICE_STATUS", "DEICE_POSITION", "DEICE_GROUP", "EFPS_SID", "EFPS_ICEID", "EFPS_REQTIME", "EFPS_PUSTIME", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_STATUS", "EFPS_TAXTIME", "GSSEQ", "GSOBT", "NORMAL", "COMMENT", "READY", "TOBT_UPDATE_TIME"];
-// const ColumnsNames =  ["ID", "MULTI_OPERATE", "FLIGHTID", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT"];
-
 //需要日期格式话的列
-const DataColumns = [ "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "POSITION", "APPFIX", "CTO2", "ACCFIX", "CTO", , "FORMER_DEP", "FORMER_ARR", "FORMER_CTOT", "SLOT_STATUS", "TAXI_WAIT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT_PASSTIME", "EFPS_REQTIME", "EFPS_PUSTIME", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_TAXTIME", "GSOBT", "TOBT_UPDATE_TIME"];
+const DataColumns = [ "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "POSITION", "APPFIX", "CTO2", "ACCFIX", "CTO", "SLOT_STATUS", "TAXI_WAIT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT_PASSTIME", "EFPS_REQTIME", "EFPS_PUSTIME", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_TAXTIME", "GSOBT", "TOBT_UPDATE_TIME"];
 
 //处理单元格样式方法
 const handleStyleFunc = ( style ) => {
@@ -108,20 +105,18 @@ const handleColumnRender = (value, row, index, colunmName) => {
     }
 };
 
-const onSearch = () => {
-
-};
-
 //根据表格列名，配置表格专用列数据格式
 const TableColumns = ( colDisplay, colNames ) => {
+    let width = 0;
     let columns = [];
-    for(let i = 0, len = ColumnsNames.length; i < len; i++){
-        const colunmName = ColumnsNames[i];
+    let i = 0;
+    for(let key in colNames){
+        const colunmName = key;
         //如果colEdit当前的列名值为1，则添加，否则不添加
         if( !isValidObject(colDisplay)){
-            break;
+            continue;
         }else if( !isValidVariable(colDisplay[colunmName]) || colDisplay[colunmName]['display']*1 != 1){ //为0不显示
-            break;
+            continue;
         }
         const title = colNames[colunmName].cn || colunmName;
 
@@ -130,7 +125,7 @@ const TableColumns = ( colDisplay, colNames ) => {
             dataIndex: colunmName,
             align: 'center',
             // key: colunmName,
-            width: 100,
+            // width: 100,
             render: (value, row, index) => {
                 return handleColumnRender(value, row, index, colunmName);
             },
@@ -138,11 +133,13 @@ const TableColumns = ( colDisplay, colNames ) => {
                 return handleColumnSort(d1, d2, colunmName);
             }
         };
-        // if( colunmName.length < 10 ){
-        //     obj['width'] = 100;
-        // }else{
-        //     obj['width'] = 100;
-        // }
+        if( title.length < 5 ){
+            obj['width'] = 90;
+            width += 90;
+        }else{
+            obj['width'] = title.length * 18;
+            width += title.length * 18;
+        }
 
         if( i < 3){
             obj['fixed'] = 'left';
@@ -192,23 +189,12 @@ const TableColumns = ( colDisplay, colNames ) => {
 
 
         columns.push( obj );
+        i++;
     }
-    return columns;
-};
-
-const ConvertToTableData = () => {
-    const data = [];
-    for (let num = 0; num < 100; num++) {
-        let opt = {
-            key: num
-        };
-        for(let i = 0, len = ColumnsNames.length; i < len; i++){
-            const key = ColumnsNames[i];
-            opt[key] = key + '-' + i;
-        }
-        data.push(opt);
-    }
-    return data;
+    return {
+        columns,
+        width
+    } ;
 };
 
 const getColEdit = ( gridEditData ) => {
@@ -412,4 +398,4 @@ const getColEdit = ( gridEditData ) => {
     return combineOperationValue;
 };
 
-export { TableColumns, ConvertToTableData, getColEdit };
+export { TableColumns, getColEdit };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { Layout, Card, Col, Row } from 'antd'
 import Head from "../layouts/Head";
-import NavMenu from "../layouts/NavMenu";
+import NavMenuContainer from "../layouts/NavMenu";
 import AirTable from '../views/AirTable'
 import "./Home.less";
 
@@ -10,7 +10,7 @@ const { Content } = Layout;
 const Home = ( props ) => (
     <Layout className="air-layout">
         <Head />
-        <NavMenu/>
+        <NavMenuContainer/>
         <Content>
             <Row className="no-margin" gutter={16}>
                 <Col className="card" xs={24} sm={24} md={24} lg={24} xl={18} xxl={18}>

@@ -1,22 +1,21 @@
 import React from 'react';
-import { Table, Row, Icon, Menu, Checkbox, Radio } from 'antd';
+import { Table, Row } from 'antd';
 import $ from 'jquery';
 import { requestGet } from '../../utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
 import { isValidObject, isValidVariable } from '../../utils/basic-verify';
-import { TableColumns, ConvertToTableData, getColEdit } from "../../utils/table-config";
+import { TableColumns, getColEdit } from "../../utils/table-config";
 import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "../../utils/flight-grid-table-data-util";
 import './Table.less';
-
-const SubMenu = Menu.SubMenu;
-const MenuItemGroup = Menu.ItemGroup;
 
 class AirTable extends React.Component{
     constructor( props ){
         super(props);
         this.convertUserProperty = this.convertUserProperty.bind(this);
+        this.convertBasicConfigInfo = this.convertBasicConfigInfo.bind(this);
         this.refreshAirportsList = this.refreshAirportsList.bind(this);
-        // this.resetTableHeight = this.resetTableHeight.bind(this);
+        this.getAirportsParams = this.getAirportsParams.bind(this);
+        this.filterBaseDatas = this.filterBaseDatas.bind(this);
         this.convertData = convertData.bind(this);
         this.getDisplayStyle = getDisplayStyle.bind(this);
         this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
@@ -24,19 +23,77 @@ class AirTable extends React.Component{
         this.airportTimerId = '';
     }
 
+    //获取机场请求url 需要拼接的请求参数
+    getAirportsParams(){
+        let params = {
+            userId: 42,
+            start: '',
+            end: '',
+        };
+        const date = new Date();
+        let year = date.getFullYear();
+        let month = date.getMonth() + 1;
+        let day = date.getDate();
+        year = '' + year;
+        month = month < 10 ? '0' + month : '' + month;
+        day = day < 10 ? '0' + day : '' + day;
+        let fullTime = year + month + day;
+        params['start'] = fullTime + '0000';
+        // params['start'] = fullTime + '0800';
+        params['end'] = fullTime + '2359';
+        // params['end'] = fullTime + '0900';
+
+        return params;
+    };
+
+    //过滤系统基本参数
+    filterBaseDatas( flight ){
+        let tableFlight = {};
+        // if (flight.hasOwnProperty("flightFieldViewMap")) {
+        //     // 当前flight对象值
+        //     let cflight = flight.flightFieldViewMap || {};
+        //     // 根据列名获取需要的参数值
+        //     let colNames = thisProxy.convertColModel();
+        //     for (let n = 0, len = colNames.length; n < len; n++) {
+        //         let colName = colNames[n].name;
+        //         // 若有该对象值则取值,否则自定义空，防止丢数据
+        //         if (cflight.hasOwnProperty(colName)) {
+        //             tableFlight[colName] = cflight[colName];
+        //         } else {
+        //             tableFlight[colName] = {};
+        //         }
+        //     }
+        // }
+
+        tableFlight.flightFieldViewMap = flight.flightFieldViewMap || {};
+        tableFlight.flightCoordinationRecordsMap = flight.flightCoordinationRecordsMap || {};
+        return tableFlight;
+    };
+    //更新航班数据
     refreshAirportsList( res ){
         const { updateTableDatas } = this.props;
         //表格数据
         let dataArr = [];
+        //数据生成时间
+        const generateTime = res.generateTime;
 
-        // const datas = res.result;
-        const datas = res;
+        //获取放行管理的航班id集合
+        const departureClearanceFlightsArr = res.departureClearanceFlights || [];
+        //航班集合
+        const flightViewMap = res.flightViewMap || {};
 
         //遍历每个航班，并转化为表格数据
-        for(var id in datas ){
-            const flight = datas[id];
+        for(let index in departureClearanceFlightsArr ){
+            //获取航班id
+            const id = departureClearanceFlightsArr[index];
+            //获取航班对象
+            const flight = flightViewMap[id] || {};
+            // 转换数据格式为convert方法需要的格式
+            const tableFlight = this.filterBaseDatas(flight);
+
+
             //转化后的数据
-            const data = this.convertData( flight );
+            const data = this.convertData( tableFlight, generateTime );
             dataArr.push(data);
         }
         //保存航班数据
@@ -44,9 +101,28 @@ class AirTable extends React.Component{
 
         this.airportTimerId = setTimeout(() => {
             //获取机场航班
-            requestGet( getAllAirportsUrl, this.refreshAirportsList );
+            const params = this.getAirportsParams();
+            requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
         },10*1000)
 
+    }
+    //转换系统基本参数信息
+    convertBasicConfigInfo( res ){
+        const status = res.status*1;
+        //成功
+        if( 200 == status){
+            //跑道配置信息  "02L/20R,02L;02R/20L,02R"
+            const physicsRunwayGap = res.physicsRunwayGap;
+            //系统参数信息
+            const systemConfigMap = res.systemConfigMap;
+            //机场参数信息
+            const airportConfigurationMap = res.airportConfigurationMap;
+            //用户基本参数配置
+            this.convertUserProperty( res.userPropertyList );
+        }else{
+            //TODO 错误提示
+            console.error(res.error.message);
+        }
     }
     //转化用户配置信息
     convertUserProperty( user_property ){
@@ -113,83 +189,72 @@ class AirTable extends React.Component{
             //存储到redux的 tableConfig 中
             updateTableConfig( configParams );
             //获取机场航班
-            requestGet( getAllAirportsUrl, this.refreshAirportsList );
+            const params = this.getAirportsParams();
+            requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
         }
 
 
     };
 
-    // componentWillMount(){
-    //     console.time('rendertable');
-    // }
-
     componentDidMount(){
         //获取用户配置
-        requestGet( getUserPropertyUrl, this.convertUserProperty );
+        const userId = 42;
+        const keys =[
+            'grid_col_style',
+            'grid_col_names',
+            'grid_col_title',
+            'grid_col_font_size',
+            'grid_cdm_col_edit',
+            'grid_cdm_col_display',
+            'grid_pool_col_edit',
+            'grid_pool_col_display',
+            'grid_special_col_edit',
+            'grid_special_col_display',
+            'grid_special_col_names',
+            'grid_alarm_col_display',
+            'grid_alarm_col_edit',
+            'grid_alarm_col_names',
+            'grid_expired_col_display',
+            'grid_expired_col_edit',
+            'grid_expired_col_names',
+            'grid_todo_list_col_display',
+            'grid_todo_list_col_edit',
+            'grid_todo_list_col_names',
+            'grid_flight_search_col_edit',
+            'grid_flight_search_col_display',
+            'grid_flight_search_col_names',
+            'grid_statistic_col_display',
+            'grid_statistic_col_edit',
+            'grid_flow_impact_col_display',
+            'grid_flow_impact_col_edit',
+            'flight_dynamic_bar_chart',
+            'flight_dynamic_pie_chart',
+            'flight_delay_bar_chart',
+            'slide_component',
+            'invalidDataStyle',
+            'operation_control_display'
+        ];
 
-
-        // console.timeEnd('rendertable');
+        let url = getUserPropertyUrl + '?userId='+ userId +'&keys=' + keys;
+        requestGet( url, {}, this.convertBasicConfigInfo );
     };
-
-    // componentWillUpdate(){
-    //     console.log('will--updatetable');
-    //     console.time('updatetable');
-    // }
-    componentDidUpdate(){
-        // console.log('did---updatetable');
-        // console.timeEnd('updatetable');
-    }
     
     componentWillUnmount(){
         clearTimeout(this.airportTimerId);
     }
 
-    // resetTableHeight(){
-    //     const $antCardBody = $(".ant-card-body");
-    //     const cardBodyHeight = $antCardBody.height();
-    //     const operationHeight = $(".ant-card-body .operation").height();
-    //     let maxHeight = cardBodyHeight - operationHeight - 43;
-    //     $(".ant-table-body-inner").height(maxHeight+'px');
-    //     $(".ant-table-body").height(maxHeight+'px');
-    // }
-
-
     render(){
-        // console.log("Table render~~~");
         const { tableDatas, tableConfig } = this.props;
         const { colDisplay, colNames } = tableConfig;
-        const columns = TableColumns( colDisplay, colNames );
+        const { columns, width }= TableColumns( colDisplay, colNames );
         const totalNum = tableDatas.length;
-        const scrollX = columns.length * 100;
-        //TODO 高度根据缩放自适应
-        // this.resetTableHeight();
+        const scrollX = width;
 
         return(
             <div className="air-table bc-1">
                 <Row className="operation">
                     <div className="tools">
-                        <Icon type="reload" title="刷新"/>
-                        <Icon type="sync" title="重置"/>
-                        <Menu
-                            defaultSelectedKeys={['filter']}
-                            selectedKeys={['filter']}
-                            mode="horizontal"
-                            theme="dark"
-                        >
-                            <SubMenu
-                                key="filter"
-                                title={<Icon type="filter" title="过滤"/>}
-                            >
-                                <MenuItemGroup title="屏蔽">
-                                    <Menu.Item key="setting:1"><Checkbox>已起飞</Checkbox></Menu.Item>
-                                    <Menu.Item key="setting:2"><Checkbox>已落地</Checkbox></Menu.Item>
-                                </MenuItemGroup>
-                                <MenuItemGroup title="时间范围">
-                                    <Menu.Item key="setting:3"><Radio>30分钟</Radio></Menu.Item>
-                                    <Menu.Item key="setting:4"><Radio>60分钟</Radio></Menu.Item>
-                                </MenuItemGroup>
-                            </SubMenu>
-                        </Menu>
+
                     </div>
                     <div className="total">总计{totalNum}条航班</div>
                 </Row>
