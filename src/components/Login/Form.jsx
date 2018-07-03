@@ -3,32 +3,11 @@ import {Form, Icon, Input, Button, Alert,Row, Col} from 'antd'
 import { Base64 } from 'js-base64';
 import axios from 'axios'
 import './Form.less'
-import { loginUrl } from '../../utils/request-urls';
+import { loginUrl, getSystemConfigUrl } from '../../utils/request-urls';
 
 const FormItem = Form.Item;
 
 class Loginform extends React.Component{
-    //从用户角色中查找出拥有的操作权限
-    convertOptAuth = (authArr) => {
-        let resStr = ""
-        if( authArr.length > 0 ){
-            //取权限
-            authArr.map( authObj => {
-                //取每个权限代码，添加到权限字符串中
-                let code = authObj.code || ''
-                code += ''
-                if( code != ''){
-                    if( resStr.indexOf(code) == -1){
-                        resStr += code + ','
-                    }
-                }
-            })
-        }
-        resStr = resStr.substring( 0 , resStr.length -1)
-        //排序
-        let resArr = resStr.split(',').sort()
-        return resArr.join()
-    }
 
     handleSubmit = (e) => {
         e.preventDefault();
@@ -110,7 +89,7 @@ class Loginform extends React.Component{
         }
     }
     render(){
-        const { loginUserInfo } = this.props;
+        const { loginUserInfo, systemConfig } = this.props;
         const { getFieldDecorator } = this.props.form;
         const rulesGenerate = {
             username: getFieldDecorator("username", {
@@ -132,7 +111,7 @@ class Loginform extends React.Component{
                             <div className="head"></div>
                             <Form className="login_form" onSubmit={this.handleSubmit}>
                                 <FormItem>
-                                    <h2 className="title">CDM机场协同放行</h2>
+                                    <h2 className="title">{systemConfig.systemElem}{systemConfig.system}{systemConfig.systemName}</h2>
                                 </FormItem>
 
                                 <FormItem>
@@ -175,7 +154,7 @@ class Loginform extends React.Component{
             </div>
         )
     }
-
+    // 通过IP登录
     handleLoginByIP(){
         const updateUserInfo = this.props.updateUserInfo;
         // 发送请求
@@ -234,6 +213,63 @@ class Loginform extends React.Component{
             console.info(err);
         })
     }
+    //获取系统参数
+    getSystemConfig(){
+        const updateSystemConfig = this.props.updateSystemConfig;
+        // 发送请求
+        axios.get(getSystemConfigUrl,{
+
+        }).then( response => {
+            const json = response.data;
+            if( 200 == json.status*1 ){
+
+                let system = json.system; // 系统  CDM/CRS
+                let systemAirport = json.systemAirport; // 机场 系统+机场名称 如："CDMZUUU"
+                let systemElem = json.systemElem; //
+                let systemName = json.systemName; // 系统名称
+                let params = {
+                    system,
+                    systemAirport,
+                    systemElem,
+                    systemName,
+                }
+                // 更新系统参数配置信息
+                updateSystemConfig(params);
+                // 设置 html title
+                this.setTitle();
+
+            }else if( 500 == json.status*1 && json.hasOwnProperty("error")  ){
+                const error = json.error.message ? json.error.message : "";
+                let param = {
+                    errmsg: error
+                }
+                updateSystemConfig(param);
+            }else if( 400 == json.status*1 && json.hasOwnProperty("error") ){
+                const error = json.error.message ? json.error.message : "";
+                let param = {
+                    errmsg: error
+                }
+                updateSystemConfig(param);
+            }
+        }).catch(err => {
+            console.error(err);
+        })
+    }
+    // 设置 html title
+    setTitle (){
+        const { systemConfig } = this.props;
+        const title = `${systemConfig.systemElem}${systemConfig.system}${systemConfig.systemName}`;
+        if(title && title!==''){
+            document.title = title;
+        }
+    }
+    // 立即调用
+    componentDidMount(){
+        this.getSystemConfig();
+    }
+
+
+
 }
 
 export default Form.create()(Loginform);

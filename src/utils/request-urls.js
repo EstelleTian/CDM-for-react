@@ -8,7 +8,13 @@ const getAllAirportsUrl = `${host}/retrieveFlights/ZUUU/201807020800/20180070212
 //获取用户配置数据
 const getUserPropertyUrl = `${host}/retrieve_user_property.action`;
 
+
+//获取系统参数
+const getSystemConfigUrl = `${host}/retrieveSystemConfig.bo`;
+
+
+
 // 用户登录
 const loginUrl = `${host}/userLogon.bo`;
 
-export { getAllAirportsUrl, getUserPropertyUrl, loginUrl };
+export {getSystemConfigUrl, getAllAirportsUrl, getUserPropertyUrl, loginUrl };

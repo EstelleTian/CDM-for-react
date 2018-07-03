@@ -1,5 +1,6 @@
 //action-type
 const UPDATE_USERINFO = 'loginUserInfo/update';
+const UPDATE_SYSTEMCONFIG = 'systemConfig/update';
 
 //action-creator
 //存储用户信息（用户名  密码）
@@ -34,4 +35,35 @@ const loginUserInfo = ( state = obj, action ) => {
     }
 }
 
-export { updateUserInfo, loginUserInfo }
+
+//存储系统参数配置
+const updateSystemConfig = configObj => ({
+    type: UPDATE_SYSTEMCONFIG,
+    configObj
+})
+
+//reducer system config
+const config = {
+    system: '',
+    systemAirport: '',
+    systemElem: '',
+    systemName: '',
+}
+
+const systemConfig = ( state = config, action ) => {
+    switch( action.type ){
+        case UPDATE_SYSTEMCONFIG:{
+            return {
+                ...state,
+                system: action.configObj.system ||'',
+                systemAirport: action.configObj.systemAirport ||'',
+                systemElem: action.configObj.systemElem || '',
+                systemName: action.configObj.systemName ||'',
+            }
+        }
+        default:
+            return state;
+    }
+}
+
+export { updateUserInfo, loginUserInfo, updateSystemConfig, systemConfig }

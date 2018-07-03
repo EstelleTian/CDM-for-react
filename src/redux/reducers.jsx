@@ -1,9 +1,10 @@
 import { combineReducers } from 'redux';
-import { loginUserInfo } from "../views/LoginRedux"
+import { loginUserInfo,systemConfig } from "../views/LoginRedux"
 import { tableConfig, tableDatas } from "../views/AirTableRedux"
 
 const reducer = combineReducers({
     loginUserInfo,
+    systemConfig,
     tableConfig, tableDatas
 });
 
