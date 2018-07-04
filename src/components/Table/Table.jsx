@@ -1,6 +1,6 @@
 import React from 'react';
 import { Table, Row } from 'antd';
-import $ from 'jquery';
+import axios from 'axios';
 import { requestGet } from '../../utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
 import { isValidObject, isValidVariable } from '../../utils/basic-verify';
@@ -39,9 +39,9 @@ class AirTable extends React.Component{
         day = day < 10 ? '0' + day : '' + day;
         let fullTime = year + month + day;
         params['start'] = fullTime + '0000';
-        // params['start'] = fullTime + '0800';
+        // params['start'] = '201807030000';
         params['end'] = fullTime + '2359';
-        // params['end'] = fullTime + '1200';
+        // params['end'] = '201807052359';
 
         return params;
     };
@@ -71,9 +71,11 @@ class AirTable extends React.Component{
     };
     //更新航班数据
     refreshAirportsList( res ){
+        console.log("refreshAirportsList");
         const { updateTableDatas } = this.props;
         //表格数据
-        let dataArr = [];
+        // let dataArr = [];
+        let dataMap = {};
         //数据生成时间
         const generateTime = res.generateTime;
 
@@ -94,16 +96,19 @@ class AirTable extends React.Component{
 
             //转化后的数据
             const data = this.convertData( tableFlight, generateTime );
-            dataArr.push(data);
+            // dataArr.push(data);
+            dataMap[id] = data;
         }
         //保存航班数据
-        updateTableDatas( dataArr );
+        console.time("updateTableDatas----------");
+        updateTableDatas( dataMap );
+        console.timeEnd("updateTableDatas----------");
 
         this.airportTimerId = setTimeout(() => {
             //获取机场航班
             const params = this.getAirportsParams();
             requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
-        },30*1000)
+        },10*1000)
 
     }
     //转换系统基本参数信息
@@ -126,6 +131,7 @@ class AirTable extends React.Component{
     }
     //转化用户配置信息
     convertUserProperty( user_property ){
+        const thisProxy = this;
         const { updateTableConfig } = this.props;
         //验证是有效的数据
         if( user_property.length > 0){
@@ -185,7 +191,6 @@ class AirTable extends React.Component{
 
                 }
             }
-
             //存储到redux的 tableConfig 中
             updateTableConfig( configParams );
             //获取机场航班
@@ -196,7 +201,11 @@ class AirTable extends React.Component{
 
     };
 
+    componentWillMount(){
+        console.time("componentMountt");
+    }
     componentDidMount(){
+        console.timeEnd("componentMountt");
         //获取用户配置
         const userId = 42;
         const keys =[
@@ -243,12 +252,25 @@ class AirTable extends React.Component{
         clearTimeout(this.airportTimerId);
     }
 
+    componentWillUpdate(){
+        console.log("componentWillUpdate");
+        console.time("componentUpdate");
+    }
+
+    componentDidUpdate(){
+        console.log("componentDidUpdate");
+        console.timeEnd("componentUpdate");
+    }
+
     render(){
+        console.log('table render~~');
+        console.time('tableDataConvert');
         const { tableDatas, tableConfig } = this.props;
         const { colDisplay, colNames } = tableConfig;
         const { columns, width }= TableColumns( colDisplay, colNames );
         const totalNum = tableDatas.length;
         const scrollX = width;
+        console.timeEnd('tableDataConvert');
 
         return(
             <div className="air-table bc-1">

@@ -74,7 +74,6 @@ class Loginform extends React.Component{
                 loginStatus: true,
                 userId
             }
-            debugger
             // 更新用户信息
             updateUserInfo(params);
             // 跳转到主页面
