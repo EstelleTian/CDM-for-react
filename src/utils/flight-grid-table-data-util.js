@@ -107,9 +107,9 @@ const convertData = function( flightMap, dataTime ){
             //处理字段显示值
             data[key] = options.value;
             //补充id增加小写id值，用于tr上id值的赋值
-            if( key.toLowerCase() == "id" ){
-                data[key.toLowerCase()] = options.value;
-            }
+            // if( key.toLowerCase() == "id" ){
+            //     data[key.toLowerCase()] = options.value;
+            // }
         }
         //处理字段样式
         let stylestr = key + "_style";
@@ -129,18 +129,9 @@ const convertData = function( flightMap, dataTime ){
                 setFlightidAttrs.call(this, key, options);
                 break;
             }
-            case 'APPFIX': {
-                setAppfixAndAccFixAttrs.call(this, key, options);
-                break;
-            }
-            case 'ACCFIX': case 'CTO': {
-            setAppfixAndAccFixAttrs.call(this, key, options);
-            break;
-        }
-            case 'CTO': {
-                setAppfixAndAccFixAttrs.call(this, key, options);
-                break;
-            }
+            case 'APPFIX':
+            case 'ACCFIX':
+            case 'CTO':
             case 'CTO2': {
                 setAppfixAndAccFixAttrs.call(this, key, options);
                 break;
@@ -186,12 +177,9 @@ const convertData = function( flightMap, dataTime ){
                 setAOBTAttrs.call(this, key, options);
                 break;
             }
-            case 'ATOT': {
-                setATOTAttrs.call(this, key, options);
-                break;
-            }
+            case 'ATOT':
             case 'ALDT': {
-                setALDTAttrs.call(this, key, options);
+                setATOTAndALDTAttrs.call(this, key, options);
                 break;
             }
             case 'FORMER_FLIGHTID': {
@@ -242,14 +230,8 @@ const convertData = function( flightMap, dataTime ){
                 setGSOBTAttrs.call(this, key, options);
                 break;
             }
-            case 'FLOWCONTROL_POINT_PASSTIME': {
-                setFlowcontrolPointPassTimeAttrs.call(this, key, options);
-                break;
-            }
-            case 'FLIGHT_ACC_POINT_PASSTIME': {
-                setFlowcontrolPointPassTimeAttrs.call(this, key, options);
-                break;
-            }
+            case 'FLOWCONTROL_POINT_PASSTIME':
+            case 'FLIGHT_ACC_POINT_PASSTIME':
             case 'FLIGHT_APP_POINT_PASSTIME': {
                 setFlowcontrolPointPassTimeAttrs.call(this, key, options);
                 break;
@@ -783,39 +765,21 @@ const convertData = function( flightMap, dataTime ){
 
         data[titlekey] = titlestr;
     };
-    //配置 实际起飞  title信息
-    function setATOTAttrs(key,obj){
+    //配置 实际起飞 和 实际降落时间   title信息
+    function setATOTAndALDTAttrs(key,obj){
         let titlekey = key + "_title";
         let titlestr = '';
-        let source = obj.source || '';
+        let stylekey = key + "_style";
+        let stylestr = '';
         let value = obj.value || '';
-        if (isValidVariable(source) && source == 'DEFAULT' && isValidVariable(value)) {
-            titlestr = convertToTableStandardDate(obj.value) + '\n'
-                + this.getDisplayStyleZh('ATOT');
+        if (isValidVariable(value)) {
+            titlestr = convertToTableStandardDate(value) + '\n' + this.getDisplayStyleZh('ATOT');
+            stylestr = this.getDisplayStyle('ATOT') + this.getDisplayFontSize('ATOT') ;
+        }else{
+            stylestr = this.getDisplayStyle('DEFAULT') + this.getDisplayFontSize('ATOT') ;
         }
         data[titlekey] = titlestr;
-        //单元格有值则展示样式
-        if( isValidVariable(obj.value) ){
-            let stylekey = key + "_style";
-            data[stylekey] = this.getDisplayStyle('ATOT') + this.getDisplayFontSize('ATOT') ;
-        }
-    };
-    //配置 实际降落时间  title信息
-    function setALDTAttrs(key,obj){
-        let titlekey = key + "_title";
-        let titlestr = '';
-        let source = obj.source || '';
-        let value = obj.value || '';
-        if (isValidVariable(source) && source == 'DEFAULT' && isValidVariable(value)) {
-            titlestr = convertToTableStandardDate(value) + '\n'
-                + this.getDisplayStyleZh('ATOT');
-        }
-        data[titlekey] = titlestr;
-        //单元格有值则展示样式
-        if( isValidVariable(obj.value) ){
-            let stylekey = key + "_style";
-            data[stylekey] = this.getDisplayStyle('ATOT') + this.getDisplayFontSize('ATOT') ;
-        }
+        data[stylekey] = stylestr;
     };
 
     //配置 前端航班号  title信息

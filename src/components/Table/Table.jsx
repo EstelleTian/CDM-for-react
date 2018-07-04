@@ -41,7 +41,7 @@ class AirTable extends React.Component{
         params['start'] = fullTime + '0000';
         // params['start'] = fullTime + '0800';
         params['end'] = fullTime + '2359';
-        // params['end'] = fullTime + '0900';
+        // params['end'] = fullTime + '1200';
 
         return params;
     };
@@ -103,7 +103,7 @@ class AirTable extends React.Component{
             //获取机场航班
             const params = this.getAirportsParams();
             requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
-        },10*1000)
+        },30*1000)
 
     }
     //转换系统基本参数信息
@@ -261,6 +261,7 @@ class AirTable extends React.Component{
                 <Table
                     columns={columns}
                     dataSource={ tableDatas }
+                    rowKey="id"
                     size="small"
                     scroll={{
                         x: scrollX,

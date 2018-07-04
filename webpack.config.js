@@ -9,7 +9,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 //代码压缩用ParallelUglifyPlugin代替自带的 UglifyJsPlugin插件
 const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
-const port = 3000;
+const port = 3033;
 
 module.exports = {
     devtool: 'source-map',

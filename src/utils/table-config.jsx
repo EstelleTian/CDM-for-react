@@ -124,7 +124,7 @@ const TableColumns = ( colDisplay, colNames ) => {
             title: title,
             dataIndex: colunmName,
             align: 'center',
-            // key: colunmName,
+            key: colunmName,
             // width: 100,
             render: (value, row, index) => {
                 return handleColumnRender(value, row, index, colunmName);
