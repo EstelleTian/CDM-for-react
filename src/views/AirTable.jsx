@@ -6,7 +6,8 @@ import AirTable from '../components/Table/Table';
 import {isValidVariable} from "../utils/basic-verify";
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
-const sortTableDatas = ( tableDatas ) => {
+const sortTableDatas = ( tableDatasMap ) => {
+    let tableDatas = Object.values( tableDatasMap );
     const sortArr = ["ATOT", "CTOT", "TOBT", "EOBT", "SOBT", "ID"];
     tableDatas = tableDatas.sort((d1, d2) => {
         for (let index in sortArr) {
@@ -32,7 +33,7 @@ const sortTableDatas = ( tableDatas ) => {
 
 const mapStateToProps = ( state ) => ({
     tableConfig: state.tableConfig,
-    tableDatas: sortTableDatas(state.tableDatas)
+    tableDatas: sortTableDatas(state.tableDatas.tableDatasMap)
 });
 
 const mapDispatchTopProps = {

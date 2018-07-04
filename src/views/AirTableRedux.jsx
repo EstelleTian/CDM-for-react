@@ -42,17 +42,26 @@ const tableConfig = ( state = initConfig, action) => {
 //action-type
 const UPDATE_TABLE_DATAS= 'tableDatas/update';
 //action-creator
-const updateTableDatas = datas => ({
+const updateTableDatas = dataMap => ({
     type: UPDATE_TABLE_DATAS,
-    datas
+    dataMap
 });
 //reducer table data 表格数据
-const initData = [];
+const initData = {
+    tableDatasMap: {},
+    filters: '',
+    isloading: false
+};
 const tableDatas = ( state = initData, action) => {
     switch ( action.type ){
         case UPDATE_TABLE_DATAS: {
-            const datas = action.datas;
-            return datas
+            const tableDatasMap = state.tableDatasMap;
+            let dataMap = action.dataMap || {};
+            dataMap = { ...tableDatasMap, ...dataMap};
+            return {
+                ...state,
+                tableDatasMap: dataMap
+            }
         }
         default:
             return state;
