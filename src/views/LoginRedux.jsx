@@ -13,9 +13,8 @@ const updateUserInfo = userObj => ({
 //reducer user info
 const obj = {
     username: '',
-    password: '',
     loginStatus: false,
-    userid :'',
+    userId :'',
     errmsg: '',
 }
 const loginUserInfo = ( state = obj, action ) => {
@@ -26,7 +25,7 @@ const loginUserInfo = ( state = obj, action ) => {
                 username: action.userObj.username || '',
                 password: action.userObj.password || '',
                 loginStatus: action.userObj.loginStatus || '',
-                userid : action.userObj.userid || '',
+                userId : action.userObj.userId || '',
                 errmsg: action.userObj.errmsg || '',
             }
         }
