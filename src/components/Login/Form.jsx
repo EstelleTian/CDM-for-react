@@ -27,8 +27,7 @@ class Loginform extends React.Component{
             if (!err) {
                 const username = values.username.trim();
                 // 对密码 base64编码 处理
-                // const password =  Base64.encode(values.password.trim());
-                const password =  values.password.trim();
+                const password =  Base64.encode(values.password.trim());
                 const params = {
                     username:username,
                     password:password
