@@ -1,6 +1,5 @@
 import React from 'react';
 import { Table, Row } from 'antd';
-import axios from 'axios';
 import $ from 'jquery';
 import { requestGet } from '../../utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
@@ -284,7 +283,7 @@ class AirTable extends React.Component{
                 <Table
                     columns={columns}
                     dataSource={ tableDatas }
-                    rowKey="id"
+                    rowKey="ID"
                     size="small"
                     scroll={{
                         x: scrollX,
