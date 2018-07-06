@@ -40,16 +40,40 @@ const tableConfig = ( state = initConfig, action) => {
 
 
 //action-type
-const UPDATE_TABLE_DATAS= 'tableDatas/update';
+const UPDATE_TABLE_DATAS= 'tableDatas/update/datas';
+const UPDATE_TABLE_COLUMNS= 'tableDatas/update/columns';
+const UPDATE_TABLE_SORTER_DATA= 'tableDatas/update/sorterData';
+const UPDATE_TABLE_SCROLL_ID= 'tableDatas/update/scrollId';
 //action-creator
+//更新表格数据集合
 const updateTableDatas = dataMap => ({
     type: UPDATE_TABLE_DATAS,
     dataMap
 });
+//更新表格列名值和表列宽度和
+const updateTableColumns = ( columns, width ) => ({
+    type: UPDATE_TABLE_COLUMNS,
+    columns,
+    width
+});
+//更新表格当前排序值
+const updateTableSorterData = ( data ) => ({
+    type: UPDATE_TABLE_SORTER_DATA,
+    data
+});
+//更新表格当前自动滚动定位航班id
+const updateTableScrollId = ( data ) => ({
+    type: UPDATE_TABLE_SCROLL_ID,
+    data
+});
 //reducer table data 表格数据
 const initData = {
-    tableDatasMap: {},
-    filters: '',
+    tableDatasMap: {}, //表格数据
+    tableColumns: [], //表格列名
+    tableWidth: 0, //表格宽
+    filters: '', //表格过滤数据
+    sorterData: 'ATOT', //表格排序字段
+    scrollTargetId: '', //表格滚动定位航班id
     isloading: false
 };
 const tableDatas = ( state = initData, action) => {
@@ -61,6 +85,25 @@ const tableDatas = ( state = initData, action) => {
             return {
                 ...state,
                 tableDatasMap: dataMap
+            }
+        }
+        case UPDATE_TABLE_COLUMNS: {
+            return {
+                ...state,
+                tableColumns: action.columns || [],
+                tableWidth: action.width || 0,
+            }
+        }
+        case UPDATE_TABLE_SORTER_DATA: {
+            return {
+                ...state,
+                sorterData: action.data
+            }
+        }
+        case UPDATE_TABLE_SCROLL_ID: {
+            return {
+                ...state,
+                scrollTargetId: action.data
             }
         }
         default:
@@ -95,9 +138,9 @@ const totalInfo = (state = initTotalInfo, action) => {
 }
 
 export {
-    updateTableConfig, tableConfig,
-    updateTableDatas, tableDatas,
-    updateTotalInfo, totalInfo
+    tableConfig, updateTableConfig,
+    tableDatas, updateTableDatas, updateTableColumns, updateTableSorterData, updateTableScrollId,
+    totalInfo, updateTotalInfo
 };
 
 

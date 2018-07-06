@@ -1,12 +1,14 @@
 import React from 'react';
-import { Table, Row } from 'antd';
+import { Table, Row, Col, Input  } from 'antd';
 import $ from 'jquery';
 import { requestGet } from '../../utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
-import { isValidObject, isValidVariable } from '../../utils/basic-verify';
-import { TableColumns, getColEdit } from "../../utils/table-config";
+import { isValidVariable, isValidObject, calculateStringTimeDiff } from '../../utils/basic-verify';
+import { TableColumns } from "../../utils/table-config";
 import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "../../utils/flight-grid-table-data-util";
 import './Table.less';
+
+const Search = Input.Search
 
 class AirTable extends React.Component{
     constructor( props ){
@@ -16,6 +18,9 @@ class AirTable extends React.Component{
         this.refreshAirportsList = this.refreshAirportsList.bind(this);
         this.getAirportsParams = this.getAirportsParams.bind(this);
         this.filterBaseDatas = this.filterBaseDatas.bind(this);
+        this.tableOnChange = this.tableOnChange.bind(this);
+        this.scrollToRow = this.scrollToRow.bind(this);
+        this.onQuicklySearch = this.onQuicklySearch.bind(this);
         this.convertData = convertData.bind(this);
         this.getDisplayStyle = getDisplayStyle.bind(this);
         this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
@@ -45,7 +50,6 @@ class AirTable extends React.Component{
 
         return params;
     };
-
     //过滤系统基本参数
     filterBaseDatas( flight ){
         let tableFlight = {};
@@ -71,8 +75,8 @@ class AirTable extends React.Component{
     };
     //更新航班数据
     refreshAirportsList( res ){
-        console.log("refreshAirportsList");
-        const { updateTableDatas,updateTotalInfo } = this.props;
+        // console.log("refreshAirportsList");
+        const { updateTableDatas, updateTotalInfo, sorterData, updateTableScrollId } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};
@@ -86,6 +90,9 @@ class AirTable extends React.Component{
         //航班集合
         const flightViewMap = res.flightViewMap || {};
 
+        let mintime_flight_id = '';
+        let time_interval = -1;
+
         //遍历每个航班，并转化为表格数据
         for(let index in departureClearanceFlightsArr ){
             //获取航班id
@@ -94,16 +101,33 @@ class AirTable extends React.Component{
             const flight = flightViewMap[id] || {};
             // 转换数据格式为convert方法需要的格式
             const tableFlight = this.filterBaseDatas(flight);
-
-
             //转化后的数据
             const data = this.convertData( tableFlight, generateTime );
+
+            //TODO 暂时写死了  自动滚动后续动态配置
+            const autoScroll = true;
+            if( autoScroll ){
+                // 取自定义排序首个字段与当前时间最接近的航班id
+                //取排序字段，比较当前数据时间和字段绝对差值最小
+                const tempTargetTime = data[sorterData];
+                if (isValidVariable(tempTargetTime) && tempTargetTime.length == 12) {
+                    // 计算计划时间和当前时间的绝对差值 返回毫秒值
+                    var tempTime = Math.abs(calculateStringTimeDiff(tempTargetTime, generateTime));
+                    //如果时间间隔 小于记录的 赋值替换
+                    //tempTime  time_interval  取最小
+                    if (time_interval == -1 || tempTime < time_interval) {
+                        time_interval = tempTime;
+                        mintime_flight_id = data['ID'];
+                    }
+                }
+            }
             // dataArr.push(data);
             dataMap[id] = data;
         }
         //保存航班数据
         console.time("updateTableDatas----------");
         updateTableDatas( dataMap );
+        updateTableScrollId( mintime_flight_id );
         console.timeEnd("updateTableDatas----------");
         const params = {
             generateTime : generateTime,
@@ -139,8 +163,7 @@ class AirTable extends React.Component{
     }
     //转化用户配置信息
     convertUserProperty( user_property ){
-        const thisProxy = this;
-        const { updateTableConfig } = this.props;
+        const { updateTableConfig, updateTableColumns } = this.props;
         //验证是有效的数据
         if( user_property.length > 0){
             //匹配赋值
@@ -201,6 +224,10 @@ class AirTable extends React.Component{
             }
             //存储到redux的 tableConfig 中
             updateTableConfig( configParams );
+            //转换为表头列数据
+            const { colDisplay, colNames, colTitle } = configParams;
+            const { columns, width } = TableColumns( colDisplay, colNames, colTitle );
+            updateTableColumns( columns, width );
             //获取机场航班
             const params = this.getAirportsParams();
             requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
@@ -208,12 +235,41 @@ class AirTable extends React.Component{
 
 
     };
+    //分页、排序、筛选变化时触发
+    tableOnChange(pagination, filters, sorter){
+        console.log(pagination, filters, sorter);
+        //获取排序的列名
+        const { columnKey } = sorter;
 
-    componentWillMount(){
-        console.time("componentMountt");
+    };
+
+    //滚动当指定行
+    scrollToRow(){
+        const { scrollTargetId  } = this.props;
+        if( isValidVariable(scrollTargetId) ){
+            let trs = $('.ant-table-scroll tr[flightid="'+ scrollTargetId +'"]');
+            //获取目标航班所在行数 - 10 ，以归置到中心位置
+            const rowid = trs.attr("rowid")*1 - 10;
+            //获取当前行行高
+            const heigth = trs.height()*1;
+            let top = rowid * heigth;
+            //滚动到指定位置
+            $(".ant-table-scroll .ant-table-body").scrollTop(top);
+        }
     }
+
+    //输入框快速过滤
+    onQuicklySearch( value ){
+        console.log(value);
+        //存储到
+
+    }
+
+    // componentWillMount(){
+    //     console.time("componentMountt");
+    // }
     componentDidMount(){
-        console.timeEnd("componentMountt");
+        // console.timeEnd("componentMountt");
         //获取用户配置
         const userId = 42;
         const keys =[
@@ -260,48 +316,57 @@ class AirTable extends React.Component{
         clearTimeout(this.airportTimerId);
     }
 
-    componentWillUpdate(){
-        console.log("componentWillUpdate");
-        console.time("componentUpdate");
-    }
+    // componentWillUpdate(){
+    //     console.log("componentWillUpdate");
+    //     console.time("componentUpdate");
+    // }
 
     componentDidUpdate(){
-        console.log("componentDidUpdate");
-        console.timeEnd("componentUpdate");
+        // console.log("componentDidUpdate");
+        // console.timeEnd("componentUpdate");
+        //表格滚动到当前的行
+        this.scrollToRow();
     }
 
     render(){
         console.log('table render~~');
-        console.time('tableDataConvert');
-        const { tableDatas, tableConfig, totalInfo } = this.props;
-        const { colDisplay, colNames } = tableConfig;
-        const { columns, width }= TableColumns( colDisplay, colNames );
-        const totalNum = tableDatas.length;
-        const scrollX = width;
-        const {generateTime = ''} = totalInfo;
-        const {generateInfo = {}} = totalInfo;
-        const {ALL_NUM ='',ARR_NUM='',CHART_CNL_NUM='',
-            CHART_DLA_NUM='',CHART_FPL_NUM='',CNL_NUM='',
-            CPL_NUM='',DEP_NUM='',FPL_NUM='',SCH_NUM='',} = generateInfo;
-        console.timeEnd('tableDataConvert');
+        const { tableDatas, tableColumns, scrollX, totalInfo } = this.props;
+        const { generateTime = '' } = totalInfo;
+        const { generateInfo = {} } = totalInfo;
+        const { ALL_NUM ='',
+                ARR_NUM='',
+                CHART_CNL_NUM='',
+                CHART_DLA_NUM='',
+                CHART_FPL_NUM='',
+                CNL_NUM='',
+                CPL_NUM='',
+                DEP_NUM='',
+                FPL_NUM='',
+                SCH_NUM='' } = generateInfo;
+
 
         return(
             <div className="air-table bc-1">
                 <Row className="operation">
-                    <div className="tools">
-
-                    </div>
-                    <div className="total">
+                    <Col span={12} className="tools">
+                        <Search
+                            placeholder="快速查询"
+                            className="quicklySearch"
+                            onSearch={ this.onQuicklySearch }
+                            style={{ width: 200 }}
+                        />
+                    </Col>
+                    <Col span={12} className="total">
                         <label>数据生成时间{generateTime}</label>
                         <label>未起飞XXX架次</label>
                         <label>已起飞{DEP_NUM}架次</label>
                         <label>已落地{ARR_NUM}架次</label>
                         <label>总计{ALL_NUM}架次</label>
-                    </div>
+                    </Col>
 
                 </Row>
                 <Table
-                    columns={columns}
+                    columns={ tableColumns }
                     dataSource={ tableDatas }
                     rowKey="ID"
                     size="small"
@@ -311,6 +376,14 @@ class AirTable extends React.Component{
                     }}
                     bordered
                     pagination = {false}
+                    onChange = { this.tableOnChange }
+                    onRow = {(record, index) =>{
+                        const id = record["ID"] || "";
+                        return {
+                            flightid: id,
+                            rowid: index*1+1
+                        }
+                    }}
                 />
             </div>
         )

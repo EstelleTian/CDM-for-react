@@ -4,7 +4,7 @@ import {isValidObject, isValidVariable} from "./basic-verify";
 import { Icon, Input, Button, Checkbox } from 'antd';
 
 //需要日期格式话的列
-const DataColumns = [ "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "POSITION", "APPFIX", "CTO2", "ACCFIX", "CTO", "SLOT_STATUS", "TAXI_WAIT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT_PASSTIME", "EFPS_REQTIME", "EFPS_PUSTIME", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_TAXTIME", "GSOBT", "TOBT_UPDATE_TIME"];
+const DataColumns = [ "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "POSITION", "APPFIX", "CTO2", "ACCFIX", "CTO", "SLOT_STATUS", "TAXI_WAIT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT_PASSTIME", "EFPS_REQTIME", "EFPS_PUSTIME", "FORMER_CTOT", "FORMER_DEP", "FORMER_ARR", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_TAXTIME", "GSOBT", "TOBT_UPDATE_TIME"];
 
 //处理单元格样式方法
 const handleStyleFunc = ( style ) => {
@@ -106,7 +106,7 @@ const handleColumnRender = (value, row, index, colunmName) => {
 };
 
 //根据表格列名，配置表格专用列数据格式
-const TableColumns = ( colDisplay, colNames ) => {
+const TableColumns = ( colDisplay, colNames, colTitle ) => {
     let width = 0;
     let columns = [];
     let i = 0;
@@ -125,12 +125,17 @@ const TableColumns = ( colDisplay, colNames ) => {
             dataIndex: colunmName,
             align: 'center',
             key: colunmName,
-            // width: 100,
             render: (value, row, index) => {
                 return handleColumnRender(value, row, index, colunmName);
             },
             sorter: (d1, d2) => {
                 return handleColumnSort(d1, d2, colunmName);
+            },
+            onHeaderCell: ( column ) => {
+                //配置表头属性，增加title值
+                return {
+                    title: colTitle[colunmName]
+                }
             }
         };
         if( title.length < 5 ){

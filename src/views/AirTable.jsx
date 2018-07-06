@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { updateTableConfig, updateTableDatas,updateTotalInfo } from './AirTableRedux';
+import { updateTableConfig, updateTableDatas, updateTotalInfo, updateTableColumns, updateTableSorterData, updateTableScrollId } from './AirTableRedux';
 import AirTable from '../components/Table/Table';
 import {isValidVariable} from "../utils/basic-verify";
 
@@ -34,12 +34,19 @@ const sortTableDatas = ( tableDatasMap ) => {
 const mapStateToProps = ( state ) => ({
     tableConfig: state.tableConfig,
     tableDatas: sortTableDatas(state.tableDatas.tableDatasMap),
+    tableColumns: state.tableDatas.tableColumns,
+    scrollX: state.tableDatas.tableWidth,
+    sorterData: state.tableDatas.sorterData,
+    scrollTargetId:  state.tableDatas.scrollTargetId,
     totalInfo: state.totalInfo
 });
 
 const mapDispatchTopProps = {
     updateTableConfig,
     updateTableDatas,
+    updateTableColumns,
+    updateTableSorterData,
+    updateTableScrollId,
     updateTotalInfo
 };
 

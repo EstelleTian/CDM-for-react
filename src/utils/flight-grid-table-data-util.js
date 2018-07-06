@@ -1,7 +1,4 @@
-import { isValidVariable, isValidObject, calculateStringTimeDiff, getFullTime } from './basic-verify';
-import FmeToday from './fmetoday';
-import BasicAirlines from './basic-airlines';
-import BasicAddress from './basic-address';
+import { isValidVariable, isValidObject} from './basic-verify';
 import FlightCoordination from './flightcoordination';
 import FlightCoordinationRecord from './flight-coordination-record';
 import FlowcontrolUtils from './flowcontrol-utils';
@@ -77,7 +74,7 @@ const getDisplayFontSize = function( dataKey ){
 /**
  * 转换航班计划表格数据
  */
-const convertData = function( flightMap, dataTime ){
+const convertData = function( flightMap, generateTime ){
     // 判断数据有效性
     if (!isValidObject(flightMap)) {
         return {};
@@ -106,10 +103,6 @@ const convertData = function( flightMap, dataTime ){
         if( options.hasOwnProperty("value") && isValidVariable(options.value) ){
             //处理字段显示值
             data[key] = options.value;
-            //补充id增加小写id值，用于tr上id值的赋值
-            // if( key.toLowerCase() == "id" ){
-            //     data[key.toLowerCase()] = options.value;
-            // }
         }
         //处理字段样式
         let stylestr = key + "_style";
@@ -866,8 +859,8 @@ const convertData = function( flightMap, dataTime ){
         let value = '';
         let source = obj.source || '';
         if(isValidVariable(obj.value)){
-            value = obj.value.substring(7, 9) + '/'
-                + obj.value.substring(9, 13);
+            value = obj.value.substring(6, 8) + '/'
+                + obj.value.substring(8);
         }
         if(isValidVariable(source) && isValidVariable(value)){
             // 前段起飞
@@ -897,8 +890,8 @@ const convertData = function( flightMap, dataTime ){
         let value = '';
         let source = obj.source || '';
         if(isValidVariable(obj.value)){
-            value = obj.value.substring(7, 9) + '/'
-                + obj.value.substring(9, 13);
+            value = obj.value.substring(6, 8) + '/'
+                + obj.value.substring(8);
         }
         if(isValidVariable(source) && isValidVariable(value)){
             if(source == 'ARRTIME_REALITY'){// 判断降落时间类型
@@ -932,6 +925,7 @@ const convertData = function( flightMap, dataTime ){
             }
             data[stylekey] = stylestr + this.getDisplayFontSize('FORMER_ARR') ;
         }
+
     };
 
     //配置 入池状态 title信息
