@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { updateTableConfig, updateTableDatas, updateTotalInfo, updateTableColumns, updateTableSorterData, updateTableScrollId } from './AirTableRedux';
-import AirTable from '../components/Table/Table';
-import {isValidVariable} from "../utils/basic-verify";
+import { isValidVariable } from '../../utils/basic-verify';
+import { updateTableDatas, updateTableDatasProperty, updateTableDatasColumns, updateTableConditionScrollId, updateTotalInfo } from './Redux';
+import Table from './Table';
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
 const sortTableDatas = ( tableDatasMap ) => {
@@ -31,28 +31,31 @@ const sortTableDatas = ( tableDatasMap ) => {
     return tableDatas;
 }
 
-const mapStateToProps = ( state ) => ({
-    tableConfig: state.tableConfig,
-    tableDatas: sortTableDatas(state.tableDatas.tableDatasMap),
-    tableColumns: state.tableDatas.tableColumns,
-    scrollX: state.tableDatas.tableWidth,
-    sorterData: state.tableDatas.sorterData,
-    scrollTargetId:  state.tableDatas.scrollTargetId,
-    totalInfo: state.totalInfo
-});
+const mapStateToProps = ( state ) =>{
+    const { tableColumns = [], tableDatasMap = {}, tableWidth = 0, property = {}} = state.tableDatas;
+    const { scroll = true, orderBy = 'ATOT', scrollId = '' } = state.tableCondition;
+    return ({
+        property,
+        tableDatas: sortTableDatas(tableDatasMap),
+        tableColumns,
+        scrollX: tableWidth,
+        autoScroll: scroll,
+        orderBy,
+        scrollId
+    })
+};
 
 const mapDispatchTopProps = {
-    updateTableConfig,
     updateTableDatas,
-    updateTableColumns,
-    updateTableSorterData,
-    updateTableScrollId,
+    updateTableDatasProperty,
+    updateTableDatasColumns,
+    updateTableConditionScrollId,
     updateTotalInfo
 };
 
-const AirTableContainer = connect(
+const TableContainer = connect(
     mapStateToProps,
     mapDispatchTopProps
-)(AirTable);
+)(Table);
 
-export default withRouter( AirTableContainer );
+export default withRouter( TableContainer );

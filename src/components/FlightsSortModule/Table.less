@@ -1,43 +1,17 @@
 @import "../../style/theme-color";
-@import "../../style/base";
-.total label {
-  margin-left: 1rem;
-  margin-right: 0.5rem;
-}
-
-.air-table{
-  table{
-    tr{
-      td,th{
-        padding: 0.5rem!important;
-      }
-    }
-  }
-
+.main-table{
+  height: 100%;
   .ant-table-fixed{
     .ant-table-tbody,.ant-table-thead{
       .bc-image-4;
       background-size: cover;
     }
   }
-}
 
-
-
-//处理表格和容器自适应问题
-.air-table{
-  height: 100%;
-  .display-flex(column);
-
-  .operation{
-    .total{
-      height: 3rem;
-      line-height: 3rem;
-    }
-  }
   .ant-table-wrapper{
     margin: 0 1rem;
-    height: calc(~"100% - 2.5rem");
+    /*减去模块头和操作栏高度*/
+    height: calc(~"100% - 6rem");
     .ant-spin-nested-loading{
       height: 100%;
       .ant-spin-container{
@@ -50,14 +24,15 @@
               height: 100%;
               .ant-table-body{
                 /*减去表头高度*/
-                max-height: calc(~"100% - 2.33rem")!important;
+                max-height: calc(~"100% - 2.66rem")!important;
               }
-
             }
+            /*处理冻结表格*/
             .ant-table-fixed-left{
               height: calc(~"100% - 1.33rem");
               .ant-table-body-outer{
-                height: calc(~"100% - 1rem");
+                /*调整冻结表格位置，使其对齐*/
+                height: calc(~"100% - 1.3rem");
                 overflow: hidden;
               }
             }
@@ -66,9 +41,4 @@
       }
     }
   }
-
 }
-
-
-
-

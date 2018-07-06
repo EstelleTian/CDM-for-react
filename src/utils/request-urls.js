@@ -1,5 +1,5 @@
 
-const host = "http://192.168.243.187:8081/airportcdm_facade";
+const host = "http://192.168.243.187:8085/airportcdm_facade";
 
 //获取全部航班数据
 const getAllAirportsUrl = `${host}/retrieveAirportFlights.bo`;

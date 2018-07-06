@@ -142,8 +142,8 @@ const TableColumns = ( colDisplay, colNames, colTitle ) => {
             obj['width'] = 90;
             width += 90;
         }else{
-            obj['width'] = title.length * 18;
-            width += title.length * 18;
+            obj['width'] = title.length * 20;
+            width += title.length * 20;
         }
 
         if( i < 3){

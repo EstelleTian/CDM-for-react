@@ -1,5 +1,5 @@
 import React from 'react';
-import { Table, Row, Col, Input  } from 'antd';
+import { Table as AntTable, Col } from 'antd';
 import $ from 'jquery';
 import { requestGet } from '../../utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
@@ -8,9 +8,7 @@ import { TableColumns } from "../../utils/table-config";
 import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "../../utils/flight-grid-table-data-util";
 import './Table.less';
 
-const Search = Input.Search
-
-class AirTable extends React.Component{
+class Table extends React.Component{
     constructor( props ){
         super(props);
         this.convertUserProperty = this.convertUserProperty.bind(this);
@@ -20,7 +18,6 @@ class AirTable extends React.Component{
         this.filterBaseDatas = this.filterBaseDatas.bind(this);
         this.tableOnChange = this.tableOnChange.bind(this);
         this.scrollToRow = this.scrollToRow.bind(this);
-        this.onQuicklySearch = this.onQuicklySearch.bind(this);
         this.convertData = convertData.bind(this);
         this.getDisplayStyle = getDisplayStyle.bind(this);
         this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
@@ -76,7 +73,7 @@ class AirTable extends React.Component{
     //更新航班数据
     refreshAirportsList( res ){
         // console.log("refreshAirportsList");
-        const { updateTableDatas, updateTotalInfo, sorterData, updateTableScrollId } = this.props;
+        const { updateTableDatas, updateTotalInfo, sorterData, updateTableConditionScrollId, autoScroll } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};
@@ -103,9 +100,7 @@ class AirTable extends React.Component{
             const tableFlight = this.filterBaseDatas(flight);
             //转化后的数据
             const data = this.convertData( tableFlight, generateTime );
-
-            //TODO 暂时写死了  自动滚动后续动态配置
-            const autoScroll = true;
+            //根据是否是自动滚动，如果是：计算滚动的航班id
             if( autoScroll ){
                 // 取自定义排序首个字段与当前时间最接近的航班id
                 //取排序字段，比较当前数据时间和字段绝对差值最小
@@ -126,21 +121,20 @@ class AirTable extends React.Component{
         }
         //保存航班数据
         console.time("updateTableDatas----------");
+        //更新表格航班数据
         updateTableDatas( dataMap );
-        updateTableScrollId( mintime_flight_id );
+        //更新自动滚动航班id值
+        updateTableConditionScrollId( mintime_flight_id );
         console.timeEnd("updateTableDatas----------");
-        const params = {
-            generateTime : generateTime,
-            generateInfo : generateInfo,
-        }
+        //更新统计数据
+        const params = { generateTime, generateInfo };
+        updateTotalInfo(params);
 
-        updateTotalInfo(params)
-
-        this.airportTimerId = setTimeout(() => {
-            //获取机场航班
-            const params = this.getAirportsParams();
-            requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
-        },10*1000)
+        // this.airportTimerId = setTimeout(() => {
+        //     //获取机场航班
+        //     const params = this.getAirportsParams();
+        //     requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
+        // },10*1000);
 
     }
     //转换系统基本参数信息
@@ -163,7 +157,7 @@ class AirTable extends React.Component{
     }
     //转化用户配置信息
     convertUserProperty( user_property ){
-        const { updateTableConfig, updateTableColumns } = this.props;
+        const { updateTableDatasProperty, updateTableDatasColumns } = this.props;
         //验证是有效的数据
         if( user_property.length > 0){
             //匹配赋值
@@ -223,11 +217,12 @@ class AirTable extends React.Component{
                 }
             }
             //存储到redux的 tableConfig 中
-            updateTableConfig( configParams );
+            updateTableDatasProperty( configParams );
             //转换为表头列数据
             const { colDisplay, colNames, colTitle } = configParams;
             const { columns, width } = TableColumns( colDisplay, colNames, colTitle );
-            updateTableColumns( columns, width );
+            //更新表头数据
+            updateTableDatasColumns( columns, width );
             //获取机场航班
             const params = this.getAirportsParams();
             requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
@@ -242,12 +237,12 @@ class AirTable extends React.Component{
         const { columnKey } = sorter;
 
     };
-
     //滚动当指定行
     scrollToRow(){
-        const { scrollTargetId  } = this.props;
-        if( isValidVariable(scrollTargetId) ){
-            let trs = $('.ant-table-scroll tr[flightid="'+ scrollTargetId +'"]');
+        const { scroll, scrollId  } = this.props;
+        //若开启自动滚动 且 滚动有值，再滚动到指定位置
+        if( scroll && isValidVariable(scrollId) ){
+            let trs = $('.ant-table-scroll tr[flightid="'+ scrollId +'"]');
             //获取目标航班所在行数 - 10 ，以归置到中心位置
             const rowid = trs.attr("rowid")*1 - 10;
             //获取当前行行高
@@ -257,14 +252,6 @@ class AirTable extends React.Component{
             $(".ant-table-scroll .ant-table-body").scrollTop(top);
         }
     }
-
-    //输入框快速过滤
-    onQuicklySearch( value ){
-        console.log(value);
-        //存储到
-
-    }
-
     // componentWillMount(){
     //     console.time("componentMountt");
     // }
@@ -311,7 +298,7 @@ class AirTable extends React.Component{
         let url = getUserPropertyUrl + '?userId='+ userId +'&keys=' + keys;
         requestGet( url, {}, this.convertBasicConfigInfo );
     };
-    
+
     componentWillUnmount(){
         clearTimeout(this.airportTimerId);
     }
@@ -330,42 +317,10 @@ class AirTable extends React.Component{
 
     render(){
         console.log('table render~~');
-        const { tableDatas, tableColumns, scrollX, totalInfo } = this.props;
-        const { generateTime = '' } = totalInfo;
-        const { generateInfo = {} } = totalInfo;
-        const { ALL_NUM ='',
-                ARR_NUM='',
-                CHART_CNL_NUM='',
-                CHART_DLA_NUM='',
-                CHART_FPL_NUM='',
-                CNL_NUM='',
-                CPL_NUM='',
-                DEP_NUM='',
-                FPL_NUM='',
-                SCH_NUM='' } = generateInfo;
-
-
+        const { tableDatas, tableColumns, scrollX} = this.props;
         return(
-            <div className="air-table bc-1">
-                <Row className="operation">
-                    <Col span={12} className="tools">
-                        <Search
-                            placeholder="快速查询"
-                            className="quicklySearch"
-                            onSearch={ this.onQuicklySearch }
-                            style={{ width: 200 }}
-                        />
-                    </Col>
-                    <Col span={12} className="total">
-                        <label>数据生成时间{generateTime}</label>
-                        <label>未起飞XXX架次</label>
-                        <label>已起飞{DEP_NUM}架次</label>
-                        <label>已落地{ARR_NUM}架次</label>
-                        <label>总计{ALL_NUM}架次</label>
-                    </Col>
-
-                </Row>
-                <Table
+            <Col span={24} className="main-table">
+                <AntTable
                     columns={ tableColumns }
                     dataSource={ tableDatas }
                     rowKey="ID"
@@ -375,7 +330,7 @@ class AirTable extends React.Component{
                         y: '100%'
                     }}
                     bordered
-                    pagination = {false}
+                    pagination = { false }
                     onChange = { this.tableOnChange }
                     onRow = {(record, index) =>{
                         const id = record["ID"] || "";
@@ -385,10 +340,9 @@ class AirTable extends React.Component{
                         }
                     }}
                 />
-            </div>
+            </Col>
         )
     }
 }
 
-
-export default AirTable;
+export default Table;

@@ -1,14 +1,12 @@
 import { combineReducers } from 'redux';
 import { filterMatches } from "../views/HomeRedux"
-import { loginUserInfo,systemConfig } from "../views/LoginRedux"
-import { tableConfig, tableDatas,totalInfo } from "../views/AirTableRedux"
+import { loginUserInfo, systemConfig } from "../views/LoginRedux"
+import { tableDatas, tableCondition, totalInfo } from "../components/FlightsSortModule/Redux"
 
 const reducer = combineReducers({
-    loginUserInfo,
-    systemConfig,
-    tableConfig, tableDatas,
+    loginUserInfo, systemConfig,
+    tableDatas, tableCondition, totalInfo,
     filterMatches,
-    totalInfo,
 });
 
 export default reducer;

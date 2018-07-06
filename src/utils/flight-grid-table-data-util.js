@@ -6,7 +6,7 @@ import FlowcontrolUtils from './flowcontrol-utils';
 const showLongFlowcontrol = true;
 
 //根据colStyle转为displayStyle和displayStyleComment
-const convertDisplayStyle = ( colStyle ) => {
+const convertDisplayStyle = ( colStyle = {} ) => {
     // 样式
     let displayStyle = {};
     let displayStyleComment = {};
@@ -34,26 +34,22 @@ const convertDisplayStyle = ( colStyle ) => {
 
 //根据dataKey获取指定样式值
 const getDisplayStyle = function( dataKey ){
-    const { displayStyle } = this.props.tableConfig;
-    let tempStr = '';
-    if (!isValidVariable(displayStyle)
-        || !isValidVariable(displayStyle[dataKey])) {
+    const { displayStyle = {} } = this.props.property;
+    if (!isValidObject(displayStyle) || !isValidVariable(displayStyle[dataKey])) {
         return '';
     }
-    if (isValidVariable(displayStyle[dataKey])) {
-        tempStr = displayStyle[dataKey];
-        if(tempStr.indexOf('transparent') != -1) {
-            tempStr = tempStr.replace('transparent', '');
-        }
+    let tempStr = displayStyle[dataKey];
+    if(tempStr.indexOf('transparent') != -1) {
+        tempStr = tempStr.replace('transparent', '');
     }
+
     return tempStr;
 };
 
 //根据dataKey获取指定样式-中文值
 const getDisplayStyleZh = function( dataKey ){
-    const { displayStyleComment } = this.props.tableConfig;
-    if (!isValidVariable(displayStyleComment)
-        || !isValidVariable(displayStyleComment[dataKey])) {
+    const { displayStyleComment = {} } = this.props.property;
+    if (!isValidObject(displayStyleComment) || !isValidVariable(displayStyleComment[dataKey])) {
         return '';
     } else {
         return displayStyleComment[dataKey];
@@ -62,9 +58,9 @@ const getDisplayStyleZh = function( dataKey ){
 
 //根据dataKey获取指定字体大小  displayFontSize == colFontSize
 const getDisplayFontSize = function( dataKey ){
-    const { colFontSize } = this.props.tableConfig;
+    const { colFontSize = {} } = this.props.property;
     if (isValidObject(colFontSize)){
-        if (!isValidVariable(colFontSize[dataKey])||!isValidVariable(colFontSize[dataKey]['font-size'])) {
+        if (!isValidVariable(colFontSize[dataKey]) || !isValidVariable(colFontSize[dataKey]['font-size'])) {
             return '';
         } else {
             return "font-size:" + colFontSize[dataKey]['font-size']+";";
