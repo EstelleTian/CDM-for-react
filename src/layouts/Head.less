@@ -1,5 +1,5 @@
 @import "../style/theme-color";
-.air-header{
+.air-header, .air-header .system-title{
   color: #fff;
   font-size: 1.6rem;
 }
@@ -8,4 +8,32 @@
 }
 .ant-card-head {
   background-color: @bc-black-20;
+}
+.air-header .system-title, .air-header .navbar{
+  line-height: 64px;
+}
+.air-header .navbar{
+  margin-top: 1.5rem;
+}
+.air-header .navbar {
+  .ant-menu-submenu, .navbar-menu, .usef-info{
+    float: right;
+
+  }
+  .usef-info {
+    line-height: 2;
+    font-size: 1.25rem;
+    label{
+      font-size: 1.5rem;
+      margin-left: 0.5rem;
+    }
+  }
+  .anticon {
+    font-size: 1.5rem;
+  }
+  .ant-menu-submenu-title .anticon {
+    line-height: 2.5rem;
+  }
+
+
 }
