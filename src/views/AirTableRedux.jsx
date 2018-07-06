@@ -68,9 +68,36 @@ const tableDatas = ( state = initData, action) => {
     }
 };
 
+const initTotalInfo = {
+    generateTime :'', // 数据生成时间
+    generateInfo : {}
+}
+//action-type
+const UPDATE_TOTALINFO= 'totalInfo/update';
+const updateTotalInfo = totalObj => ({
+    type : UPDATE_TOTALINFO,
+    totalObj
+});
+
+
+const totalInfo = (state = initTotalInfo, action) => {
+    switch ( action.type ){
+        case UPDATE_TOTALINFO: {
+            return{
+                ...state,
+                generateTime : action.totalObj.generateTime,
+                generateInfo : action.totalObj.generateInfo
+            }
+        }
+        default:
+            return state;
+    }
+}
+
 export {
     updateTableConfig, tableConfig,
-    updateTableDatas, tableDatas
+    updateTableDatas, tableDatas,
+    updateTotalInfo, totalInfo
 };
 
 

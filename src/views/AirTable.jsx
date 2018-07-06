@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { updateTableConfig, updateTableDatas } from './AirTableRedux';
+import { updateTableConfig, updateTableDatas,updateTotalInfo } from './AirTableRedux';
 import AirTable from '../components/Table/Table';
 import {isValidVariable} from "../utils/basic-verify";
 
@@ -33,12 +33,14 @@ const sortTableDatas = ( tableDatasMap ) => {
 
 const mapStateToProps = ( state ) => ({
     tableConfig: state.tableConfig,
-    tableDatas: sortTableDatas(state.tableDatas.tableDatasMap)
+    tableDatas: sortTableDatas(state.tableDatas.tableDatasMap),
+    totalInfo: state.totalInfo
 });
 
 const mapDispatchTopProps = {
     updateTableConfig,
-    updateTableDatas
+    updateTableDatas,
+    updateTotalInfo
 };
 
 const AirTableContainer = connect(

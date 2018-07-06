@@ -73,12 +73,14 @@ class AirTable extends React.Component{
     //更新航班数据
     refreshAirportsList( res ){
         console.log("refreshAirportsList");
-        const { updateTableDatas } = this.props;
+        const { updateTableDatas,updateTotalInfo } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};
         //数据生成时间
         const generateTime = res.generateTime;
+        //生成信息
+        const generateInfo = res.generateInfo;
 
         //获取放行管理的航班id集合
         const departureClearanceFlightsArr = res.departureClearanceFlights || [];
@@ -104,6 +106,12 @@ class AirTable extends React.Component{
         console.time("updateTableDatas----------");
         updateTableDatas( dataMap );
         console.timeEnd("updateTableDatas----------");
+        const params = {
+            generateTime : generateTime,
+            generateInfo : generateInfo,
+        }
+
+        updateTotalInfo(params)
 
         this.airportTimerId = setTimeout(() => {
             //获取机场航班
@@ -266,11 +274,16 @@ class AirTable extends React.Component{
     render(){
         console.log('table render~~');
         console.time('tableDataConvert');
-        const { tableDatas, tableConfig } = this.props;
+        const { tableDatas, tableConfig, totalInfo } = this.props;
         const { colDisplay, colNames } = tableConfig;
         const { columns, width }= TableColumns( colDisplay, colNames );
         const totalNum = tableDatas.length;
         const scrollX = width;
+        const {generateTime = ''} = totalInfo;
+        const {generateInfo = {}} = totalInfo;
+        const {ALL_NUM ='',ARR_NUM='',CHART_CNL_NUM='',
+            CHART_DLA_NUM='',CHART_FPL_NUM='',CNL_NUM='',
+            CPL_NUM='',DEP_NUM='',FPL_NUM='',SCH_NUM='',} = generateInfo;
         console.timeEnd('tableDataConvert');
 
         return(
@@ -279,7 +292,14 @@ class AirTable extends React.Component{
                     <div className="tools">
 
                     </div>
-                    <div className="total">总计{totalNum}条航班</div>
+                    <div className="total">
+                        <label>数据生成时间{generateTime}</label>
+                        <label>未起飞XXX架次</label>
+                        <label>已起飞{DEP_NUM}架次</label>
+                        <label>已落地{ARR_NUM}架次</label>
+                        <label>总计{ALL_NUM}架次</label>
+                    </div>
+
                 </Row>
                 <Table
                     columns={columns}
