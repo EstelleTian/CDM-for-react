@@ -72,25 +72,62 @@ const tableDatas = ( state = initData, action) => {
     }
 };
 //---------------------------------------------------------------------
+// 航班数据统计信息
 //action-type
-const UPDATE_TABLE_INFO= 'totalInfo/update';
-//更新表格数据时间和统计值字段
-const updateTotalInfo = totalObj => ({
-    type : UPDATE_TABLE_INFO,
-    totalObj
+const UPDATE_GENERATE_INFO= 'generateInfo/update';
+//更新数据航班统计值字段
+const updateGenerateInfo = generateObj => ({
+    type : UPDATE_GENERATE_INFO,
+    generateObj
 });
-const initTotalInfo = {
-    generateTime :'', // 数据生成时间
-    generateInfo : {}
+const initGenerateInfo = {
+    CHART_CNL_NUM : '',
+    CHART_DLA_NUM : '',
+    CHART_FPL_NUM : '',
+    CNL_NUM : '',
+    CPL_NUM : '',
+    ALL_NUM : '', // 全部航班数
+    ARR_NUM : '', // 已落地航班数
+    DEP_NUM : '', // 已起飞航班数
+    FPL_NUM : '',
+    SCH_NUM : '',
+    GROUND_NUM: '' // 未起飞航班数
 };
-//store table data 表格数据-- 数据生成时间、统计各个数值
-const totalInfo = (state = initTotalInfo, action) => {
+//航班数据统计各个数值
+const generateInfo = (state = initGenerateInfo, action) => {
     switch ( action.type ){
-        case UPDATE_TABLE_INFO: {
-            const { totalObj } = action;
+        case UPDATE_GENERATE_INFO: {
+            const { generateObj } = action;
             return{
                 ...state,
-                ...totalObj
+                ...generateObj
+            }
+        }
+        default:
+            return state;
+    }
+};
+
+//---------------------------------------------------------------------
+//数据生成时间
+//action-type
+const UPDATE_GENERATE_TIME= 'GENERATETIME/update';
+//更新数据生成时间
+const updateGenerateTime = time => ({
+    type : UPDATE_GENERATE_TIME,
+    time
+});
+const initGenerateTime = {
+    time : ''
+};
+//数据生成时间数值
+const generateTime = (state = initGenerateTime, action) => {
+    switch ( action.type ){
+        case UPDATE_GENERATE_TIME: {
+            const { time } = action;
+            return{
+                ...state,
+                ...time
             }
         }
         default:
@@ -157,6 +194,6 @@ const tableCondition = (state = initTableCondition, action) => {
 //---------------------------------------------------------------------
 export {
     tableDatas, updateTableDatas, updateTableDatasProperty, updateTableDatasColumns,
-    totalInfo, updateTotalInfo,
+    generateInfo, updateGenerateInfo, generateTime, updateGenerateTime,
     tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy
 };
