@@ -135,11 +135,11 @@ class Table extends React.Component{
         }
         updateGenerateTime(params)
 
-        this.airportTimerId = setTimeout(() => {
-            //获取机场航班
-            const params = this.getAirportsParams();
-            requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
-        },10*1000);
+        // this.airportTimerId = setTimeout(() => {
+        //     //获取机场航班
+        //     const params = this.getAirportsParams();
+        //     requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
+        // },10*1000);
 
     }
     //转换系统基本参数信息
@@ -237,7 +237,7 @@ class Table extends React.Component{
     };
     //分页、排序、筛选变化时触发
     tableOnChange(pagination, filters, sorter){
-        console.log(pagination, filters, sorter);
+        // console.log(pagination, filters, sorter);
         //获取排序的列名
         const { columnKey } = sorter;
 
@@ -339,7 +339,7 @@ class Table extends React.Component{
 
 
     render(){
-        console.log('table render~~');
+        // console.log('table render~~');
         const { tableDatas, tableColumns, scrollX} = this.props;
         return(
             <Col span={24} className="main-table">

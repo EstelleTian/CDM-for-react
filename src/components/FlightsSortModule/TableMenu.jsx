@@ -16,7 +16,7 @@ class TableMenu extends React.Component{
 
     //输入框快速过滤
     onQuicklySearch( value ){
-        console.log(value);
+        // console.log(value);
         let val = value.trim();
         if(isValidVariable( val )){
             //存储
