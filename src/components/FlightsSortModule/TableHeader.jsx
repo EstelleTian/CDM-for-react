@@ -10,10 +10,17 @@ class TableHeader extends React.Component{
     }
 
     render(){
+        const { generateTime = {} } = this.props;
+        const {time = ''} = generateTime;
+
         return (
             <Col span={24} className="header">
                 <div className="title">
                     <span>航班起飞排序</span>
+                    {
+                        (time ) ? <span>{time}</span> : ''
+                    }
+
                 </div>
             </Col>
         )

@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { isValidVariable } from '../../utils/basic-verify';
-import { updateTableDatas, updateTableDatasProperty, updateTableDatasColumns, updateTableConditionScrollId, updateTotalInfo } from './Redux';
+import { updateTableDatas, updateTableDatasProperty, updateTableDatasColumns, updateTableConditionScrollId, updateGenerateInfo,updateGenerateTime } from './Redux';
 import Table from './Table';
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
@@ -70,7 +70,8 @@ const mapDispatchTopProps = {
     updateTableDatasProperty,
     updateTableDatasColumns,
     updateTableConditionScrollId,
-    updateTotalInfo
+    updateGenerateInfo,
+    updateGenerateTime,
 };
 
 const TableContainer = connect(

@@ -74,7 +74,7 @@ class Table extends React.Component{
     //更新航班数据
     refreshAirportsList( res ){
         // console.log("refreshAirportsList");
-        const { updateTableDatas, updateTotalInfo, orderBy, updateTableConditionScrollId, autoScroll } = this.props;
+        const { updateTableDatas, updateGenerateInfo, updateGenerateTime,  orderBy, updateTableConditionScrollId, autoScroll } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};
@@ -128,8 +128,12 @@ class Table extends React.Component{
         updateTableConditionScrollId( mintime_flight_id );
         console.timeEnd("updateTableDatas----------");
         //更新统计数据
-        const params = { generateTime, generateInfo };
-        updateTotalInfo(params);
+        updateGenerateInfo(generateInfo);
+        //
+        var params = {
+            time : generateTime,
+        }
+        updateGenerateTime(params)
 
         this.airportTimerId = setTimeout(() => {
             //获取机场航班
