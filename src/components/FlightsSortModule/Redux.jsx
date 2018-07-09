@@ -101,6 +101,7 @@ const totalInfo = (state = initTotalInfo, action) => {
 const UPDATE_TABLE_CONDITION_SCROLL= 'tableCondition/update/scroll';
 const UPDATE_TABLE_CONDITION_SCROLL_ID= 'tableCondition/update/scrollId';
 const UPDATE_TABLE_CONDITION_ORDER_BY= 'tableCondition/update/orderBy';
+const UPDATE_TABLE_CONDITION_QUICKLY_FILTERS= 'tableCondition/update/quicklyFilters';
 //更新表格当前是否是自动滚动
 const updateTableConditionScroll = flag => ({
     type: UPDATE_TABLE_CONDITION_SCROLL,
@@ -114,6 +115,11 @@ const updateTableConditionScrollId = id => ({
 //更新表格当前排序值
 const updateTableConditionOrderBy = data => ({
     type: UPDATE_TABLE_CONDITION_ORDER_BY,
+    data
+});
+//更新表格当前快速查询条件值
+const updateTableConditionQuicklyFilters = data => ({
+    type: UPDATE_TABLE_CONDITION_QUICKLY_FILTERS,
     data
 });
 const initTableCondition = {
@@ -149,6 +155,12 @@ const tableCondition = (state = initTableCondition, action) => {
                 }
             }
         }
+        case UPDATE_TABLE_CONDITION_QUICKLY_FILTERS: {
+            return {
+                ...state,
+                quicklyFilters: action.data
+            }
+        }
 
         default:
             return state;
@@ -158,5 +170,5 @@ const tableCondition = (state = initTableCondition, action) => {
 export {
     tableDatas, updateTableDatas, updateTableDatasProperty, updateTableDatasColumns,
     totalInfo, updateTotalInfo,
-    tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy
+    tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy, updateTableConditionQuicklyFilters
 };

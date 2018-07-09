@@ -3,6 +3,7 @@
 import React from 'react';
 import { Row, Col, Input, Checkbox } from 'antd';
 import './TableMenu.less';
+import {isValidVariable} from "../../utils/basic-verify";
 
 const Search = Input.Search;
 
@@ -16,15 +17,19 @@ class TableMenu extends React.Component{
     //输入框快速过滤
     onQuicklySearch( value ){
         console.log(value);
-        //存储到
+        let val = value.trim();
+        if(isValidVariable( val )){
+            //存储
+            const { updateTableConditionQuicklyFilters  } = this.props;
+            updateTableConditionQuicklyFilters( val );
+        }
     }
 
     //自动滚动--变化事件
     onAutoScrollChange(e) {
-        console.log(`checked = ${e.target.checked}`);
         const checked = e.target.checked;
-        const { updateTableAutoScroll } = this.props;
-        updateTableAutoScroll( checked );
+        const { updateTableConditionScroll } = this.props;
+        updateTableConditionScroll( checked );
     }
 
     render(){

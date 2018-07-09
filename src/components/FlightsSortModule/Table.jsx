@@ -18,6 +18,7 @@ class Table extends React.Component{
         this.filterBaseDatas = this.filterBaseDatas.bind(this);
         this.tableOnChange = this.tableOnChange.bind(this);
         this.scrollToRow = this.scrollToRow.bind(this);
+        this.resetFrozenTableStyle = this.resetFrozenTableStyle.bind(this);
         this.convertData = convertData.bind(this);
         this.getDisplayStyle = getDisplayStyle.bind(this);
         this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
@@ -73,7 +74,7 @@ class Table extends React.Component{
     //更新航班数据
     refreshAirportsList( res ){
         // console.log("refreshAirportsList");
-        const { updateTableDatas, updateTotalInfo, sorterData, updateTableConditionScrollId, autoScroll } = this.props;
+        const { updateTableDatas, updateTotalInfo, orderBy, updateTableConditionScrollId, autoScroll } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};
@@ -104,7 +105,7 @@ class Table extends React.Component{
             if( autoScroll ){
                 // 取自定义排序首个字段与当前时间最接近的航班id
                 //取排序字段，比较当前数据时间和字段绝对差值最小
-                const tempTargetTime = data[sorterData];
+                const tempTargetTime = data[orderBy];
                 if (isValidVariable(tempTargetTime) && tempTargetTime.length == 12) {
                     // 计算计划时间和当前时间的绝对差值 返回毫秒值
                     var tempTime = Math.abs(calculateStringTimeDiff(tempTargetTime, generateTime));
@@ -130,11 +131,11 @@ class Table extends React.Component{
         const params = { generateTime, generateInfo };
         updateTotalInfo(params);
 
-        // this.airportTimerId = setTimeout(() => {
-        //     //获取机场航班
-        //     const params = this.getAirportsParams();
-        //     requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
-        // },10*1000);
+        this.airportTimerId = setTimeout(() => {
+            //获取机场航班
+            const params = this.getAirportsParams();
+            requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
+        },10*1000);
 
     }
     //转换系统基本参数信息
@@ -239,9 +240,9 @@ class Table extends React.Component{
     };
     //滚动当指定行
     scrollToRow(){
-        const { scroll, scrollId  } = this.props;
+        const { autoScroll, scrollId  } = this.props;
         //若开启自动滚动 且 滚动有值，再滚动到指定位置
-        if( scroll && isValidVariable(scrollId) ){
+        if( autoScroll && isValidVariable(scrollId) ){
             let trs = $('.ant-table-scroll tr[flightid="'+ scrollId +'"]');
             //获取目标航班所在行数 - 10 ，以归置到中心位置
             const rowid = trs.attr("rowid")*1 - 10;
@@ -251,6 +252,21 @@ class Table extends React.Component{
             //滚动到指定位置
             $(".ant-table-scroll .ant-table-body").scrollTop(top);
         }
+    }
+    resetFrozenTableStyle(){
+        const $fixedLeft = $(".ant-table-fixed-left");
+        if( $fixedLeft.length > 0 ){
+            $fixedLeft.addClass('overflow');
+            const $scroll = $(".ant-table-scroll");
+
+            const antScroll = $scroll.height() || 0;
+            const antBody = $(".ant-table-body", $scroll).height() || 0;
+            const antHead = $(".ant-table-header", $scroll).height() || 0;
+            if( antBody + antHead < antScroll ){
+                $fixedLeft.removeClass('overflow');
+            }
+        }
+
     }
     // componentWillMount(){
     //     console.time("componentMountt");
@@ -313,7 +329,10 @@ class Table extends React.Component{
         // console.timeEnd("componentUpdate");
         //表格滚动到当前的行
         this.scrollToRow();
+        //处理冻结表格样式
+        this.resetFrozenTableStyle();
     }
+
 
     render(){
         console.log('table render~~');

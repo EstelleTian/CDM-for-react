@@ -6,9 +6,29 @@ import { updateTableDatas, updateTableDatasProperty, updateTableDatasColumns, up
 import Table from './Table';
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
-const sortTableDatas = ( tableDatasMap ) => {
-    let tableDatas = Object.values( tableDatasMap );
+const sortTableDatas = ( tableDatasMap, quicklyFilters ) => {
+    let tableDatas = Object.values( tableDatasMap ); //转为数组
+    //如果快速查询有值，则先进行过滤，后排序
+    if( isValidVariable(quicklyFilters) ){
+        tableDatas = tableDatas.filter( ( item ) => {
+            let flag = false;
+            for(let i in item){
+                if( i.indexOf("_style") == -1 && i.indexOf("_title") == -1 ){
+                    const itemVal = item[i] || "";
+                    //若值包含过滤条件，则中，否则不显示
+                    if( isValidVariable(itemVal) && itemVal.toLowerCase().indexOf( quicklyFilters.toLowerCase() ) > -1 ){
+                        flag = true;
+                    }
+                }
+            }
+            return flag;
+        })
+    }
+
+
+    //默认排序队列
     const sortArr = ["ATOT", "CTOT", "TOBT", "EOBT", "SOBT", "ID"];
+    //排序
     tableDatas = tableDatas.sort((d1, d2) => {
         for (let index in sortArr) {
             let sortColumnName = sortArr[index];
@@ -33,10 +53,10 @@ const sortTableDatas = ( tableDatasMap ) => {
 
 const mapStateToProps = ( state ) =>{
     const { tableColumns = [], tableDatasMap = {}, tableWidth = 0, property = {}} = state.tableDatas;
-    const { scroll = true, orderBy = 'ATOT', scrollId = '' } = state.tableCondition;
+    const { scroll = true, orderBy = 'ATOT', scrollId = '', quicklyFilters = '' } = state.tableCondition;
     return ({
         property,
-        tableDatas: sortTableDatas(tableDatasMap),
+        tableDatas: sortTableDatas(tableDatasMap, quicklyFilters),
         tableColumns,
         scrollX: tableWidth,
         autoScroll: scroll,
