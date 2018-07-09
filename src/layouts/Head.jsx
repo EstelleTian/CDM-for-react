@@ -53,18 +53,22 @@ class Head extends React.Component{
                                     title={<Icon type="setting" />}
                                 >
                                     <Menu.Item key="1">
+                                        <Icon type="book" />
                                         <span  >帮助手册</span>
                                     </Menu.Item>
 
                                     <Menu.Item key="2">
+                                        <Icon type="api" />
                                         <span   >历史查询</span>
                                     </Menu.Item>
 
                                     <Menu.Item key="3">
+                                        <Icon type="key" />
                                         <span >修改密码</span>
                                     </Menu.Item>
 
                                     <Menu.Item key="logout" onClick={this.handleLogout} >
+                                        <Icon type="logout" />
                                         <span  >登出</span>
                                     </Menu.Item>
 
