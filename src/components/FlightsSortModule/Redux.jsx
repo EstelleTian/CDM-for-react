@@ -207,5 +207,5 @@ const tableCondition = (state = initTableCondition, action) => {
 export {
     tableDatas, updateTableDatas, updateTableDatasProperty, updateTableDatasColumns,
     generateInfo, updateGenerateInfo, generateTime, updateGenerateTime,
-    tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy
+    tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy, updateTableConditionQuicklyFilters
 };

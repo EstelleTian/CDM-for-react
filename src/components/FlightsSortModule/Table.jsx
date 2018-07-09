@@ -74,7 +74,7 @@ class Table extends React.Component{
     //更新航班数据
     refreshAirportsList( res ){
         // console.log("refreshAirportsList");
-        const { updateTableDatas, updateGenerateInfo, updateGenerateTime,  orderBy, updateTableConditionScrollId, autoScroll } = this.props;
+        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};

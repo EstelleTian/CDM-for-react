@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { updateTableSorterData, updateGenerateInfo, updateTableConditionScroll, updateTableConditionQuicklyFilters  } from './Redux';
+import { updateTableConditionOrderBy, updateGenerateInfo, updateTableConditionScroll, updateTableConditionQuicklyFilters  } from './Redux';
 import TableMenu from './TableMenu';
 
 // 计算未起飞航班数据
@@ -20,7 +20,7 @@ const mapStateToProps = ( state ) => ({
 });
 
 const mapDispatchTopProps = {
-    updateTableSorterData,
+    updateTableConditionOrderBy,
     updateGenerateInfo,
     updateTableConditionScroll,
     updateTableConditionQuicklyFilters
