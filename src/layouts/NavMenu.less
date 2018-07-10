@@ -2,7 +2,7 @@
 .ant-menu-dark.ant-menu-submenu-popup{
   background: @bc-black-80;
 }
-
+//导航激活颜色
 .ant-menu-horizontal{
  > .ant-menu-item:hover,
  > .ant-menu-item-active,
@@ -10,10 +10,21 @@
   background-color: @bc-black-30;
  }
 }
-
+//导航菜单布局
 .ant-menu-item, .ant-menu-submenu-title{
  padding: 0 1rem;
  .anticon{
   margin-right: 0;
  }
+}
+//导航展开高亮到子菜单后颜色
+.ant-menu-item:hover,
+.ant-menu-item-active,
+.ant-menu:not(.ant-menu-inline) .ant-menu-submenu-open,
+.ant-menu-submenu-active, .ant-menu-submenu-title:hover{
+ color: #fff;
+}
+
+.menu-right{
+ float: right;
 }

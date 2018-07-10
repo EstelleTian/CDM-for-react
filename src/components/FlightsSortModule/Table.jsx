@@ -28,8 +28,13 @@ class Table extends React.Component{
 
     //获取机场请求url 需要拼接的请求参数
     getAirportsParams(){
+        const { userId, history } = this.props;
+        if( !isValidVariable(userId) ){
+            //跳转回登录页面
+            history.push('/');
+        }
         let params = {
-            userId: 42,
+            userId,
             start: '',
             end: '',
         };
@@ -41,10 +46,10 @@ class Table extends React.Component{
         month = month < 10 ? '0' + month : '' + month;
         day = day < 10 ? '0' + day : '' + day;
         let fullTime = year + month + day;
-        params['start'] = fullTime + '0000';
-        // params['start'] = '201807030000';
-        params['end'] = fullTime + '2359';
-        // params['end'] = '201807052359';
+        // params['start'] = fullTime + '0000';
+        params['start'] = fullTime + '1200';
+        // params['end'] = fullTime + '2359';
+        params['end'] = fullTime + '1559';
 
         return params;
     };
@@ -157,7 +162,7 @@ class Table extends React.Component{
             this.convertUserProperty( res.userPropertyList );
         }else{
             //TODO 错误提示
-            console.error(res.error.message);
+            console.error(res.error.message || "");
         }
     }
     //转化用户配置信息
@@ -278,7 +283,11 @@ class Table extends React.Component{
     componentDidMount(){
         // console.timeEnd("componentMountt");
         //获取用户配置
-        const userId = 42;
+        const { userId, history } = this.props;
+        if( !isValidVariable(userId) ){
+            //跳转回登录页面
+            history.push('/');
+        }
         const keys =[
             'grid_col_style',
             'grid_col_names',

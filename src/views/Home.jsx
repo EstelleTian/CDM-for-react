@@ -1,8 +1,9 @@
 import React from 'react';
 import { Layout, Card, Col, Row } from 'antd'
 import Head from "../layouts/Head";
-import NavMenuContainer from "../layouts/NavMenu";
+import NavMenuContainer from "../layouts/NavMenuContainer";
 import FlightsSortModule from '../components/FlightsSortModule/FlightsSortModule';
+import DragDom from '../components/DragModal/Drag';
 import "./Home.less";
 
 const { Content } = Layout;
@@ -20,6 +21,8 @@ const Home = ( props ) => (
             </Row>
 
         </Content>
+
+        <DragDom/>
     </Layout>
 )
 

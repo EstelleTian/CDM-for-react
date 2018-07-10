@@ -52,8 +52,9 @@ const sortTableDatas = ( tableDatasMap, quicklyFilters ) => {
 }
 
 const mapStateToProps = ( state ) =>{
-    const { tableColumns = [], tableDatasMap = {}, tableWidth = 0, property = {}} = state.tableDatas;
+    const { tableColumns = [], tableDatasMap = {}, tableWidth = 0, property = {} } = state.tableDatas;
     const { scroll = true, orderBy = 'ATOT', scrollId = '', quicklyFilters = '' } = state.tableCondition;
+    const { userId = '' } = state.loginUserInfo;
     return ({
         property,
         tableDatas: sortTableDatas(tableDatasMap, quicklyFilters),
@@ -61,7 +62,8 @@ const mapStateToProps = ( state ) =>{
         scrollX: tableWidth,
         autoScroll: scroll,
         orderBy,
-        scrollId
+        scrollId,
+        userId
     })
 };
 
