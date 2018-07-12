@@ -22,6 +22,7 @@ const formatGenerateTime =(generateTime) => {
 
 const mapStateToProps = ( state ) => ({
     generateTime: formatGenerateTime(state.generateTime),
+    subTableDatas: state.subTableDatas
 });
 
 const mapDispatchTopProps = {

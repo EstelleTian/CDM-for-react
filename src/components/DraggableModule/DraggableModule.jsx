@@ -1,9 +1,8 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Draggable from 'react-draggable';
-import './Drag.less'
+import './DraggableModule.less'
 
-class DragDom extends React.Component {
+class DraggableModal extends React.Component {
     constructor( props ){
         super( props );
         this.onStart = this.onStart.bind(this);
@@ -23,17 +22,19 @@ class DragDom extends React.Component {
 
     render() {
         const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
+        const { x, y } = this.props;
+        console.log( x, y );
         return (
-            <Draggable handle="strong" {...dragHandlers}>
-                <div className="box no-cursor">
-                    <strong className="cursor"><div>可拖拽标题</div></strong>
-                    <div>内容</div>
-                    <div>内容</div>
-                    <div>内容</div>
-                </div>
+            <Draggable
+                defaultPosition={{ x, y }}
+                bounds=".root"
+                handle=".drag-target"
+                {...dragHandlers}
+            >
+                { this.props.children }
             </Draggable>
         );
     }
 }
 
-export default DragDom;
+export default DraggableModal;

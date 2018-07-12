@@ -10,6 +10,9 @@ const Search = Input.Search;
 class TableMenu extends React.Component{
     constructor( props ){
         super(props);
+        this.state = {
+            autoScroll: true
+        }
         this.onQuicklySearch = this.onQuicklySearch.bind(this);
         this.onAutoScrollChange = this.onAutoScrollChange.bind(this);
     }
@@ -28,12 +31,16 @@ class TableMenu extends React.Component{
     //自动滚动--变化事件
     onAutoScrollChange(e) {
         const checked = e.target.checked;
+        this.setState({
+            autoScroll: checked
+        })
         const { updateTableConditionScroll } = this.props;
         updateTableConditionScroll( checked );
     }
 
     render(){
         const { isAutoScroll, generateInfo } = this.props;
+        const { autoScroll } = this.state;
 
         const { ALL_NUM ='',
             ARR_NUM='',
@@ -51,7 +58,7 @@ class TableMenu extends React.Component{
                     />
                     <Checkbox
                         className = "auto-scroll-check"
-                        checked = { isAutoScroll }
+                        checked = { autoScroll }
                         onChange={ this.onAutoScrollChange}
                     >自动滚动</Checkbox>
                 </Col>

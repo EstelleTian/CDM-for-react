@@ -138,14 +138,24 @@ const TableColumns = ( colDisplay, colNames, colTitle ) => {
                 }
             }
         };
-        if( title.length < 5 ){
+
+        //调整每列宽度
+        if( title == 'ID' ){
+            obj['width'] = 60;
+            width += 60;
+        }else if( title == 'CallSign' || title == 'ACWakes' || title == '批量操作' ){
+            obj['width'] = 100;
+            width += 100;
+        }else if( title == 'ACType' || title.length == 4 || title.length == 3 ){
             obj['width'] = 90;
             width += 90;
-        }else{
+        }
+        else{
             obj['width'] = title.length * 20;
             width += title.length * 20;
         }
 
+        // 冻结列
         if( i < 3){
             obj['fixed'] = 'left';
         }

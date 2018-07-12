@@ -19,25 +19,26 @@ const options = [
 class NavMenu extends React.Component{
     constructor(props){
         super(props);
-        this.onOpenChange = this.onOpenChange.bind(this);
         this.onRadioChange = this.onRadioChange.bind(this);
         this.onCheckboxChange = this.onCheckboxChange.bind(this);
-        // this.onTitleClick = this.onTitleClick.bind(this);
+        this.onMenuTitleSelect = this.onMenuTitleSelect.bind(this);
 
     }
-    onOpenChange(openKeys){
-        //修改其遮罩width从100%改为auto，导致表格滚动遮挡
-        // $(".ant-menu-submenu").parent().parent().width('auto');
-    };
+    //
     onRadioChange(e){
         console.log('radio checked', e.target.value);
         this.props.updateScopeFilter( e.target.value );
 
     };
+    //
     onCheckboxChange( checkedValues ){
         console.log('checked = ', checkedValues);
         this.props.updateStatusFilter( checkedValues );
     };
+    //导航栏目选中
+    onMenuTitleSelect({ key, domEvent }){
+        console.log( key );
+    }
     // onTitleClick({ key, domEvent }){
     //     console.log(key);
     //     switch (key){
@@ -57,7 +58,6 @@ class NavMenu extends React.Component{
             <Row>
                 <Col xs={24} sm={24} md={24} lg={6} xl={6} xxl={6}>
                     <Menu
-                        onOpenChange={this.onOpenChange}
                         mode="horizontal"
                         theme="dark"
                         className="menu-left"
@@ -100,7 +100,6 @@ class NavMenu extends React.Component{
                 </Col>
                 <Col xs={24} sm={24} md={24} lg={18} xl={18} xxl={18}>
                     <Menu
-                    onOpenChange={this.onOpenChange}
                     mode="horizontal"
                     theme="dark"
                     className="menu-right"
@@ -139,12 +138,14 @@ class NavMenu extends React.Component{
                     <SubMenu
                         key="notice-info"
                         title="通告信息"
+                        onTitleClick={ this.onMenuTitleSelect }
                     >
                         <Menu.Item key="notice-info-publish">发布通告信息</Menu.Item>
                     </SubMenu>
                     <SubMenu
                         key="runway-config"
                         title="跑道配置"
+                        onTitleClick={ this.onMenuTitleSelect }
                     >
                         <Menu.Item key="runway-config-edit">默认跑道配置</Menu.Item>
                         <Menu.Item key="runway-config-dynamic-publish">动态跑道配置</Menu.Item>
@@ -155,6 +156,7 @@ class NavMenu extends React.Component{
                     <SubMenu
                         key="flowcontrol-info"
                         title="流控信息"
+                        onTitleClick={ this.onMenuTitleSelect }
                     >
                         <Menu.Item key="ap-publish">发布机场受限</Menu.Item>
                         <Menu.Item key="ap-gs-dep-publish">发布低能见度受限</Menu.Item>
@@ -168,15 +170,24 @@ class NavMenu extends React.Component{
                     <SubMenu
                         key="restriction-info"
                         title="限制信息"
+                        onTitleClick={ this.onMenuTitleSelect }
                     >
                         <Menu.Item key="restriction-deice-publish">发布除冰限制</Menu.Item>
                     </SubMenu>
-                        <SubMenu key="navigator-expired" title="失效航班" />
-                        <SubMenu key="navigator-special" title="特殊航班" />
-                        <SubMenu key="navigator-pool" title="等待池" />
-                        <SubMenu key="navigator-alarm" title="告警信息" />
-                        <SubMenu key="navigator-flight-search" title="航班查询" />
-                        <SubMenu key="navigator-todo" title="待办事项" />
+                    <SubMenu key="navigator-flight-search" title="航班查询"
+                             onTitleClick={ this.onMenuTitleSelect } />
+                        {/*<SubMenu key="navigator-expired" title="失效航班"*/}
+                                 {/*onTitleClick={ this.onMenuTitleSelect } />*/}
+                        {/*<SubMenu key="navigator-special" title="特殊航班"*/}
+                                 {/*onTitleClick={ this.onMenuTitleSelect } />*/}
+                        {/*<SubMenu key="navigator-pool" title="等待池"*/}
+                                 {/*onTitleClick={ this.onMenuTitleSelect } />*/}
+                        {/*<SubMenu key="navigator-alarm" title="告警信息"*/}
+                                 {/*onTitleClick={ this.onMenuTitleSelect } />*/}
+                        {/*<SubMenu key="navigator-flight-search" title="航班查询"*/}
+                                 {/*onTitleClick={ this.onMenuTitleSelect } />*/}
+                        {/*<SubMenu key="navigator-todo" title="待办事项"*/}
+                                 {/*onTitleClick={ this.onMenuTitleSelect } />*/}
                 </Menu>
                 </Col>
             </Row>

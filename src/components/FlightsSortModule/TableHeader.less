@@ -1,11 +1,33 @@
+@import "../../style/theme-color";
 .header{
   height: 3rem;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.125);
-  .title{
+  border-bottom: 1px solid @c-white-15;
+
+  >.title{
     padding: 1rem 1rem;
+    display: inline-block;
     span{
       font-size: 1.3rem;
       margin: 0.5rem;
     }
   }
+
+  .flight-menu{
+    display: inline-block;
+    float: right;
+    ul > li{
+      padding: 1rem 1rem;
+    }
+  }
+}
+
+.sub-table{
+  .title{
+    padding: .5rem 0;
+    border-bottom: 1px solid @c-white-50;
+    span{
+      font-size: 1.25rem;
+    }
+  }
+
 }

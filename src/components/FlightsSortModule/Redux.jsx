@@ -35,7 +35,8 @@ const initData = {
         colEdit: {},
         colFontSize: {},
         colStyle: {},
-        invalidDataStyle: "" //失效航班样式
+        invalidDataStyle: "", //失效航班样式
+        colPoolDisplay: {},
     }
 };
 //store table data 表格数据-- 包含：表格列名、数据、样式配置字段

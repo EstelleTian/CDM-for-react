@@ -28,11 +28,12 @@ class Table extends React.Component{
 
     //获取机场请求url 需要拼接的请求参数
     getAirportsParams(){
-        const { userId, history } = this.props;
-        if( !isValidVariable(userId) ){
-            //跳转回登录页面
-            history.push('/');
-        }
+        // const { userId, history } = this.props;
+        // if( !isValidVariable(userId) ){
+        //     //跳转回登录页面
+        //     history.push('/');
+        // }
+        const userId = 42;
         let params = {
             userId,
             start: '',
@@ -47,9 +48,9 @@ class Table extends React.Component{
         day = day < 10 ? '0' + day : '' + day;
         let fullTime = year + month + day;
         // params['start'] = fullTime + '0000';
-        params['start'] = fullTime + '1200';
+        params['start'] = fullTime + '0800';
         // params['end'] = fullTime + '2359';
-        params['end'] = fullTime + '1559';
+        params['end'] = fullTime + '1159';
 
         return params;
     };
@@ -132,6 +133,22 @@ class Table extends React.Component{
         //更新自动滚动航班id值
         updateTableConditionScrollId( mintime_flight_id );
         console.timeEnd("updateTableDatas----------");
+
+        //获取等待池航班的航班id集合
+        const poolFlightsArr = res.poolFlights || [];
+        let poolFlightsMap = {};
+        for(let index in poolFlightsArr ){
+            //获取航班id
+            const id = departureClearanceFlightsArr[index];
+            //获取航班对象
+            const flight = flightViewMap[id] || {};
+            const data = this.convertData( flight, generateTime );
+            poolFlightsMap[id] = data;
+        }
+        //更新等待池航班数据
+
+
+
         //更新统计数据
         updateGenerateInfo(generateInfo);
         //
@@ -182,8 +199,10 @@ class Table extends React.Component{
                     let titleStr = 'grid_col_title';
                     let fontSizeStr = 'grid_col_font_size';
                     let editStr = 'grid_cdm_col_edit';
-                    let displayNameStr = 'grid_cdm_col_display';
+                    let displayStr = 'grid_cdm_col_display';
                     let invalidDataStyleStr = 'invalidDataStyle';
+                    let displayPoolStr = 'grid_pool_col_display';
+
 
                     switch( uKey ){
                         case styleStr : {
@@ -206,7 +225,7 @@ class Table extends React.Component{
                             configParams['colEdit'] = value;
                             break;
                         }
-                        case displayNameStr : {
+                        case displayStr : {
                             configParams['colDisplay'] = value;
                             break;
                         }
@@ -220,6 +239,10 @@ class Table extends React.Component{
                                 invalidStr += key+":"+value[key]+';';
                             }
                             configParams['invalidDataStyle'] = invalidStr;
+                            break;
+                        }
+                        case displayPoolStr : {
+                            configParams['colPoolDisplay'] = value;
                             break;
                         }
                     }
@@ -283,11 +306,12 @@ class Table extends React.Component{
     componentDidMount(){
         // console.timeEnd("componentMountt");
         //获取用户配置
-        const { userId, history } = this.props;
-        if( !isValidVariable(userId) ){
-            //跳转回登录页面
-            history.push('/');
-        }
+        // const { userId, history } = this.props;
+        // if( !isValidVariable(userId) ){
+        //     //跳转回登录页面
+        //     history.push('/');
+        // }
+        const userId = 42;
         const keys =[
             'grid_col_style',
             'grid_col_names',
