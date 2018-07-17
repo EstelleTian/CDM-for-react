@@ -128,9 +128,6 @@ const convertData = function( flight, generateTime ){
         setTitleAndStyleData.call(thisProxy, key, value, flight );
     }
 
-    if( flight["FLIGHTID"].value == "CSN3768" ){
-        console.log(1111);
-    }
     //处理基本数据值和样式
     function setDataValue(key, options){
         //处理数值

@@ -207,7 +207,6 @@ class Table extends React.Component{
             }
 
         }
-        console.log( tableName, flightsMap );
         //更新告警航班数据
         this.props.updateSubTableDatas( tableName, flightsMap );
     };

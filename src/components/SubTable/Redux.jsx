@@ -80,7 +80,6 @@ const subTableDatas = ( state = initData, action) => {
 
         }
         case UPDATE_SUB_TABLE_DATAS_PROPERTY: {
-            console.log("UPDATE_SUB_TABLE_DATAS_PROPERTY");
             return {
                 ...state,
                 ...( action.property )
