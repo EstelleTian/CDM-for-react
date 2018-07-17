@@ -5,7 +5,7 @@ import { requestGet } from '../../utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
 import { isValidVariable, isValidObject, calculateStringTimeDiff } from '../../utils/basic-verify';
 import { TableColumns } from "../../utils/table-config";
-import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "../../utils/flight-grid-table-data-util";
+import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize, convertAlarmData, convertExpiredData, converSpecialtData, convertTodoData } from "../../utils/flight-grid-table-data-util";
 import './Table.less';
 
 class Table extends React.Component{
@@ -19,11 +19,18 @@ class Table extends React.Component{
         this.tableOnChange = this.tableOnChange.bind(this);
         this.scrollToRow = this.scrollToRow.bind(this);
         this.resetFrozenTableStyle = this.resetFrozenTableStyle.bind(this);
+        this.handleSubTableDatas = this.handleSubTableDatas.bind(this);
         this.convertData = convertData.bind(this);
+        this.convertAlarmData = convertAlarmData.bind(this);
+        this.convertExpiredData = convertExpiredData.bind(this);
+        this.converSpecialtData = converSpecialtData.bind(this);
+        this.convertTodoData = convertTodoData.bind(this);
         this.getDisplayStyle = getDisplayStyle.bind(this);
         this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
         this.getDisplayFontSize = getDisplayFontSize.bind(this);
-        this.airportTimerId = '';
+        this.state = {
+            airportTimerId : 0
+        };
     }
 
     //获取机场请求url 需要拼接的请求参数
@@ -47,10 +54,10 @@ class Table extends React.Component{
         month = month < 10 ? '0' + month : '' + month;
         day = day < 10 ? '0' + day : '' + day;
         let fullTime = year + month + day;
-        // params['start'] = fullTime + '0000';
-        params['start'] = fullTime + '0800';
-        // params['end'] = fullTime + '2359';
-        params['end'] = fullTime + '1159';
+        params['start'] = fullTime + '0000';
+        // params['start'] = fullTime + '1230';
+        params['end'] = fullTime + '2359';
+        // params['end'] = fullTime + '1400';
 
         return params;
     };
@@ -80,7 +87,7 @@ class Table extends React.Component{
     //更新航班数据
     refreshAirportsList( res ){
         // console.log("refreshAirportsList");
-        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll } = this.props;
+        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateSubTableDatas } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};
@@ -106,7 +113,8 @@ class Table extends React.Component{
             // 转换数据格式为convert方法需要的格式
             const tableFlight = this.filterBaseDatas(flight);
             //转化后的数据
-            const data = this.convertData( tableFlight, generateTime );
+            const flightFieldViewMap = tableFlight.flightFieldViewMap;
+            const data = this.convertData( flightFieldViewMap, generateTime );
             //根据是否是自动滚动，如果是：计算滚动的航班id
             if( autoScroll ){
                 // 取自定义排序首个字段与当前时间最接近的航班id
@@ -134,20 +142,11 @@ class Table extends React.Component{
         updateTableConditionScrollId( mintime_flight_id );
         console.timeEnd("updateTableDatas----------");
 
-        //获取等待池航班的航班id集合
-        const poolFlightsArr = res.poolFlights || [];
-        let poolFlightsMap = {};
-        for(let index in poolFlightsArr ){
-            //获取航班id
-            const id = departureClearanceFlightsArr[index];
-            //获取航班对象
-            const flight = flightViewMap[id] || {};
-            const data = this.convertData( flight, generateTime );
-            poolFlightsMap[id] = data;
-        }
-        //更新等待池航班数据
-
-
+        this.handleSubTableDatas(res, 'expired', this.convertExpiredData, generateTime);
+        this.handleSubTableDatas(res, 'pool', this.convertData, generateTime);
+        this.handleSubTableDatas(res, 'alarm', this.convertAlarmData, generateTime);
+        this.handleSubTableDatas(res, 'special', this.converSpecialtData, generateTime);
+        this.handleSubTableDatas(res, 'todo', this.convertTodoData, generateTime);
 
         //更新统计数据
         updateGenerateInfo(generateInfo);
@@ -157,13 +156,61 @@ class Table extends React.Component{
         }
         updateGenerateTime(params)
 
-        // this.airportTimerId = setTimeout(() => {
+        // const airportTimerId = setTimeout(() => {
         //     //获取机场航班
         //     const params = this.getAirportsParams();
         //     requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
         // },10*1000);
+        // this.setState({
+        //     airportTimerId
+        // });
 
     }
+    /* 处理副表数据后保存到store中
+     * data : 全部航班数据集合
+     * tableName ： 表名称
+     * generateTime : 数据生成时间
+     */
+    handleSubTableDatas( data, tableName, convertFunc, generateTime ){
+        //航班集合
+        const flightViewMap = data.flightViewMap || {};
+        //各类航班id集合数组
+        const flightsArr = data[tableName+"Flights"] || [];
+        let flightsMap = {};
+        for(let index in flightsArr ){
+            //获取航班id
+            const id = flightsArr[index];
+            //获取一条航班对象
+            let flight = flightViewMap[id] || {};
+            //获取对应航班状态
+            let flightStatus;
+            //一条航班 失效 告警 等待 特殊 待办 状态集合
+            const flightStatusFieldViewMap = flight.flightStatusFieldViewMap;
+            if( isValidObject(flightStatusFieldViewMap) ){
+                flightStatus = flightStatusFieldViewMap[tableName.toUpperCase() + "_STATUS"];
+            }
+            //转换为表格数据后的对象集合
+            if( tableName == 'pool'){
+                flight = flight.flightFieldViewMap || {};
+            }
+            const rowData = convertFunc(flight, generateTime, flightStatus);
+            //如果是数组
+            if( Array.isArray(rowData) ){
+                if( rowData.length > 0 ){
+                    for(let n = 0; n < rowData.length; n++){
+                        let rowdatas = rowData[n];
+                        flightsMap[id] = rowdatas;
+                    }
+                }
+            }else{//是对象
+                flightsMap[id] = rowData;
+            }
+
+        }
+        console.log( tableName, flightsMap );
+        //更新告警航班数据
+        this.props.updateSubTableDatas( tableName, flightsMap );
+    };
     //转换系统基本参数信息
     convertBasicConfigInfo( res ){
         const status = res.status*1;
@@ -184,56 +231,65 @@ class Table extends React.Component{
     }
     //转化用户配置信息
     convertUserProperty( user_property ){
-        const { updateTableDatasProperty, updateTableDatasColumns } = this.props;
+        const { updateTableDatasProperty, updateTableDatasColumns, updateSubTableDatasProperty } = this.props;
         //验证是有效的数据
         if( user_property.length > 0){
             //匹配赋值
             let configParams = {};
+            let subTableConfigParams = {
+                expired: {},
+                special: {},
+                pool: {},
+                alarm: {},
+                todo: {}
+            };
             for ( let i in user_property) {
                 let userProperty = user_property[i];
                 if( isValidObject(userProperty) ){
                     let value = JSON.parse(userProperty['value']);
                     let uKey = userProperty.key;
-                    let styleStr = 'grid_col_style';
-                    let namesStr = 'grid_col_names';
-                    let titleStr = 'grid_col_title';
-                    let fontSizeStr = 'grid_col_font_size';
-                    let editStr = 'grid_cdm_col_edit';
-                    let displayStr = 'grid_cdm_col_display';
-                    let invalidDataStyleStr = 'invalidDataStyle';
-                    let displayPoolStr = 'grid_pool_col_display';
-
 
                     switch( uKey ){
-                        case styleStr : {
+                        case 'grid_col_style' : {
                             configParams['colStyle'] = value;
+                            subTableConfigParams['pool']['colStyle'] = value;
+                            subTableConfigParams['todo']['colStyle'] = value;
+                            subTableConfigParams['special']['colStyle'] = value;
+                            subTableConfigParams['alarm']['colStyle'] = value;
+                            subTableConfigParams['expired']['colStyle'] = value;
                             //将该数据转化为convert需要数据
                             const obj = convertDisplayStyle(value);
                             configParams['displayStyle'] = obj.displayStyle;
                             configParams['displayStyleComment'] = obj.displayStyleComment;
                             break;
                         }
-                        case namesStr : {
+                        case 'grid_col_names' : {
                             configParams['colNames'] = value;
+                            subTableConfigParams['pool']['colNames'] = value;
                             break;
                         }
-                        case titleStr : {
+                        case 'grid_col_title' : {
                             configParams['colTitle'] = value;
+                            subTableConfigParams['pool']['colTitle'] = value;
+                            subTableConfigParams['todo']['colTitle'] = value;
+                            subTableConfigParams['special']['colTitle'] = value;
+                            subTableConfigParams['alarm']['colTitle'] = value;
+                            subTableConfigParams['expired']['colTitle'] = value;
                             break;
                         }
-                        case editStr : {
+                        case 'grid_cdm_col_edit' : {
                             configParams['colEdit'] = value;
                             break;
                         }
-                        case displayStr : {
+                        case 'grid_cdm_col_display' : {
                             configParams['colDisplay'] = value;
                             break;
                         }
-                        case fontSizeStr : {
+                        case 'grid_col_font_size' : {
                             configParams['colFontSize'] = value;
                             break;
                         }
-                        case invalidDataStyleStr : { //失效航班样式
+                        case 'invalidDataStyle' : { //失效航班样式
                             let invalidStr = "";
                             for(let key in value){
                                 invalidStr += key+":"+value[key]+';';
@@ -241,8 +297,60 @@ class Table extends React.Component{
                             configParams['invalidDataStyle'] = invalidStr;
                             break;
                         }
-                        case displayPoolStr : {
-                            configParams['colPoolDisplay'] = value;
+                        case 'grid_pool_col_display' : {
+                            subTableConfigParams['pool']['colDisplay'] = value;
+                            break;
+                        }
+                        case 'grid_pool_col_edit' : {
+                            subTableConfigParams['pool']['colEdit'] = value;
+                            break;
+                        }
+                        case 'grid_todo_list_col_names' : {
+                            subTableConfigParams['todo']['colNames'] = value;
+                            break;
+                        }
+                        case 'grid_todo_list_col_edit' : {
+                            subTableConfigParams['todo']['colEdit'] = value;
+                            break;
+                        }
+                        case 'grid_todo_list_col_display' : {
+                            subTableConfigParams['todo']['colDisplay'] = value;
+                            break;
+                        }
+                        case 'grid_special_col_names' : {
+                            subTableConfigParams['special']['colNames'] = value;
+                            break;
+                        }
+                        case 'grid_special_col_edit' : {
+                            subTableConfigParams['special']['colEdit'] = value;
+                            break;
+                        }
+                        case 'grid_special_col_display' : {
+                            subTableConfigParams['special']['colDisplay'] = value;
+                            break;
+                        }
+                        case 'grid_alarm_col_names' : {
+                            subTableConfigParams['alarm']['colNames'] = value;
+                            break;
+                        }
+                        case 'grid_alarm_col_edit' : {
+                            subTableConfigParams['alarm']['colEdit'] = value;
+                            break;
+                        }
+                        case 'grid_alarm_col_display' : {
+                            subTableConfigParams['alarm']['colDisplay'] = value;
+                            break;
+                        }
+                        case 'grid_expired_col_names' : {
+                            subTableConfigParams['expired']['colNames'] = value;
+                            break;
+                        }
+                        case 'grid_expired_col_edit' : {
+                            subTableConfigParams['expired']['colEdit'] = value;
+                            break;
+                        }
+                        case 'grid_expired_col_display' : {
+                            subTableConfigParams['expired']['colDisplay'] = value;
                             break;
                         }
                     }
@@ -251,9 +359,11 @@ class Table extends React.Component{
             }
             //存储到redux的 tableConfig 中
             updateTableDatasProperty( configParams );
+            //存储到redux的 subTableDatas 中
+            updateSubTableDatasProperty( subTableConfigParams );
             //转换为表头列数据
             const { colDisplay, colNames, colTitle } = configParams;
-            const { columns, width } = TableColumns( colDisplay, colNames, colTitle );
+            const { columns, width } = TableColumns( "", colDisplay, colNames, colTitle );
             //更新表头数据
             updateTableDatasColumns( columns, width );
             //获取机场航班
@@ -353,7 +463,9 @@ class Table extends React.Component{
     };
 
     componentWillUnmount(){
-        clearTimeout(this.airportTimerId);
+        //清除定时器
+        const { airportTimerId = 0} = this.state;
+        clearTimeout( airportTimerId );
     }
 
     // componentWillUpdate(){

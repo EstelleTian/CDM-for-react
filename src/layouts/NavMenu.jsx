@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Menu, Checkbox, Radio, Icon, Row, Col } from 'antd';
+import { Menu, Checkbox, Radio, Icon, Row, Col, Badge } from 'antd';
 import $ from 'jquery';
 import './NavMenu.less';
 
@@ -24,21 +24,33 @@ class NavMenu extends React.Component{
         this.onMenuTitleSelect = this.onMenuTitleSelect.bind(this);
 
     }
-    //
+    //过滤--单选--时间范围
     onRadioChange(e){
-        console.log('radio checked', e.target.value);
+        // console.log('radio checked', e.target.value);
         this.props.updateScopeFilter( e.target.value );
 
     };
-    //
+    //过滤--多选--航班状态
     onCheckboxChange( checkedValues ){
-        console.log('checked = ', checkedValues);
+        // console.log('checked = ', checkedValues);
         this.props.updateStatusFilter( checkedValues );
     };
     //导航栏目选中
     onMenuTitleSelect({ key, domEvent }){
         console.log( key );
     }
+    //获取过滤条件判断是否计数，用于判断是否显示过滤提示红点
+    getFilterCount() {
+        const { filterMatches = {} } = this.props;
+        const { scopeFilter = "all", statusFilter = [] } = filterMatches;
+        let count = statusFilter.length;
+        if (scopeFilter != 'all') {
+            count++;
+        }
+        return count;
+    }
+
+
     // onTitleClick({ key, domEvent }){
     //     console.log(key);
     //     switch (key){
@@ -54,6 +66,7 @@ class NavMenu extends React.Component{
     // }
     render(){
         const { filterMatches } = this.props;
+        const count = this.getFilterCount();
         return (
             <Row>
                 <Col xs={24} sm={24} md={24} lg={6} xl={6} xxl={6}>
@@ -64,7 +77,12 @@ class NavMenu extends React.Component{
                     >
                         <SubMenu
                             key="filter"
-                            title={<Icon type="filter" title="快速过滤"/>}
+                            title={
+                                <Badge count={ count } dot>
+                                    <Icon type="filter" title="快速过滤"/>
+                                </Badge>
+
+                            }
                         >
                             <MenuItemGroup title="屏蔽">
                                 <Menu.Item>

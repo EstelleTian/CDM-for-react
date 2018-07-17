@@ -1,4 +1,4 @@
-
+@import "../../style/theme-color";
 .react-draggable, .cursor {
   cursor: move;
 }
@@ -14,20 +14,20 @@
 
 .react-draggable strong {
   background: #ddd;
-  border: 1px solid #999;
-  border-radius: 3px;
+  border: 0.08rem solid #999;
+  border-radius: 0.25rem;
   display: block;
-  margin-bottom: 10px;
-  padding: 3px 5px;
+  margin-bottom: 1rem;
+  padding: 0.25rem 0.5rem;
   text-align: center;
 }
 
 .box {
-  background: rgba(0, 0, 0, 0.75);
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  width: 620px;
-  padding: 0.5rem;
+  background: @bc-black-90;
+  border: 0.08rem solid @c-white-30;
+  border-radius: 0.25rem;
+  max-height: 25rem;
+  padding: 0 0.5rem 0.5rem;
   float: left;
   position: absolute;
   z-index: 999;

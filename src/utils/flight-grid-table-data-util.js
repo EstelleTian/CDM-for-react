@@ -1,9 +1,47 @@
-import { isValidVariable, isValidObject} from './basic-verify';
+import { isValidVariable, isValidObject, calculateStringTimeDiff} from './basic-verify';
 import FlightCoordination from './flightcoordination';
 import FlightCoordinationRecord from './flight-coordination-record';
 import FlowcontrolUtils from './flowcontrol-utils';
 
 const showLongFlowcontrol = true;
+//系统告警类型
+const AlarmType = {
+
+    /**
+     * 航班延误接近90分钟
+     */
+    FLIGHT_DELAY : '1',
+
+    /**
+     * 航班接近HOBT未发关舱门
+     */
+    FLIGHT_CLOSE : '2',
+
+    /**
+     * 关舱门等待
+     */
+    FLIGHT_CLOSE_WAIT : '3',
+
+    /**
+     * 流控发布/变更
+     */
+    FLOW_CONTROL : '4',
+
+    /**
+     * 申请时间  > 计划时间 + 10分钟
+     */
+    FLIGHT_PDEPTIME : '5',
+
+    /**
+     * 实关时间 > 协关时间 + 5分钟
+     */
+    FLIGHT_HOBT : '6',
+
+    /**
+     * 时隙修改
+     */
+    FLIGHT_SLOT_UPDATE : '7'
+};
 
 //根据colStyle转为displayStyle和displayStyleComment
 const convertDisplayStyle = ( colStyle = {} ) => {
@@ -67,12 +105,10 @@ const getDisplayFontSize = function( dataKey ){
         }
     }
 }
-/**
- * 转换航班计划表格数据
- */
-const convertData = function( flightMap, generateTime ){
+//转换航班计划表格数据
+const convertData = function( flight, generateTime ){
     // 判断数据有效性
-    if (!isValidObject(flightMap)) {
+    if (!isValidObject(flight)) {
         return {};
     }
     const thisProxy = this;
@@ -83,7 +119,6 @@ const convertData = function( flightMap, generateTime ){
     let defaultFontSize = this.getDisplayFontSize('DEFAULT');
     data.default_style = defaultStyle + defaultFontSize;
 
-    const flight = flightMap.flightFieldViewMap;
 
    //遍历航班生成各个列数据
     for(let key in flight){
@@ -91,6 +126,10 @@ const convertData = function( flightMap, generateTime ){
         //处理基本数据值和样式
         setDataValue.call(thisProxy, key, value );
         setTitleAndStyleData.call(thisProxy, key, value, flight );
+    }
+
+    if( flight["FLIGHTID"].value == "CSN3768" ){
+        console.log(1111);
     }
     //处理基本数据值和样式
     function setDataValue(key, options){
@@ -364,11 +403,11 @@ const convertData = function( flightMap, generateTime ){
                 + this.getDisplayStyleZh(key);
             // 判断来源
             if(isValidVariable(source)){
-                if (source="EOBT_DLA") {
+                if (source == "EOBT_DLA") {
                     titlestr = 'DLA ' + titlestr;
-                } else if (source="EOBT_CHG") {
+                } else if (source == "EOBT_CHG") {
                     titlestr = 'CHG ' + titlestr;
-                } else if (source="EOBT_FPL") {
+                } else if (source == "EOBT_FPL") {
                     titlestr = 'FPL ' + titlestr;
                 }
             }
@@ -1192,24 +1231,271 @@ const convertToTableStandardDate = function(time){
         return '';
     }
 };
-
-/**
- * 判断是否已起飞
- *
- */
+//判断是否已起飞
 const ifDep = function (obj){
     if(isValidVariable(obj)){
-        var processMap = obj.processMap || '';
+        let processMap = obj.processMap || '';
         if(isValidVariable(processMap) && isValidVariable(processMap.DEP)){
             return true;
         }
     }
     return false;
-}
+};
+//告警航班表格数据转换
+const convertAlarmData = function( flight, datatime, statusObj ){
+    let resArr = [];
+    if (isValidVariable(flight)) {
+        let flightFieldViewMap = flight.flightFieldViewMap;
+        if (isValidObject(flightFieldViewMap)) {
+            //获取航班对应的状态信息，取自flightStatusFieldViewMap对应的ALARM_STATUS
+            let statusArr = statusObj.statusInfos || [];
+            if( statusArr.length > 0 ){
+                for(let i = 0,len = statusArr.length; i < len; i++){
+                    // 创建结果对象
+                    let data = {};
+                    let status = statusObj.statusInfos[i];
+                    let commentStr = "";
+                    if (isValidVariable(status)) {
+                        let infoMap = status.infoMap;
+                        if (isValidObject(infoMap)){
+                            if (isValidVariable(infoMap.ID)) {
+                                data.id = infoMap.ID;
+                                data.ID = infoMap.ID;
+                            }
+                            if (isValidVariable(infoMap.FLIGHTID)) {
+                                data.FLIGHTID = infoMap.FLIGHTID;
+                            }
+                            if (isValidVariable(infoMap.TYPE)) {
+                                data.TYPE = AlarmType[infoMap.TYPE];
+                                data.DESCRIBTION = "";
+                                switch(infoMap.TYPE){
+                                    case "FLIGHT_CLOSE":{
+                                        data.DESCRIBTION = '航班未关舱门';break;
+                                    }
+                                    case "FLIGHT_CLOSE_WAIT":{
+                                        data.DESCRIBTION = '航班未推出';break;
+                                    }
+                                    case "FLIGHT_PDEPTIME":{
+                                        data.DESCRIBTION = '申请时间大于计划时间10分钟以上';break;
+                                    }
+                                    case "FLIGHT_HOBT":{
+                                        data.DESCRIBTION = '实关时间大于协关时间5分钟以上';break;
+                                    }
+                                    case "FLIGHT_DELAY":{
+                                        data.DESCRIBTION = '航班延误';break;
+                                    }
+                                }
+                            }
+                            if (isValidVariable(infoMap.REASON)) {
+                                let reasonStr = infoMap.REASON;
+                                let min = infoMap.VALUE ? infoMap.VALUE : "-";
+                                let reason = "";
+                                if( reasonStr.indexOf("HOBT_BEFORE") > -1){
+                                    reason += "距离协关时间还剩" + min +  "分钟,"
+                                }
+                                if( reasonStr.indexOf("HOBT_ON") > -1){
+                                    reason += "已到协关时间,"
+                                }
+                                if( reasonStr.indexOf("HOBT_BEYOND") > -1){
+                                    reason += "超过协关时间" + min +  "分钟,"
+                                }
+                                if( reasonStr.indexOf("CLOSE_WAIT") > -1){
+                                    reason += "关舱门等待超过" + min +  "分钟,"
+                                }
+                                if( reasonStr.indexOf("EOBT_GT_SOBT") > -1){
+                                    reason += "申请时间大于计划时间" + min +  "分钟,"
+                                }
+                                if( reasonStr.indexOf("AGCT_GT_HOBT") > -1){
+                                    reason += "实关时间大于协关时间" + min +  "分钟,"
+                                }
+                                if( reasonStr.indexOf("DELAY") > -1){
+                                    reason += "航班延误" + min +  "分钟,"
+                                }
+                                data.REASON = reason.substring(0, reason.length-1);
+                            }
+                            resArr.push(data);
+                        }}
+                }
+                return resArr;
+            }
+        }
+        return resArr;
+    }
 
+};
+//失效航班表格数据转换
+const convertExpiredData = function (flight, datatime, statusObj ){
+    let resArr = [];
+    if (isValidVariable(flight)) {
+        let flightFieldViewMap = flight.flightFieldViewMap;
+        if (isValidObject(flightFieldViewMap)) {
+            // 创建结果对象
+            let data = this.convertData(flightFieldViewMap, datatime);
+            let status = statusObj.value;
+            let commentStr = "";
+            if (isValidVariable(status)) {
+                if (status.indexOf("100") > -1) {
+                    commentStr += 'EOBT超时,';
+                }
+                if (status.indexOf("200") > -1) {
+                    commentStr += '退出时隙分配,';
+                }
+                if (status.indexOf("300") > -1) {
+                    commentStr += '人工标记取消,';
+                }
+                if (status.indexOf("310") > -1) {
+                    commentStr += '报文取消,';
+                }
+            }
+            if (commentStr.length > 0) {
+                commentStr = commentStr.substring(0, commentStr.length - 1);
+            }
+            data.COMMENT = commentStr;
+            data.COMMENT_title = commentStr;
+            resArr.push(data);
+            return resArr;
+        }
+    }
+    return resArr;
+};
+//特殊航班表格数据转换
+const converSpecialtData = function( flight, datatime, statusObj ) {
+    let resArr = [];
+    if (isValidVariable(flight)) {
+        let flightFieldViewMap = flight.flightFieldViewMap;
+        if (isValidObject(flightFieldViewMap)) {
+            // 创建结果对象
+            let data = this.convertData(flightFieldViewMap, datatime);
+            let status = statusObj.value;
+            let commentStr = "";
+            if (isValidVariable(status)) {
+                if (status.indexOf("NOSLOT") > -1) {
+                    commentStr += '退出时隙分配,';
+                }
+                if (status.indexOf("CNL") > -1) {
+                    commentStr += '取消航班,';
+                }
+                if (status.indexOf("ALN") > -1) {
+                    commentStr += '本段返航,';
+                }
+                if (status.indexOf("RTN") > -1) {
+                    commentStr += '本段备降,';
+                }
+                if (status.indexOf("FORMER_ALN") > -1) {
+                    commentStr += '前段返航,';
+                }
+                if (status.indexOf("FORMER_RTN") > -1) {
+                    commentStr += '前段备降,';
+                }
+                if (status.indexOf("FORMER_ALN_PATCH") > -1) {
+                    commentStr += '返航补班,';
+                }
+                if (status.indexOf("FORMER_RTN_PATCH") > -1) {
+                    commentStr += '备降补班,';
+                }
+            }
+            if (commentStr.length > 0) {
+                commentStr = commentStr.substring(0, commentStr.length - 1);
+            }
+            data.COMMENT = commentStr;
+            data.COMMENT_title = commentStr;
+            resArr.push(data);
+            return resArr;
+        }
+    }
+    return resArr;
+};
+//待办航班表格数据转换
+const convertTodoData = function( flight, datatime, statusObj ){
+    let resArr = [];
+    if (isValidVariable(flight)) {
+        let flightFieldViewMap = flight.flightFieldViewMap || {};
+        if (isValidObject(flightFieldViewMap)) {
+            let statusArr = statusObj.statusInfos || [];
+            if(statusArr.length > 0){
+                for(let i = 0,len=statusArr.length;i<len;i++){
+                    // 创建结果对象
+                    let data = {};
+                    let status = statusObj.statusInfos[i];
+                    let commentStr = "";
+                    if (isValidVariable(status)) {
+                        let infoMap = status.infoMap;
+                        if (isValidVariable(infoMap)) {
+                            if (isValidVariable(infoMap.ID)) {
+                                data.id = infoMap.ID;
+                                data.ID = infoMap.ID;
+                            }
+                            if (isValidVariable(infoMap.FLIGHTID)) {
+                                data.FLIGHTID = infoMap.FLIGHTID;
+                            }
+                            if (isValidVariable(infoMap.TIMESTAMP)) {
+                                data.TIMESTAMP = infoMap.TIMESTAMP.substring(8, 12);
+                            }
+                            if (isValidVariable(infoMap.TYPE)) {
+                                switch (infoMap.TYPE) {
+                                    case FlightCoordinationRecord.TYPE_PRIORITY :
+                                    {
+                                        data.TYPE = "任务";
+                                        if (isValidVariable(infoMap.VALUE)) {
+                                            data.VALUE = FlightCoordination.getPriorityZh(infoMap.VALUE);
+                                        }
+                                        break;
+                                    }
+                                    case FlightCoordinationRecord.TYPE_TOBT :
+                                    {
+                                        data.TYPE = "预关";
+                                        data.VALUE = "";
+                                        if (isValidVariable(infoMap.VALUE)) {
+                                            data.VALUE = infoMap.VALUE.substring(8);
+                                        }
+                                        break;
+                                    }
+                                    case FlightCoordinationRecord.TYPE_HOBT :
+                                    {
+                                        data.TYPE = "协关";
+                                        data.VALUE = "";
+                                        if (isValidVariable(infoMap.VALUE)) {
+                                            data.VALUE = infoMap.VALUE.substring(8);
+                                        }
+                                        break;
+                                    }
+                                    case FlightCoordinationRecord.TYPE_REQ_MANUAL_CTOT :
+                                    {
+                                        data.TYPE = "CTOT申请";
+                                        data.VALUE = "";
+                                        break;
+                                    }
+                                    case FlightCoordinationRecord.TYPE_INPOOL :
+                                    {
+                                        data.TYPE = "等待池";
+                                        data.VALUE = "";
+                                        if (isValidVariable(infoMap.VALUE)) {
+                                            data.VALUE = FlightCoordination.getPoolStatusZh(infoMap.VALUE);
+                                        }
+                                        data.COMMENT = "";
+                                        break;
+                                    }
+                                }
+                            }
+                            data.USER = "";
+                            data.USERNAME = "";
+                            data.COMMENT = "";
+                        }
 
+                        if (commentStr.length > 0) {
+                            commentStr = commentStr.substring(0, commentStr.length - 1);
+                        }
+                        data.COMMENT = commentStr;
+                        data.COMMENT_title = commentStr;
+                        resArr.push(data);
+                    }
+                }
+                return resArr;
+            }
+        }
+    }
+    return resArr;
+};
 
-
-
-
-export { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize };
+export { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize,
+    convertAlarmData, convertExpiredData, converSpecialtData, convertTodoData };

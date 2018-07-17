@@ -1,6 +1,6 @@
 //航班起飞排序---菜单操作功能
 import React from 'react';
-import { Row, Table } from 'antd';
+import { Row, Table, Icon } from 'antd';
 import DraggableModule from '../DraggableModule/DraggableModule';
 import './SubTable.less';
 
@@ -42,27 +42,36 @@ class SubTable extends React.Component{
 
 
     render(){
-        const { titleName, tableDatas, tableColumnsObj, scrollX, x, y} = this.props;
+        const { titleName, type, tableDatas, tableColumnsObj, x, y, clickCloseBtn} = this.props;
         const { width } = tableColumnsObj;
         return (
             <DraggableModule
                 x = {x}
                 y = {y}
             >
-            <div className="box no-cursor">
+            <div className="box no-cursor" style={{ width: width + 50 }}>
                 <div className="sub-table expired-table">
-                    <Row className="title drag-target">
-                        <span className="cursor">{ titleName }</span>
+                    <Row className="title drag-target cursor">
+                        <span>{ titleName }</span>
+                        <div
+                            className="close-target"
+                            onClick={ () => {
+                                clickCloseBtn(type);
+                            } }
+                        >
+                            <Icon type="close" title="关闭"/>
+                        </div>
+
                     </Row>
                     <Row className="content">
                         <Table
-                            columns={ tableColumnsObj.column }
+                            columns={ tableColumnsObj.columns }
                             dataSource={ tableDatas }
                             rowKey="ID"
                             size="small"
                             scroll={{
-                                x: scrollX,
-                                y: width
+                                x: width,
+                                y: 200
                             }}
                             bordered
                             pagination = { false }

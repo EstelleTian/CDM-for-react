@@ -4,7 +4,7 @@ import {isValidObject, isValidVariable} from "./basic-verify";
 import { Icon, Input, Button, Checkbox } from 'antd';
 
 //需要日期格式话的列
-const DataColumns = [ "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "POSITION", "APPFIX", "CTO2", "ACCFIX", "CTO", "SLOT_STATUS", "TAXI_WAIT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT_PASSTIME", "EFPS_REQTIME", "EFPS_PUSTIME", "FORMER_CTOT", "FORMER_DEP", "FORMER_ARR", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_TAXTIME", "GSOBT", "TOBT_UPDATE_TIME"];
+const DataColumns = [ "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "POSITION","CTO2", "CTO", "SLOT_STATUS", "TAXI_WAIT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT_PASSTIME", "EFPS_REQTIME", "EFPS_PUSTIME", "FORMER_CTOT", "FORMER_DEP", "FORMER_ARR", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_TAXTIME", "GSOBT", "TOBT_UPDATE_TIME"];
 
 //处理单元格样式方法
 const handleStyleFunc = ( style ) => {
@@ -104,9 +104,79 @@ const handleColumnRender = (value, row, index, colunmName) => {
         }
     }
 };
+//处理每列列宽，type为识别是主表还是其他表
+const handleColumnWidth = ( type, title ) => {
+    let width = 0;
+    if( title == 'CallSign' || title == 'ACWakes' || title == '批量操作' ){
+        width = 100;
+    }else if( title == 'ACType' ){
+        width = 85;
+    }else if( title.length == 4 ){
+        width = 90;
+    }else if( title.length == 3 ){
+        width = 80;
+    }else if( title == 'ID' || title.length < 3 ){
+        width = 55;
+    }else{
+        width = title.length * 20;
+    }
+    switch (type){
+        case "pool": {
+            if( title.length == 4 ){
+                width = 65;
+            }else if( title == 'ID' ){
+                width = 50;
+            }
+            break;
+        }
+        case "alarm": {
+            if( title == '描述' || title == '告警原因' ){
+                width = 100;
+            }else if(title == '类型'){
+                width = 65;
+            }else if( title == 'ID' ){
+                width = 50;
+            }
+            break;
+        }
+        case "expired": {
+            if( title == '备注' ){
+                width = 100;
+            }else if( title.length == 4 ){
+                width = 65;
+            }else if( title == 'ID' ){
+                width = 50;
+            }
+            break;
+        }
+        case "special": {
+            if( title == '备注' ){
+                width = 100;
+            }else if( title.length == 4 ){
+                width = 65;
+            }else if( title == 'ID' ){
+                width = 50;
+            }
+            break;
+        }
+        case "todo": {
+            if( title == '备注' ){
+                width = 100;
+            }else if( title.length == 4 ){
+                width = 85;
+            }else if( title == 'ID' ){
+                width = 50;
+            }
+            break;
+        }
+    }
 
+    return width;
+
+
+}
 //根据表格列名，配置表格专用列数据格式
-const TableColumns = ( colDisplay, colNames, colTitle ) => {
+const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
     let width = 0;
     let columns = [];
     let i = 0;
@@ -140,25 +210,19 @@ const TableColumns = ( colDisplay, colNames, colTitle ) => {
         };
 
         //调整每列宽度
-        if( title == 'ID' ){
-            obj['width'] = 60;
-            width += 60;
-        }else if( title == 'CallSign' || title == 'ACWakes' || title == '批量操作' ){
-            obj['width'] = 100;
-            width += 100;
-        }else if( title == 'ACType' || title.length == 4 || title.length == 3 ){
-            obj['width'] = 90;
-            width += 90;
-        }
-        else{
-            obj['width'] = title.length * 20;
-            width += title.length * 20;
+        const w = handleColumnWidth( type, title );
+        obj['width'] = w;
+        width += w;
+
+
+
+        // 冻结列,等待池不加冻结
+        if( type == ""){
+            if( i < 3){
+                obj['fixed'] = 'left';
+            }
         }
 
-        // 冻结列
-        if( i < 3){
-            obj['fixed'] = 'left';
-        }
 
         // if( colunmName == "TOBT") {
         // //     console.log(1111);

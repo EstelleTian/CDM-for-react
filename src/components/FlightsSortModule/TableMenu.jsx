@@ -21,11 +21,9 @@ class TableMenu extends React.Component{
     onQuicklySearch( value ){
         // console.log(value);
         let val = value.trim();
-        if(isValidVariable( val )){
-            //存储
-            const { updateTableConditionQuicklyFilters  } = this.props;
-            updateTableConditionQuicklyFilters( val );
-        }
+        //存储
+        const { updateTableConditionQuicklyFilters  } = this.props;
+        updateTableConditionQuicklyFilters( val );
     }
 
     //自动滚动--变化事件

@@ -41,15 +41,12 @@ const filterMatches = (state = initFilterMatches, action) => {
         }
         //更新屏蔽
         case UPDATE_STATUS_FILTER: {
-            const newValue = action.value;
-            if( typeof newValue == 'object' && newValue.length > 0 ){
-                return {
-                    ...state,
-                    statusFilter: newValue
-                }
-            }else{
-                return state;
+            const newValue = action.value || [];
+            return {
+                ...state,
+                statusFilter: newValue
             }
+
 
         }
         default:

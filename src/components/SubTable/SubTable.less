@@ -1,0 +1,26 @@
+@import "../../style/theme-color";
+.close-target{
+  display: inline-block;
+  float: right;
+  >i{
+    font-size: 1.25rem;
+  }
+}
+.close-target:hover{
+  cursor: pointer;
+}
+
+.sub-table{
+  .title{
+    padding: 0.75rem .5rem;
+    border-bottom: 1px solid @c-white-50;
+    span{
+      font-size: 1.25rem;
+    }
+  }
+
+}
+//副表不需要滚动条时候不需要scroll
+.ant-table-body{
+  overflow: auto!important;
+}
