@@ -85,7 +85,6 @@ const flowcontrolCondition = (state = initFlowcontrolCondition, action) => {
     switch ( action.type ){
         case UPDATE_FLOWCONTROL_CONDITION_SHIELD_LONG: {
             if( state.shieldLong != action.flag ){
-                debugger
                 return {
                     ...state,
                     shieldLong: action.flag

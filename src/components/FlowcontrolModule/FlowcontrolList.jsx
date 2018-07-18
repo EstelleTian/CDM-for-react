@@ -17,7 +17,6 @@ class FlowcontrolList extends React.Component{
         super(props);
         this.getParams = this.getParams.bind(this);
         this.getFlowcontrolDatas = this.getFlowcontrolDatas.bind(this);
-        this.filterFlowoncontrolDatas = this.filterFlowoncontrolDatas.bind(this);
         this.handleUpdateFlowcontrolData = this.handleUpdateFlowcontrolData.bind(this);
     }
     getParams (){
@@ -93,7 +92,19 @@ class FlowcontrolList extends React.Component{
         //     updateFlowcontrolViewMap(viewMap);
         //
         // })
-        request(getFlowcontrolUrl, 'POST', JSON.stringify(params), this.handleUpdateFlowcontrolData)
+        request(getFlowcontrolUrl, 'POST', JSON.stringify(params), this.handleUpdateFlowcontrolData);
+    }
+    // 更新流控数据
+    handleUpdateFlowcontrolData(res) {
+        const {updateFlowcontrolDatas, updateFlowGenerateTime} = this.props;
+        // 流控数据生成时间
+        const {generateTime = ''} = res;
+        // 更新流控数据生成时间
+        updateFlowGenerateTime(generateTime);
+        // 取流控数据
+        const {result = {}} = res;
+        // 更新流控数据
+        updateFlowcontrolDatas(result);
     }
 
     // 立即调用
