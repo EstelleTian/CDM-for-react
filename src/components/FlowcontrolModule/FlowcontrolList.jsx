@@ -68,30 +68,7 @@ class FlowcontrolList extends React.Component{
             "waypoints" : "PARGU,RG,CZH,ENH,P127,P124,SUBUL,UPKUS,AGULU,OMBON",
             "startWaypoints" : "ZUUU",
         };
-        // axios.request({
-        //     url: getFlowcontrolUrl,
-        //     method: "post",
-        //     data: JSON.stringify(params),
-        //     headers: {
-        //         'Content-Type': 'application/json; charset=utf-8'
-        //     }
-        // }).then(function (response) {
-        //
-        //     const { data = {} } = response;
-        //     // 流控数据生成时间
-        //     const { generateTime = '' } = data;
-        //     // 更新流控数据生成时间
-        //     updateFlowGenerateTime(generateTime);
-        //     // 取流控数据
-        //     const { result = {} } = data;
-        //     // 更新流控数据
-        //     updateFlowcontrolDatas(result);
-        //     // 根据过虑条件过滤显示的流控数据
-        //     const viewMap = filterFlowoncontrolDatas(flowcontrolDataMap);
-        //     // 更新显示的流控数据
-        //     updateFlowcontrolViewMap(viewMap);
-        //
-        // })
+
         request(getFlowcontrolUrl, 'POST', JSON.stringify(params), this.handleUpdateFlowcontrolData);
     }
     // 更新流控数据

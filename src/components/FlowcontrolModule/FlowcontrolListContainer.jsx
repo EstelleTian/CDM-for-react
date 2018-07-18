@@ -8,7 +8,7 @@ import { updateFlowcontrolDatas,  updateFlowcontrolConditionShieldLong,
 
 import FlowcontrolList from './FlowcontrolList';
 import { isValidVariable, isValidObject } from '../../utils/basic-verify';
-import { isEffective } from '../../utils/flowcontrol-data-util';
+import { isEffective, FlowcontroConstant } from '../../utils/flowcontrol-data-util';
 
 
 /**
@@ -62,8 +62,8 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
     if("TIME" == orderBy){ // 按时间排序
         // 时间排序
         //失效在下生效在上 ? (原代码未按此规则排序)
-        // 失效流控按lastModifyTime倒叙排
-        // 生效流控按generateTime倒叙排排
+        // 失效流控按lastModifyTime 降序排
+        // 生效流控按generateTime 降序排
 
         flowcontrolDatas.sort((d1,d2) =>{
             if(isValidObject(d1) && isValidObject(d2)){
@@ -75,21 +75,54 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
         });
 
     }else if("LEVEL" == orderBy){ // 按程度排序
-        // LDR 排在最后
-        //
+        flowcontrolDatas.sort((d1,d2) =>{
+            if(isValidObject(d1) && isValidObject(d2)){
+                // LDR 排在最后
+                if(d1.placeType == FlowcontroConstant.TYPE_LDR
+                    && d2.placeType != FlowcontroConstant.TYPE_LDR  ){
+                    return -1;
+                }
+                // 按程度标记降序排序
+                let d1Value = calculateLevelValue(d1);
+                let d2Value = calculateLevelValue(d2);
+                return (d1Value *1 > d2Value *1) ? -1 : 1;
 
+            }
+        });
 
     }
 
-
     return flowcontrolDatas;
+}
+
+/**
+ * 计算流控单个数据程度
+ * */
+const calculateLevelValue = (data) => {
+    const { type, value, assignSlot } = data;
+    debugger
+    let res = 0;
+    if(type == FlowcontroConstant.TYPE_MIT ){ // 距离
+        res = parseInt( value, 10) / 13;
+    }else if(type == FlowcontroConstant.TYPE_TIME){ // 时间
+        res = value;
+    }else if(type == FlowcontroConstant.TYPE_GS){ // 地面停止
+        res = 0;
+    }else if(type == FlowcontroConstant.TYPE_ASSIGN){ // 指定时隙
+        res = assignSlot;
+    }else if(type == FlowcontroConstant.TYPE_RESERVE){ // 预留时隙
+        res = assignSlot;
+    }
+
+    return res;
+
 }
 
 const mapStateToProps = ( state ) => {
     const { flowcontrolDataMap , flowcontrolViewMap} = state.flowcontrolDatas;
 
     const {  shieldLong = false,
-        scope = 'effective',
+        scope = 'EFFECTIVE',
         placeType = 'ALL',
         orderBy = 'TIME',
         quicklyFilters = ''

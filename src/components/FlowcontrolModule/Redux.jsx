@@ -75,7 +75,7 @@ const updateFlowcontrolConditionQuicklyFilters = data => ({
 });
 const initFlowcontrolCondition = {
     shieldLong : true, // 是否屏蔽长期
-    scope: 'ALL', //流控列表范围 EFFECTIVE ALL
+    scope: 'EFFECTIVE', //流控列表范围 EFFECTIVE ALL
     placeType: 'ALL', //流控类型
     orderBy: 'TIME', //流控列表排序字段
     quicklyFilters: '', //流控列表快速过滤数值
