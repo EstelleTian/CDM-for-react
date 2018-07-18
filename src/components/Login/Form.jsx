@@ -62,8 +62,7 @@ class Loginform extends React.Component{
     }
     // 更新用户信息
     updateUserInfoData(res){
-        const updateUserInfo = this.props.updateUserInfo;
-        const history = this.props.history;
+        const { updateUserInfo, history } = this.props;
         // 200 成功
         if( 200 == res.status*1 ){
             // 用户信息

@@ -95,27 +95,37 @@ class TableHeader extends React.Component{
                 <div className="flight-menu">
                     <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('expired', e)} }>
                         <Badge count={ Object.keys( expiredData.datas || {} ).length } className="badge-icon">
-                            <span title="失效航班">失</span>
+                            <span title="失效航班">
+                                <i className="iconfont icon-expired"></i>
+                            </span>
                         </Badge>
                     </div>
                     <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('special', e)} }>
                         <Badge count={ Object.keys( specialData.datas || {} ).length } className="badge-icon">
-                            <span title="特殊航班">特</span>
+                            <span title="特殊航班">
+                                <i className="iconfont icon-special"></i>
+                            </span>
                         </Badge>
                     </div>
                     <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('pool', e)} }>
                         <Badge count={ Object.keys( poolData.datas || {} ).length } className="badge-icon">
-                            <span title="等待池">池</span>
+                            <span title="等待池">
+                                <i className="iconfont icon-pool"></i>
+                            </span>
                         </Badge>
                     </div>
                     <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('alarm', e)} }>
                         <Badge count={ Object.keys( alarmData.datas || {} ).length } className="badge-icon">
-                            <span title="告警信息">警</span>
+                            <span title="告警信息">
+                                <i className="iconfont icon-alarm"></i>
+                            </span>
                         </Badge>
                     </div>
                     <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('todo', e)} }>
                         <Badge count={ Object.keys( todoData.datas || {} ).length } className="badge-icon">
-                            <span title="待办事项">待</span>
+                            <span title="待办事项">
+                                <i className="iconfont icon-todo"></i>
+                            </span>
                         </Badge>
                     </div>
                 {/*<Menu*/}

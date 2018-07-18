@@ -79,7 +79,7 @@ class NavMenu extends React.Component{
                             key="filter"
                             title={
                                 <Badge count={ count } dot>
-                                    <Icon type="filter" title="快速过滤"/>
+                                    <icon className="iconfont icon-filter" title="快速过滤"/>
                                 </Badge>
 
                             }

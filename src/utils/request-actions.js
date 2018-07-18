@@ -13,6 +13,7 @@ const requestGet = ( url, params, resFunc ) => {
             console.error(err);
         })
 };
+
 /*axios  get 请求
  * @param url 请求url
  * @param type 请求类型  POST PUT DELETE
@@ -24,7 +25,10 @@ const request = ( url, type, params, resFunc ) => {
     axios({
         method: type,
         url,
-        params
+        data: params,
+        headers: {
+            'Content-Type': 'application/json; charset=utf-8'
+        }
     }).then( response => {
         const data = response.data;
         resFunc( data );

@@ -17,6 +17,8 @@ class FlowcontrolList extends React.Component{
         super(props);
         this.getParams = this.getParams.bind(this);
         this.getFlowcontrolDatas = this.getFlowcontrolDatas.bind(this);
+        this.filterFlowoncontrolDatas = this.filterFlowoncontrolDatas.bind(this);
+        this.handleUpdateFlowcontrolData = this.handleUpdateFlowcontrolData.bind(this);
     }
     getParams (){
         let params = {
@@ -43,9 +45,9 @@ class FlowcontrolList extends React.Component{
 
     // 获取流控数据
     getFlowcontrolDatas(){
-        const { flowcontrolDataMap, updateFlowcontrolDatas, updateFlowcontrolViewMap, updateFlowGenerateTime } = this.props;
-
-        const  filterFlowoncontrolDatas = this.filterFlowoncontrolDatas;
+        // const { flowcontrolDataMap, updateFlowcontrolDatas, updateFlowcontrolViewMap, updateFlowGenerateTime } = this.props;
+        //
+        // const  filterFlowoncontrolDatas = this.filterFlowoncontrolDatas;
 
         // let params = this.getParams();
         // params = JSON.stringify(params)
@@ -59,27 +61,39 @@ class FlowcontrolList extends React.Component{
         day = day < 10 ? '0' + day : '' + day;
         let fullTime = year + month + day;
 
-
-        axios.post(getFlowcontrolUrl,{
+        const params = {
             "startTime": fullTime+"0000",
             "endTime":  fullTime+ "2359",
             "system": "CDM",
             "systemProgram": "CDMZUUU",
             "waypoints" : "PARGU,RG,CZH,ENH,P127,P124,SUBUL,UPKUS,AGULU,OMBON",
             "startWaypoints" : "ZUUU",
-        }).then(function (response) {
-
-            const { data = {} } = response;
-            // 流控数据生成时间
-            const { generateTime = '' } = data;
-            // 更新流控数据生成时间
-            updateFlowGenerateTime(generateTime);
-            // 取流控数据
-            const { result = {} } = data;
-            // 更新流控数据
-            updateFlowcontrolDatas(result);
-        })
-        // request(getFlowcontrolUrl,'POST',params,this.handleUpdateFlowcontrolData)
+        };
+        // axios.request({
+        //     url: getFlowcontrolUrl,
+        //     method: "post",
+        //     data: JSON.stringify(params),
+        //     headers: {
+        //         'Content-Type': 'application/json; charset=utf-8'
+        //     }
+        // }).then(function (response) {
+        //
+        //     const { data = {} } = response;
+        //     // 流控数据生成时间
+        //     const { generateTime = '' } = data;
+        //     // 更新流控数据生成时间
+        //     updateFlowGenerateTime(generateTime);
+        //     // 取流控数据
+        //     const { result = {} } = data;
+        //     // 更新流控数据
+        //     updateFlowcontrolDatas(result);
+        //     // 根据过虑条件过滤显示的流控数据
+        //     const viewMap = filterFlowoncontrolDatas(flowcontrolDataMap);
+        //     // 更新显示的流控数据
+        //     updateFlowcontrolViewMap(viewMap);
+        //
+        // })
+        request(getFlowcontrolUrl, 'POST', JSON.stringify(params), this.handleUpdateFlowcontrolData)
     }
 
     // 立即调用
