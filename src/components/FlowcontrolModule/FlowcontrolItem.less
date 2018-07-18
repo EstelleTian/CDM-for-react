@@ -1,0 +1,91 @@
+@import "../../style/base";
+@import "../../style/theme-color";
+.flow-item{
+  background-color: @bc-black-10;
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  .ant-row {
+    div {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+  .title {
+    //height: 3rem;
+    //line-height: 3rem;
+    .status {
+      //font-size: 1.5rem;
+      padding: 0.2rem 0.5rem;
+      display: inline-block;
+      border-top-left-radius: 0.5rem;
+      border-bottom-right-radius: 0.5rem;
+    }
+    //
+    .status.running {
+      background-color: #75df33 ;
+    }
+    .status.future {
+      background-color: #1827ff;
+    }
+    .status.terminated {
+      background-color: #ff0000;
+    }
+    .status.cancel {
+      background-color: #B848FF;
+    }
+    .status.finished {
+      background-color: #ffa500;
+    }
+
+    .calculate {
+      margin: 0 0.5rem;
+    }
+    .place-type, .effective-time {
+      line-height: 2;
+    }
+    .place-type {
+      padding-left: 0.5rem;
+    }
+
+  }
+  .row {
+    margin: 0 1rem;
+    padding: 0.5rem 0;
+    color: @c-white-50;
+  }
+  .row.value {
+    padding: 0;
+    div {
+      font-size: 1.15rem;
+      color: @c-white-100;
+      font-weight: 600;
+    }
+  }
+  .describe {
+    span {
+      margin-left: 0.5rem;
+    }
+  }
+
+  .operator{
+      padding-top: 1rem;
+      padding-bottom: 1rem;
+      text-align: right;
+    a {
+      display: inline-block;
+      margin: 0 0.5rem;
+      color: #37aafd;
+    }
+  }
+  .number {
+    display: inline-block;
+    background-color: @bc-black-30;
+    border-radius: 50%;
+    margin-right: 0.5rem;
+    padding: 0.2rem 0.5rem;
+  }
+
+}
+.flow-item:hover {
+  background-color: @bc-mazarine-100;
+}

@@ -11,9 +11,10 @@ const getUserPropertyUrl = `${host}/retrieveNeedBasicParam.bo`;
 //获取系统参数
 const getSystemConfigUrl = `${host}/retrieveSystemConfig.bo`;
 
-
+//获取流控信息
+const getFlowcontrolUrl = `http://192.168.217.233:38181/flow/retrieveFlowcontrols.action`
 
 // 用户登录
 const loginUrl = `${host}/userLogon.bo`;
 
-export {getSystemConfigUrl, getAllAirportsUrl, getUserPropertyUrl, loginUrl };
+export {getSystemConfigUrl, getAllAirportsUrl, getUserPropertyUrl, loginUrl, getFlowcontrolUrl };
