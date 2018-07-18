@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { updateFlowcontrolDatas, updateFlowcontrolViewMap, updateFlowcontrolConditionShieldLong,
+import {  updateFlowcontrolConditionShieldLong,
     updateFlowcontrolConditionScope, updateFlowcontrolConditionPlaceType,
     updateFlowcontrolConditionOrderBy, updateFlowcontrolConditionQuicklyFilters,
-    updateFlowGenerateTime, } from './Redux';
+    } from './Redux';
 import FlowcontrolHeader from './FlowcontrolHeader';
 
 const mapStateToProps = ( state ) => {
@@ -31,10 +31,9 @@ const mapStateToProps = ( state ) => {
 };
 
 const mapDispatchTopProps = {
-    updateFlowcontrolDatas, updateFlowcontrolViewMap, updateFlowcontrolConditionShieldLong,
+    updateFlowcontrolConditionShieldLong,
     updateFlowcontrolConditionScope, updateFlowcontrolConditionPlaceType,
     updateFlowcontrolConditionOrderBy, updateFlowcontrolConditionQuicklyFilters,
-    updateFlowGenerateTime,
 };
 
 const FlowcontrolHeaderContainer = connect(

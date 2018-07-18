@@ -58,10 +58,6 @@ class FlowcontrolHeader extends React.Component{
             <Col span={24} className="header">
                 <Col span={10} className="title" >
                     <span className="designation">流控信息</span>
-                    {/*<span className="designation">{placeType}</span>*/}
-                    {/*<span className="designation">{shieldLong.toString()}</span>*/}
-                    {/*<span className="designation">{scope}</span>*/}
-                    {/*<span className="designation">{orderBy}</span>*/}
                 </Col>
                 <Col span={10} className="tools">
                 </Col>

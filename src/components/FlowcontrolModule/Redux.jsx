@@ -13,7 +13,6 @@ const updateFlowcontrolDatas = dataMap => ({
 //reducer flowcontrol data 流控数据
 const initData = {
     flowcontrolDataMap: {}, // 流控数据
-    flowcontrolViewMap: [], // 流控显示数据(依据选中的过滤条件过滤后的)
 };
 
 // 更新流控显示数据集合
@@ -29,18 +28,10 @@ const flowcontrolDatas = ( state = initData, action) => {
         case UPDATE_FLOWCONTROL_DATAS: {
             const flowcontrolDataMap = state.flowcontrolDataMap;
             let dataMap = action.dataMap || {};
-
             dataMap = { ...flowcontrolDataMap, ...dataMap};
             return {
                 ...state,
                 flowcontrolDataMap: dataMap
-            }
-        }
-        case UPDATE_FLOWCONTROL_VIEWMAP: {
-            let viewMap = action.viewMap || {};
-            return {
-                ...state,
-                flowcontrolViewMap: viewMap
             }
         }
         default:
@@ -168,7 +159,7 @@ const flowGenerateTime = (state = initFlowGenerateTime, action) => {
 
 //---------------------------------------------------------------------
 export {
-    flowcontrolDatas, updateFlowcontrolDatas, updateFlowcontrolViewMap,
+    flowcontrolDatas, updateFlowcontrolDatas,
     flowcontrolCondition, updateFlowcontrolConditionShieldLong,
     updateFlowcontrolConditionScope, updateFlowcontrolConditionPlaceType,
     updateFlowcontrolConditionOrderBy, updateFlowcontrolConditionQuicklyFilters,

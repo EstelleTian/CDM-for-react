@@ -3,7 +3,6 @@
 import React from 'react';
 import { Row, Col } from 'antd';
 import { getFlowcontrolUrl } from '../../utils/request-urls';
-import { isValidVariable, isValidObject } from '../../utils/basic-verify';
 import { isEffective } from '../../utils/flowcontrol-data-util';
 
 import { requestGet, request } from '../../utils/request-actions';
@@ -18,7 +17,6 @@ class FlowcontrolList extends React.Component{
         super(props);
         this.getParams = this.getParams.bind(this);
         this.getFlowcontrolDatas = this.getFlowcontrolDatas.bind(this);
-        this.filterFlowoncontrolDatas = this.filterFlowoncontrolDatas.bind(this);
     }
     getParams (){
         let params = {
@@ -42,67 +40,6 @@ class FlowcontrolList extends React.Component{
         return params;
     }
 
-    // 过滤流控数据
-    filterFlowoncontrolDatas(){
-        const { flowcontrolDataMap, shieldLong, scope, placeType, orderBy, quicklyFilters, generateTime } = this.props;
-        let flowcontrolDatas = Object.values( flowcontrolDataMap ); //转为数组
-        // 过滤
-
-        // 过滤是否屏蔽长期
-        if(shieldLong){ // 不屏蔽长期则不进行过滤,反之过滤
-            flowcontrolDatas = flowcontrolDatas.filter((item) => {
-                // 0 : 长期  1 : 非长期
-                if( 0 == item.flowcontrolType*1){
-                    return false
-                }else{
-                    return true
-                }
-            })
-        }
-
-        // 过滤范围
-        if(isValidVariable(scope) && 'ALL' != scope){ // 范围为"ALL"或无效则不进行过滤,反之过滤
-            // 若范围为"EFFECTIVE"(正在生效)
-            if('EFFECTIVE' == scope){
-                // 过滤正在生效流控数据
-                flowcontrolDatas = flowcontrolDatas.filter((item) => {
-                    return isEffective(item,generateTime);
-                });
-            }
-
-        }
-        // 过滤类型
-        if(isValidVariable(placeType) && 'ALL' != placeType){ // 类型为"ALL"或无效则不进行过滤,反之过滤
-            flowcontrolDatas = flowcontrolDatas.filter((item) => placeType == item.placeType);
-        }
-
-
-        // 排序
-        if("TIME" == orderBy){ // 按时间排序
-            // 时间排序
-            //失效在下生效在上 ? (原代码未按此规则排序)
-            // 失效流控按lastModifyTime倒叙排
-            // 生效流控按generateTime倒叙排排
-
-            flowcontrolDatas.sort((d1,d2) =>{
-                if(isValidObject(d1) && isValidObject(d2)){
-                    const d1Time = d1.lastModifyTime || d1.generateTime;
-                    const d2Time = d2.lastModifyTime || d2.generateTime;
-
-                    return (d1Time * 1 > d2Time *1) ? -1 : 1 ;
-                }
-            });
-
-        }else if("LEVEL" == orderBy){ // 按程度排序
-            // LDR 排在最后
-            //
-
-
-        }
-
-
-        return flowcontrolDatas;
-    }
 
     // 获取流控数据
     getFlowcontrolDatas(){
@@ -141,11 +78,6 @@ class FlowcontrolList extends React.Component{
             const { result = {} } = data;
             // 更新流控数据
             updateFlowcontrolDatas(result);
-            // 根据过虑条件过滤显示的流控数据
-            const viewMap = filterFlowoncontrolDatas(flowcontrolDataMap);
-            // 更新显示的流控数据
-            updateFlowcontrolViewMap(viewMap);
-
         })
         // request(getFlowcontrolUrl,'POST',params,this.handleUpdateFlowcontrolData)
     }
@@ -156,11 +88,9 @@ class FlowcontrolList extends React.Component{
         this.getFlowcontrolDatas()
     }
 
-
-
     render(){
         // 流控数据
-        const { flowcontrolViewMap = [], generateTime } = this.props;
+        const { flowcontrolViewMap = [], flowGenerateTime } = this.props;
         return (
             <Col span={24} className="flowcontrol-list">
                 <Row className="flow-item-wrapper">
@@ -171,7 +101,7 @@ class FlowcontrolList extends React.Component{
                                     key={item.id}
                                     data = {item}
                                     indexNumber = { (index +1) }
-                                    generateTime = { generateTime }
+                                    generateTime = { flowGenerateTime }
                                 />
                             )
                         })
