@@ -12,10 +12,11 @@ const updateUserInfo = userObj => ({
 
 //reducer user info
 const obj = {
-    username: '',
-    loginStatus: false,
-    userId :'',
-    errmsg: '',
+    username: '', // 用户名
+    loginStatus: false, // 是否已登录
+    userId :'', // 用户Id
+    errmsg: '', // 登录失败信息
+    allAuthority : [] // 用户权限集合
 }
 const loginUserInfo = ( state = obj, action ) => {
     switch( action.type ){
@@ -27,6 +28,7 @@ const loginUserInfo = ( state = obj, action ) => {
                 loginStatus: action.userObj.loginStatus || '',
                 userId : action.userObj.userId || '',
                 errmsg: action.userObj.errmsg || '',
+                allAuthority: action.userObj.allAuthority || [],
             }
         }
         default:

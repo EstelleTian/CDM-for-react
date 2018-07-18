@@ -21,7 +21,8 @@ class Head extends React.Component{
         let params = {
             username : '',
             loginStatus: false,
-            userId : ''
+            userId : '',
+            allAuthority : []
         }
         // 更新用户信息
         updateUserInfo(params);
