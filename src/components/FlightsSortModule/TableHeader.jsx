@@ -46,7 +46,7 @@ class TableHeader extends React.Component{
         }
     }
     //导航栏目选中
-    onMenuTitleSelect({ key, domEvent }){
+    onMenuTitleSelect(key, domEvent){
         let { clientX = 0, clientY = 0 }  = domEvent;
         let show = this.state[key].show;
         this.setState({
@@ -93,38 +93,63 @@ class TableHeader extends React.Component{
                     }
                 </div>
                 <div className="flight-menu">
-                <Menu
-                    mode="horizontal"
-                    theme="dark"
-                    multiple={ true }
-                    onClick={ this.onMenuTitleSelect }
-                >
-                    <Menu.Item key="expired" title="失效航班" className="expired">
+                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('expired', e)} }>
                         <Badge count={ Object.keys( expiredData.datas || {} ).length } className="badge-icon">
-                            <span>失效航班</span>
+                            <span title="失效航班">失</span>
                         </Badge>
-                    </Menu.Item>
-                    <Menu.Item key="special" title="特殊航班" className="special">
+                    </div>
+                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('special', e)} }>
                         <Badge count={ Object.keys( specialData.datas || {} ).length } className="badge-icon">
-                            <span>特殊航班</span>
+                            <span title="特殊航班">特</span>
                         </Badge>
-                    </Menu.Item>
-                    <Menu.Item key="pool" title="等待池" className="pool">
+                    </div>
+                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('pool', e)} }>
                         <Badge count={ Object.keys( poolData.datas || {} ).length } className="badge-icon">
-                            <span>等待池</span>
+                            <span title="等待池">池</span>
                         </Badge>
-                    </Menu.Item>
-                    <Menu.Item key="alarm" title="告警信息" className="alarm">
+                    </div>
+                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('alarm', e)} }>
                         <Badge count={ Object.keys( alarmData.datas || {} ).length } className="badge-icon">
-                            <span>告警信息</span>
+                            <span title="告警信息">警</span>
                         </Badge>
-                    </Menu.Item>
-                    <Menu.Item key="todo" title="待办事项" className="todo">
+                    </div>
+                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('todo', e)} }>
                         <Badge count={ Object.keys( todoData.datas || {} ).length } className="badge-icon">
-                            <span>待办事项</span>
+                            <span title="待办事项">待</span>
                         </Badge>
-                    </Menu.Item>
-                </Menu>
+                    </div>
+                {/*<Menu*/}
+                    {/*mode="horizontal"*/}
+                    {/*theme="dark"*/}
+                    {/*multiple={ true }*/}
+                    {/*onClick={ this.onMenuTitleSelect }*/}
+                    {/*>*/}
+                    {/*<Menu.Item key="expired" title="失效航班" className="expired">*/}
+                        {/*<Badge count={ Object.keys( expiredData.datas || {} ).length } className="badge-icon">*/}
+                            {/*<span>失效航班</span>*/}
+                        {/*</Badge>*/}
+                    {/*</Menu.Item>*/}
+                    {/*<Menu.Item key="special" title="特殊航班" className="special">*/}
+                        {/*<Badge count={ Object.keys( specialData.datas || {} ).length } className="badge-icon">*/}
+                            {/*<span>特殊航班</span>*/}
+                        {/*</Badge>*/}
+                    {/*</Menu.Item>*/}
+                    {/*<Menu.Item key="pool" title="等待池" className="pool">*/}
+                        {/*<Badge count={ Object.keys( poolData.datas || {} ).length } className="badge-icon">*/}
+                            {/*<span>等待池</span>*/}
+                        {/*</Badge>*/}
+                    {/*</Menu.Item>*/}
+                    {/*<Menu.Item key="alarm" title="告警信息" className="alarm">*/}
+                        {/*<Badge count={ Object.keys( alarmData.datas || {} ).length } className="badge-icon">*/}
+                            {/*<span>告警信息</span>*/}
+                        {/*</Badge>*/}
+                    {/*</Menu.Item>*/}
+                    {/*<Menu.Item key="todo" title="待办事项" className="todo">*/}
+                        {/*<Badge count={ Object.keys( todoData.datas || {} ).length } className="badge-icon">*/}
+                            {/*<span>待办事项</span>*/}
+                        {/*</Badge>*/}
+                    {/*</Menu.Item>*/}
+                {/*</Menu>*/}
                 </div>
                 {
                     ( expired.show ) ?

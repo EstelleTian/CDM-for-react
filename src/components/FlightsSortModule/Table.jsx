@@ -15,7 +15,6 @@ class Table extends React.Component{
         this.convertBasicConfigInfo = this.convertBasicConfigInfo.bind(this);
         this.refreshAirportsList = this.refreshAirportsList.bind(this);
         this.getAirportsParams = this.getAirportsParams.bind(this);
-        this.filterBaseDatas = this.filterBaseDatas.bind(this);
         this.tableOnChange = this.tableOnChange.bind(this);
         this.scrollToRow = this.scrollToRow.bind(this);
         this.resetFrozenTableStyle = this.resetFrozenTableStyle.bind(this);
@@ -54,35 +53,12 @@ class Table extends React.Component{
         month = month < 10 ? '0' + month : '' + month;
         day = day < 10 ? '0' + day : '' + day;
         let fullTime = year + month + day;
-        params['start'] = fullTime + '0000';
-        // params['start'] = fullTime + '1230';
-        params['end'] = fullTime + '2359';
-        // params['end'] = fullTime + '1400';
+        // params['start'] = fullTime + '0000';
+        params['start'] = fullTime + '0800';
+        // params['end'] = fullTime + '2359';
+        params['end'] = fullTime + '1400';
 
         return params;
-    };
-    //过滤系统基本参数
-    filterBaseDatas( flight ){
-        let tableFlight = {};
-        // if (flight.hasOwnProperty("flightFieldViewMap")) {
-        //     // 当前flight对象值
-        //     let cflight = flight.flightFieldViewMap || {};
-        //     // 根据列名获取需要的参数值
-        //     let colNames = thisProxy.convertColModel();
-        //     for (let n = 0, len = colNames.length; n < len; n++) {
-        //         let colName = colNames[n].name;
-        //         // 若有该对象值则取值,否则自定义空，防止丢数据
-        //         if (cflight.hasOwnProperty(colName)) {
-        //             tableFlight[colName] = cflight[colName];
-        //         } else {
-        //             tableFlight[colName] = {};
-        //         }
-        //     }
-        // }
-
-        tableFlight.flightFieldViewMap = flight.flightFieldViewMap || {};
-        tableFlight.flightCoordinationRecordsMap = flight.flightCoordinationRecordsMap || {};
-        return tableFlight;
     };
     //更新航班数据
     refreshAirportsList( res ){
@@ -110,11 +86,12 @@ class Table extends React.Component{
             const id = departureClearanceFlightsArr[index];
             //获取航班对象
             const flight = flightViewMap[id] || {};
-            // 转换数据格式为convert方法需要的格式
-            const tableFlight = this.filterBaseDatas(flight);
             //转化后的数据
-            const flightFieldViewMap = tableFlight.flightFieldViewMap;
+            const flightFieldViewMap = flight.flightFieldViewMap;
             const data = this.convertData( flightFieldViewMap, generateTime );
+            //将航班原数据补充到航班对象中
+            data.originalData = flight;
+
             //根据是否是自动滚动，如果是：计算滚动的航班id
             if( autoScroll ){
                 // 取自定义排序首个字段与当前时间最接近的航班id
@@ -150,11 +127,8 @@ class Table extends React.Component{
 
         //更新统计数据
         updateGenerateInfo(generateInfo);
-        //
-        var params = {
-            time : generateTime,
-        }
-        updateGenerateTime(params)
+        //更新数据生成时间
+        updateGenerateTime({time : generateTime})
 
         // const airportTimerId = setTimeout(() => {
         //     //获取机场航班

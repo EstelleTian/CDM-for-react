@@ -7,8 +7,55 @@ import { updateSubTableDatasProperty, updateSubTableDatas } from '../SubTable/Re
 import Table from './Table';
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
-const sortTableDatas = ( tableDatasMap, quicklyFilters ) => {
-    let tableDatas = Object.values( tableDatasMap ); //转为数组
+const sortTableDatas = ( tableDatasMap, quicklyFilters, scopeFilter, statusFilter ) => {
+
+    //高级过滤 scopeFilter  时间过滤 30 45 60min
+    if( scopeFilter != "all" ){
+
+    }
+    //高级过滤 statusFilter 高级过滤（已起飞、已落地）
+    let statusFilterTableDatasMap = {};
+    if( statusFilter.length > 0 ){
+        //遍历航班
+        for( let id in tableDatasMap ){
+            //一条航班对象
+            const flightObj = tableDatasMap[id];
+            const { flightFieldViewMap = {} } = flightObj.originalData || {};
+            //屏蔽已起飞
+            if( statusFilter.indexOf('dep') > -1 ){
+                //判断航班是否已起飞,若已起飞，不加入过滤后集合中
+                if( flightFieldViewMap["HADDEP"].value == "true"){
+                    continue;
+                }
+            }
+            //屏蔽已落地
+            if( statusFilter.indexOf('arr') > -1 ){
+                //判断航班是否已落地,若已落地，不加入过滤后集合中
+                if( flightFieldViewMap["HADARR"].value == "true"){
+                    continue;
+                }
+            }
+            //屏蔽已取消
+            if( statusFilter.indexOf('cnl') > -1 ){
+                //判断航班是否已取消,若已取消，不加入过滤后集合中
+                if( flightFieldViewMap["HADCNL"].value == "true"){
+                    continue;
+                }
+            }
+            //屏蔽未发FPL
+            if( statusFilter.indexOf('nofpl') > -1 ){
+                //判断航班是否已发FPL,若已发FPL，加入过滤后集合中
+                if( flightFieldViewMap["HADFPL"].value == "false"){
+                    continue;
+                }
+            }
+            statusFilterTableDatasMap[id] = flightObj;
+        }
+    }else{
+        statusFilterTableDatasMap = tableDatasMap;
+    }
+
+    let tableDatas = Object.values( statusFilterTableDatasMap ); //转为数组
     //如果快速查询有值，则先进行过滤，后排序
     if( isValidVariable(quicklyFilters) ){
         tableDatas = tableDatas.filter( ( item ) => {
@@ -25,7 +72,6 @@ const sortTableDatas = ( tableDatasMap, quicklyFilters ) => {
             return flag;
         })
     }
-
 
     //默认排序队列
     const sortArr = ["ATOT", "CTOT", "TOBT", "EOBT", "SOBT", "ID"];
@@ -56,9 +102,10 @@ const mapStateToProps = ( state ) =>{
     const { tableColumns = [], tableDatasMap = {}, tableWidth = 0, property = {} } = state.tableDatas;
     const { scroll = true, orderBy = 'ATOT', scrollId = '', quicklyFilters = '' } = state.tableCondition;
     const { userId = '' } = state.loginUserInfo;
+    const { scopeFilter = 'all', statusFilter = [] } = state.filterMatches;
     return ({
         property,
-        tableDatas: sortTableDatas(tableDatasMap, quicklyFilters),
+        tableDatas: sortTableDatas(tableDatasMap, quicklyFilters, scopeFilter, statusFilter ),
         tableColumns,
         scrollX: tableWidth,
         autoScroll: scroll,

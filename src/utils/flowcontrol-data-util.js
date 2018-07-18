@@ -157,7 +157,6 @@ const convertFlowcontrolData =(data, generateTime) => {
      *
      * */
     const setDataTime= (data, generateTime) => {
-        debugger
         // 流控
         let { status,  startTime = "", endTime = "",  placeType, relativeStartTime, relativeStatus } = data;
 
