@@ -69,7 +69,7 @@ class FlowcontrolHeader extends React.Component{
                     >
                         <SubMenu
                             key="flowcontrol-filter"
-                            title={<Icon type="filter" title="快速过滤"/>}
+                            title={<i className="iconfont icon-filter" title="快速过滤"/>}
                         >
                             <MenuItemGroup title="屏蔽">
                                 <Menu.Item>

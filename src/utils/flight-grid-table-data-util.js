@@ -281,21 +281,51 @@ const convertData = function( flight, generateTime ){
         //航班title
         let titlekey = key + "_title";
         let titlestr = '';
-        let processmap = obj.processMap || '';
-        if(isValidVariable(processmap) && isValidVariable(processmap.FLIGHTID)){
-            titlestr += 'ID:' + processmap.FLIGHTID.value;
-            if( obj.source == "FLIGHTID_CDM" ){
+        //单元格样式
+        let stylekey = key + "_style";
+        let stylestr = data.default_style;
+        let { source = '', processMap = '' } = obj;
+        if(isValidVariable(processMap) && isValidVariable(processMap.FLIGHTID)){
+            titlestr += 'ID:' + processMap.FLIGHTID.value;
+            if( source == "FLIGHTID_CDM" ){
                 //CDM航班
                 titlestr += '\n' + "CDM航班";
-            }else if(obj.source == "FLIGHTID_CRS"){
+            }else if( source == "FLIGHTID_CRS" ){
                 //CRS航班
                 titlestr += '\n' + "CRS航班";
             }
+            const styleSource = processMap.FLIGHTID.source || "";
+            if( isValidVariable(styleSource) ){
+                if( styleSource == "MARK_NEED_SLOT"){
+                    stylestr = this.getDisplayStyle('MARK_NEED_SLOT');
+                    titlestr += '\n' + '已退出时隙分配';
+                }else if( styleSource == "IN_WAIT_POOL"){
+                    stylestr = this.getDisplayStyle('IN_WAIT_POOL');
+                    titlestr += '\n' + '已入池';
+                }else if( styleSource == "FLIGHT_QUALIFICATIONS_MANUAL"){
+                    stylestr = this.getDisplayStyle('FLIGHT_QUALIFICATIONS_MANUAL');
+                    titlestr += '\n' + '已标记为二类飞行资质';
+                }else if( styleSource == "MARK_EXEMPT"){
+                    stylestr = this.getDisplayStyle('MARK_EXEMPT');
+                    titlestr += '\n' + '已豁免';
+                }else if( styleSource == "DELAY_DEP_ALARM"){
+                    stylestr = this.getDisplayStyle('DELAY_DEP_ALARM');
+                    titlestr += '\n' + '延误起飞告警';
+                }else if( styleSource == "CRITICAL_FLIGHT"){
+                    stylestr = this.getDisplayStyle('CRITICAL_FLIGHT');
+                    titlestr += '\n' + '临界(特殊航班)';
+                }else if( styleSource == "CLEARANCE_MANUAL"){
+                    stylestr = this.getDisplayStyle('CLEARANCE_MANUAL');
+                    titlestr += '\n' + '已放行';
+                }else if( styleSource == "MARK_READY"){
+                    stylestr = this.getDisplayStyle('MARK_READY');
+                    titlestr += '\n' + '已标记准备完毕';
+                }
+            }
+
         }
         data[titlekey] = titlestr;
-        //单元格样式
-        let stylekey = key + "_style";
-        data[stylekey] = data.default_style;
+        data[stylekey] = stylestr + this.getDisplayFontSize('FLIGHTID');
     };
 
     //配置 内/外控点  title信息

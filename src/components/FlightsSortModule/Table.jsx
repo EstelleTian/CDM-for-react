@@ -470,7 +470,6 @@ class Table extends React.Component{
                         x: scrollX,
                         y: '100%'
                     }}
-                    bordered
                     pagination = { false }
                     onChange = { this.tableOnChange }
                     onRow = {(record, index) =>{

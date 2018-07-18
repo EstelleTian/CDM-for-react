@@ -62,10 +62,12 @@ const sortTableDatas = ( tableDatasMap, quicklyFilters, scopeFilter, statusFilte
             let flag = false;
             for(let i in item){
                 if( i.indexOf("_style") == -1 && i.indexOf("_title") == -1 ){
-                    const itemVal = item[i] || "";
+                    const itemVal = item[i] + "" || "";
                     //若值包含过滤条件，则中，否则不显示
-                    if( isValidVariable(itemVal) && itemVal.toLowerCase().indexOf( quicklyFilters.toLowerCase() ) > -1 ){
-                        flag = true;
+                    if( isValidVariable(itemVal) ){
+                        if( itemVal.toLowerCase().indexOf( quicklyFilters.toLowerCase() ) > -1 ){
+                            flag = true;
+                        }
                     }
                 }
             }

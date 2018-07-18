@@ -79,9 +79,8 @@ class NavMenu extends React.Component{
                             key="filter"
                             title={
                                 <Badge count={ count } dot>
-                                    <icon className="iconfont icon-filter" title="快速过滤"/>
+                                    <i className="iconfont icon-filter" title="快速过滤"/>
                                 </Badge>
-
                             }
                         >
                             <MenuItemGroup title="屏蔽">

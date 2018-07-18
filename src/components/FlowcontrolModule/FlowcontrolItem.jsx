@@ -46,7 +46,7 @@ class FlowcontrolItem extends React.Component{
 
                 </Row>
 
-                <Row className="row">
+                <Row className="row value-title">
                     <Col span={4} >限制类型</Col>
                     <Col span={4} >限制数值</Col>
                     <Col span={6} >受控航路点</Col>

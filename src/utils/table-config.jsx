@@ -214,58 +214,12 @@ const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
         obj['width'] = w;
         width += w;
 
-
-
         // 冻结列,等待池不加冻结
         if( type == ""){
             if( i < 3){
                 obj['fixed'] = 'left';
             }
         }
-
-
-        // if( colunmName == "TOBT") {
-        // //     console.log(1111);
-        //     obj["defaultSortOrder"] = 'ascend';
-        // //     // obj["sorter"] = handleDataSort;
-        // }
-            // obj["sorter"] = handleDataSort;
-        // }else{
-        //     obj["sorter"] = (d1, d2) => {
-        //         let data1 = d1[colunmName] + "";
-        //         let data2 = d2[colunmName] + "";
-        //         if (isValidVariable(data1) && isValidVariable(data2)) {
-        //             let res = data1.localeCompare(data2);
-        //             if (0 != res) {
-        //                 return res;
-        //             }
-        //         } else if (isValidVariable(data1)) {
-        //             return -1;
-        //         } else if (isValidVariable(data2)) {
-        //             return 1;
-        //         } else {
-        //             return 0;
-        //         }
-        //
-        //     };
-        // }
-
-        // if( colunmName == "FLIGHTID"){
-        //     //过滤是否可见
-        //     obj["filterDropdownVisible"] = true;
-        //     //过滤图标
-        //     obj["filterIcon"] = <Icon type="search" style={{ color: true ? '#108ee9' : '#aaa' }} />
-        //     obj["filterDropdown"] = (
-        //         <div className="custom-filter-dropdown">
-        //             <Input
-        //                 placeholder="请输入航班号"
-        //                 onPressEnter={onSearch}
-        //             />
-        //             <Button type="primary" onClick={onSearch}>查询</Button>
-        //         </div>
-        //     );
-        // }
-
 
         columns.push( obj );
         i++;
