@@ -1,7 +1,7 @@
 @import "../../style/base";
 @import "../../style/theme-color";
 .flow-item{
-  background-color: @bc-black-10;
+  background-color: rgba(105, 105, 105, 0.2);
   border-radius: 0.5rem;
   margin-bottom: 1.5rem;
   .ant-row {
@@ -11,10 +11,8 @@
     }
   }
   .title {
-    //height: 3rem;
-    //line-height: 3rem;
     .status {
-      //font-size: 1.5rem;
+      font-size: 1.25rem;
       padding: 0.2rem 0.5rem;
       display: inline-block;
       border-top-left-radius: 0.5rem;
@@ -46,6 +44,13 @@
     .place-type {
       padding-left: 0.5rem;
     }
+    .effective-time{
+      >span{
+        padding-left: 0.5rem;
+        position: relative;
+        top: -0.08rem;
+      }
+    }
 
   }
   .row {
@@ -68,13 +73,15 @@
   }
 
   .operator{
-      padding-top: 1rem;
-      padding-bottom: 1rem;
-      text-align: right;
-    a {
+    text-align: right;
+    .iconfont{
       display: inline-block;
       margin: 0 0.5rem;
-      color: #37aafd;
+      font-size: 1.5rem
+    }
+    .iconfont:hover{
+      color: #fff;
+      cursor: pointer;
     }
   }
   .number {

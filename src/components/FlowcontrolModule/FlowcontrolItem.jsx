@@ -23,7 +23,7 @@ class FlowcontrolItem extends React.Component{
         return (
             <Col span={24} className="flow-item">
                 <Row className="title">
-                    <Col span={12} className={ statusClassName ? `${statusClassName} status` : 'status'}
+                    <Col span={14} className={ statusClassName ? `${statusClassName} status` : 'status'}
                          title={ `流控名称:${name}  ${status} ${casaStatus}`}
                     >
                         <span className="number" >{indexNumber}</span>
@@ -38,9 +38,10 @@ class FlowcontrolItem extends React.Component{
                             {/*/!*</span>*!/*/}
                         {/*</div>*/}
                     </Col>
-                    <Col  span={4} className="place-type" title={placeType ? `${placeType}流控`: ''} >{placeType}</Col>
-                    <Col  span={8} className="effective-time" title={effectiveDate ? `${effectiveDate}`: ''} >
-                        生效时间: {effectiveTime}
+                    <Col  span={3} className="place-type" title={placeType ? `${placeType}流控`: ''} >{placeType}</Col>
+                    <Col  span={7} className="effective-time" title={effectiveDate ? `${effectiveDate}`: ''} >
+                        <i className="iconfont icon-time" title="生效时间" />
+                        <span>{effectiveTime}</span>
                     </Col>
 
                 </Row>
@@ -59,12 +60,15 @@ class FlowcontrolItem extends React.Component{
                     <Col span={6} className="control-direction" title={controlDirection ? `受控降落机场:${controlDirection}`: '' }>{controlDirection}</Col>
                     <Col span={4} className="reason" title={reason ? `原因:${reason}` : ''}>{reason}</Col>
                 </Row>
-                <Row className="row operator">
-                    <Col span={24}>
-                        <a href="javascript:;">详情</a>
-                        <a href="javascript:;">影响</a>
-                        <a href="javascript:;">修改</a>
-                        <a href="javascript:;">终止</a>
+                <Row className="row">
+                    <Col span={10}>
+
+                    </Col>
+                    <Col className="operator" span={14}>
+                        <i className="iconfont icon-detail" title="详情"/>
+                        <i className="iconfont icon-effect" title="影响"/>
+                        <i className="iconfont icon-edit" title="修改"/>
+                        <i className="iconfont icon-stop" title="终止"/>
                     </Col>
 
                 </Row>
