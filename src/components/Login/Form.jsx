@@ -87,18 +87,26 @@ class Loginform extends React.Component{
             updateFlowcontrolParams(para);
             // 跳转到主页面
             history.push('/home');
-        }else if( 500 == res.status*1 && res.hasOwnProperty("error")  ){ //    500 失败
+        }else if( 500 == res.status*1 && res.error){ //    500 失败
             // 错误信息
-            const error = res.error.message ? res.error.message : "";
+            const { error ={} } = res;
+            const errmsg = error.message ? error.message : "";
             let param = {
-                errmsg: error
+                errmsg: errmsg
             };
             updateUserInfo(param);
-        }else if( 400 == res.status*1 && res.hasOwnProperty("error") ){ //    400 失败
+        }else if( 400 == res.status*1 && res.error ){ //    400 失败
             // 错误信息
-            const error = res.error.message ? res.error.message : "";
+            const { error ={} } = res;
+            const errmsg = error.message ? error.message : "";
             let param = {
-                errmsg: error
+                errmsg: errmsg
+            };
+            updateUserInfo(param);
+        }else {
+            let errmsg = `登录出现异常，请联系管理员`;
+            let param = {
+                errmsg: errmsg
             };
             updateUserInfo(param);
         }
