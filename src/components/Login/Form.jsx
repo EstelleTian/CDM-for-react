@@ -66,7 +66,7 @@ class Loginform extends React.Component{
         // 200 成功
         if( 200 == res.status*1 ){
             // 用户信息
-            let {username, id:userId, allAuthority, waypoints, airports,  } = res.user;
+            let {username, id:userId, allAuthority, waypoints,  system, flowAssemblyAirports, systemProgram  } = res.user;
             let params = {
                 username,
                 loginStatus: true,
@@ -76,15 +76,12 @@ class Loginform extends React.Component{
             // 更新用户信息
             updateUserInfo(params);
 
-            // 系统信息
-            let { system, systemAirport } = res;
-
+            // 获取流控数据请求中所需参数
             let para = {
-                startWaypoints : airports,
+                startWaypoints : flowAssemblyAirports,
                 waypoints,
                 system,
-                systemProgram : systemAirport
-
+                systemProgram
             };
             // 更新获取流控数据请求中所需参数
             updateFlowcontrolParams(para);
