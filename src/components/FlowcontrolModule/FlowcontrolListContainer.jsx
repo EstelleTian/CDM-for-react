@@ -100,7 +100,6 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
  * */
 const calculateLevelValue = (data) => {
     const { type, value, assignSlot } = data;
-    debugger
     let res = 0;
     if(type == FlowcontroConstant.TYPE_MIT ){ // 距离
         res = parseInt( value, 10) / 13;
