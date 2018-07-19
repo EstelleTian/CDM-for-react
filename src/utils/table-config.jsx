@@ -3,17 +3,25 @@ import React from 'react';
 import {isValidObject, isValidVariable} from "./basic-verify";
 import { Icon, Input, Button, Checkbox } from 'antd';
 
-//需要日期格式话的列
+//需要日期格式化的列
 const DataColumns = [ "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "POSITION","CTO2", "CTO", "SLOT_STATUS", "TAXI_WAIT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT_PASSTIME", "EFPS_REQTIME", "EFPS_PUSTIME", "FORMER_CTOT", "FORMER_DEP", "FORMER_ARR", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_TAXTIME", "GSOBT", "TOBT_UPDATE_TIME"];
+//需要排序的列
+const SortColumns = [ "FLIGHTID", "AGCT", "AOBT", "CTOT", "ATOT", "ALDT" ];
 
 //处理单元格样式方法
 const handleStyleFunc = ( style ) => {
+    if( !isValidVariable(style) ){
+        return {};
+    }
     const styleArr = style.split(';');
     //将样式由字符串转化为需要的对象格式
     let styleObj = {};
     //遍历每个样式值
     for(let i = 0, len = styleArr.length; i < len; i++){
         const item = styleArr[i];
+        if( !isValidVariable(item) ){
+            continue;
+        }
         const itemArr = item.split(':');
         //每个样式的key/value
         const key = itemArr[0];
@@ -29,17 +37,16 @@ const handleStyleFunc = ( style ) => {
         }
         styleObj[newKey] = value;
      }
-     const backgroundColor = styleObj["backgroundColor"];
+    const backgroundColor = styleObj["backgroundColor"];
 
 
     if( ( backgroundColor == '' || backgroundColor == "transparent" )){
-        // styleObj["backgroundColor"]  ==
+        // 如果字体颜色是黑色，改为灰色
         if( styleObj["color"] == '#000000' ){
             styleObj["color"] = '#cccccc';
         }
 
     }
-
     return styleObj;
 };
 
@@ -96,23 +103,52 @@ const handleColumnRender = (value, row, index, colunmName) => {
     if( DataColumns.indexOf(colunmName) > -1 ){
         value = handleDateFormat( value );
     }
+
+    // let resStyleObj = styleObj;
+
+    let resStyleObj = {};
+    if( isValidVariable(row[colunmName]) ){
+        //如果背景色不是transparent,加圆点
+        const { backgroundColor = "", fontSize = "" } = styleObj;
+        if( colunmName == "COBT" || colunmName == "CTOT" ){
+            if( backgroundColor == "#FF99FF"){ //锁定
+                value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-lock" style={{color: backgroundColor}}></i>{value}</span>);
+            }else if( backgroundColor == "#FFFF00"){ //预锁
+                value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-unlock" style={{color: backgroundColor}}></i>{value}</span>);
+            }else{
+                value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
+            }
+        }else if( colunmName == "FLIGHTID" ){
+            value = (<span style={{fontSize: fontSize, color: backgroundColor}}>{value}</span>);
+
+        }else if( isValidVariable(backgroundColor) && backgroundColor != "transparent"){
+            value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
+        }
+    }
+    resStyleObj['fontSize'] = styleObj['fontSize'] || "";
+
     return {
         children: value,
         props:{
             title: title,
-            style: styleObj
+            style: resStyleObj
         }
     }
 };
 //处理每列列宽，type为识别是主表还是其他表
 const handleColumnWidth = ( type, title ) => {
     let width = 0;
-    if( title == 'CallSign' || title == 'ACWakes' || title == '批量操作' ){
+    const numReg = new RegExp("[A-Za-z]+");
+    if( title == 'CallSign' || title == 'ACWakes' ){
         width = 100;
     }else if( title == 'ACType' ){
         width = 85;
-    }else if( title.length == 4 ){
+    }else if( title == 'RWY' ){
+        width = 60;
+    }else if( !numReg.test(title) && title.length == 4 ){ //不是字母且是4位
         width = 90;
+    }else if( numReg.test(title) && title.length == 4 ){ //不是字母且是4位
+        width = 80;
     }else if( title.length == 3 ){
         width = 80;
     }else if( title == 'ID' || title.length < 3 ){
@@ -123,7 +159,7 @@ const handleColumnWidth = ( type, title ) => {
     switch (type){
         case "pool": {
             if( title.length == 4 ){
-                width = 65;
+                width = 70;
             }else if( title == 'ID' ){
                 width = 50;
             }
@@ -143,7 +179,7 @@ const handleColumnWidth = ( type, title ) => {
             if( title == '备注' ){
                 width = 100;
             }else if( title.length == 4 ){
-                width = 65;
+                width = 70;
             }else if( title == 'ID' ){
                 width = 50;
             }
@@ -153,7 +189,7 @@ const handleColumnWidth = ( type, title ) => {
             if( title == '备注' ){
                 width = 100;
             }else if( title.length == 4 ){
-                width = 65;
+                width = 70;
             }else if( title == 'ID' ){
                 width = 50;
             }
@@ -198,9 +234,6 @@ const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
             render: (value, row, index) => {
                 return handleColumnRender(value, row, index, colunmName);
             },
-            sorter: (d1, d2) => {
-                return handleColumnSort(d1, d2, colunmName);
-            },
             onHeaderCell: ( column ) => {
                 //配置表头属性，增加title值
                 return {
@@ -208,6 +241,12 @@ const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
                 }
             }
         };
+        //处理数据格式化，当列是DateColumns，且value为12位时间格式，做日期格式化
+        if( SortColumns.indexOf(colunmName) > -1 ){
+            obj["sorter"] = (d1, d2) => {
+                return handleColumnSort(d1, d2, colunmName);
+            }
+        }
 
         //调整每列宽度
         const w = handleColumnWidth( type, title );

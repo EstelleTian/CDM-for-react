@@ -1,6 +1,7 @@
 import React from 'react';
 import { Table as AntTable, Col } from 'antd';
 import $ from 'jquery';
+import shallowequal from 'shallowequal';
 import { requestGet } from '../../utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
 import { isValidVariable, isValidObject, calculateStringTimeDiff } from '../../utils/basic-verify';
@@ -54,9 +55,9 @@ class Table extends React.Component{
         day = day < 10 ? '0' + day : '' + day;
         let fullTime = year + month + day;
         // params['start'] = fullTime + '0000';
-        params['start'] = fullTime + '0800';
+        params['start'] = fullTime + '1500';
         // params['end'] = fullTime + '2359';
-        params['end'] = fullTime + '1400';
+        params['end'] = fullTime + '1800';
 
         return params;
     };
@@ -119,12 +120,13 @@ class Table extends React.Component{
         updateTableConditionScrollId( mintime_flight_id );
         console.timeEnd("updateTableDatas----------");
 
+        console.time("updateOtherTableDatas----------");
         this.handleSubTableDatas(res, 'expired', this.convertExpiredData, generateTime);
         this.handleSubTableDatas(res, 'pool', this.convertData, generateTime);
         this.handleSubTableDatas(res, 'alarm', this.convertAlarmData, generateTime);
         this.handleSubTableDatas(res, 'special', this.converSpecialtData, generateTime);
         this.handleSubTableDatas(res, 'todo', this.convertTodoData, generateTime);
-
+        console.timeEnd("updateOtherTableDatas----------");
         //更新统计数据
         updateGenerateInfo(generateInfo);
         //更新数据生成时间
@@ -134,7 +136,7 @@ class Table extends React.Component{
         //     //获取机场航班
         //     const params = this.getAirportsParams();
         //     requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
-        // },10*1000);
+        // }, 30*1000);
         // this.setState({
         //     airportTimerId
         // });
@@ -455,9 +457,23 @@ class Table extends React.Component{
         this.resetFrozenTableStyle();
     }
 
-
+    shouldComponentUpdate( nextProps, nextState ){
+        if( nextProps.tableColumns.length < 0 ){
+            return false;
+        }
+        const thisTableDatas = this.props.tableDatas || [];
+        const nextTableDatas = nextProps.tableDatas || [];
+        const isDiff = shallowequal(thisTableDatas, nextTableDatas);
+        // console.log(thisTableDatas, nextTableDatas);
+        if( !isDiff ){  //只有tableDatas改变了才重新render，目前是浅拷贝方式
+            console.log("tableDatas改变了");
+            return true;
+        }else{
+            return false;
+        }
+    }
     render(){
-        // console.log('table render~~');
+        console.log('table render~~');
         const { tableDatas, tableColumns, scrollX} = this.props;
         return(
             <Col span={24} className="main-table">
