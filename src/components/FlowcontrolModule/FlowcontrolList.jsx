@@ -59,12 +59,26 @@ class FlowcontrolList extends React.Component{
         const {result = {}} = res;
         // 更新流控数据
         updateFlowcontrolDatas(result);
+        // 定时30秒后再次获取流控数据并更新
+        const flowcontrolTimerId = setTimeout(() => {
+            // 获取流控数据
+            this.getFlowcontrolDatas();
+        },30*1000);
+        this.setState({
+            flowcontrolTimerId
+        });
     }
 
     // 立即调用
     componentDidMount(){
         // 获取流控数据
         this.getFlowcontrolDatas()
+    }
+
+    componentWillUnmount(){
+        //清除定时器
+        const { flowcontrolTimerId = 0} = this.state;
+        clearTimeout( flowcontrolTimerId );
     }
 
     render(){
