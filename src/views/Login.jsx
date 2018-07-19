@@ -1,17 +1,19 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom'
-import { updateUserInfo, updateSystemConfig   } from './LoginRedux'
+import { updateUserInfo, updateSystemConfig,  updateFlowcontrolParams } from './LoginRedux'
 import LoginForm from '../components/Login/Form'
 
 const mapStateToProps = ( state ) => ({
-    loginUserInfo : state.loginUserInfo,
-    systemConfig : state.systemConfig
+    loginUserInfo : state.loginUserInfo, // 登录用户信息
+    systemConfig : state.systemConfig, // 系统参数配置
+    flowcontrolParams : state.flowcontrolParams, // 获取流控数据请求中所需参数
 })
 
 const mapDispatchToProps = {
     updateUserInfo,
-    updateSystemConfig
+    updateSystemConfig,
+    updateFlowcontrolParams
 }
 
 const Login = connect(

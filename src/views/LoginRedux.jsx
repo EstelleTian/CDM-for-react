@@ -1,6 +1,7 @@
 //action-type
 const UPDATE_USERINFO = 'loginUserInfo/update';
 const UPDATE_SYSTEMCONFIG = 'systemConfig/update';
+const UPDATE_FLOWCONTROL_PARAMS = 'flowcontrolParams/update';
 
 //action-creator
 //存储用户信息（用户名  密码）
@@ -67,4 +68,35 @@ const systemConfig = ( state = config, action ) => {
     }
 }
 
-export { updateUserInfo, loginUserInfo, updateSystemConfig, systemConfig }
+
+//存储获取流控数据请求中所需参数
+const updateFlowcontrolParams = paramObj => ({
+    type: UPDATE_FLOWCONTROL_PARAMS,
+    paramObj
+})
+
+//reducer system config
+const params = {
+    startWaypoints : '', // 用户关注机场,即开始点
+    waypoints : '', // 用户关注受控点
+    system : '', // 用户所属平台
+    systemProgram : '' // 用户所属平台分组
+}
+
+const flowcontrolParams = ( state = params, action ) => {
+    switch( action.type ){
+        case UPDATE_FLOWCONTROL_PARAMS:{
+            return {
+                ...state,
+                startWaypoints: action.paramObj.startWaypoints ||'',
+                waypoints: action.paramObj.waypoints ||'',
+                system: action.paramObj.system || '',
+                systemProgram: action.paramObj.systemProgram ||'',
+            }
+        }
+        default:
+            return state;
+    }
+}
+
+export { updateUserInfo, loginUserInfo, updateSystemConfig, systemConfig, updateFlowcontrolParams, flowcontrolParams}

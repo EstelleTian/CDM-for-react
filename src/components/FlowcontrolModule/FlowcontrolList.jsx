@@ -3,8 +3,6 @@
 import React from 'react';
 import { Row, Col } from 'antd';
 import { getFlowcontrolUrl } from '../../utils/request-urls';
-import { isEffective } from '../../utils/flowcontrol-data-util';
-
 import { requestGet, request } from '../../utils/request-actions';
 import axios from 'axios';
 
@@ -19,37 +17,9 @@ class FlowcontrolList extends React.Component{
         this.getFlowcontrolDatas = this.getFlowcontrolDatas.bind(this);
         this.handleUpdateFlowcontrolData = this.handleUpdateFlowcontrolData.bind(this);
     }
+    // 拼接获取流控数据请求中所需参数
     getParams (){
-        let params = {
-            "startTime": "",
-            "endTime": "",
-            "system": "CDM",
-            "systemProgram": "CDMZUUU",
-            "waypoints" : "PARGU,RG,CZH,ENH,P127,P124,SUBUL,UPKUS,AGULU,OMBON",
-            "startWaypoints" : "ZUUU",
-        };
-        const date = new Date();
-        let year = date.getFullYear();
-        let month = date.getMonth() + 1;
-        let day = date.getDate();
-        year = '' + year;
-        month = month < 10 ? '0' + month : '' + month;
-        day = day < 10 ? '0' + day : '' + day;
-        let fullTime = year + month + day;
-        params["startTime"] = fullTime + '0000';
-        params["endTime"] = fullTime + '2359';
-        return params;
-    }
-
-
-    // 获取流控数据
-    getFlowcontrolDatas(){
-        // const { flowcontrolDataMap, updateFlowcontrolDatas, updateFlowcontrolViewMap, updateFlowGenerateTime } = this.props;
-        //
-        // const  filterFlowoncontrolDatas = this.filterFlowoncontrolDatas;
-
-        // let params = this.getParams();
-        // params = JSON.stringify(params)
+        const { startWaypoints, waypoints, system, systemProgram} = this.props.flowcontrolParams;
         // 暂时取客户端当前日期
         const date = new Date();
         let year = date.getFullYear();
@@ -63,12 +33,19 @@ class FlowcontrolList extends React.Component{
         const params = {
             "startTime": fullTime+"0000",
             "endTime":  fullTime+ "2359",
-            "system": "CDM",
-            "systemProgram": "CDMZUUU",
-            "waypoints" : "PARGU,RG,CZH,ENH,P127,P124,SUBUL,UPKUS,AGULU,OMBON",
-            "startWaypoints" : "ZUUU",
+            "system": system,
+            "systemProgram": systemProgram,
+            "waypoints" : waypoints,
+            "startWaypoints" : startWaypoints,
         };
+        return params;
+    }
 
+    // 获取流控数据
+    getFlowcontrolDatas(){
+        // 获取参数
+        let params = this.getParams();
+        // 发送请求并指定回调方法
         request(getFlowcontrolUrl, 'POST', JSON.stringify(params), this.handleUpdateFlowcontrolData);
     }
     // 更新流控数据

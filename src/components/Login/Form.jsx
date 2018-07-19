@@ -29,9 +29,9 @@ class Loginform extends React.Component{
                 // 对密码 base64编码 处理
                 const password =  Base64.encode(values.password.trim());
                 const params = {
-                    username:username,
-                    password:password
-                }
+                    "username":username,
+                    "password":password
+                };
                 request(loginUrl,'POST',params,this.updateUserInfoData)
 
             }else{
@@ -62,11 +62,11 @@ class Loginform extends React.Component{
     }
     // 更新用户信息
     updateUserInfoData(res){
-        const { updateUserInfo, history } = this.props;
+        const { updateUserInfo, updateFlowcontrolParams, history } = this.props;
         // 200 成功
         if( 200 == res.status*1 ){
             // 用户信息
-            let {username, id:userId, allAuthority} = res.user;
+            let {username, id:userId, allAuthority, waypoints, airports,  } = res.user;
             let params = {
                 username,
                 loginStatus: true,
@@ -75,6 +75,19 @@ class Loginform extends React.Component{
             }
             // 更新用户信息
             updateUserInfo(params);
+
+            // 系统信息
+            let { system, systemAirport } = res;
+
+            let para = {
+                startWaypoints : airports,
+                waypoints,
+                system,
+                systemProgram : systemAirport
+
+            };
+            // 更新获取流控数据请求中所需参数
+            updateFlowcontrolParams(para);
             // 跳转到主页面
             history.push('/home');
         }else if( 500 == res.status*1 && res.hasOwnProperty("error")  ){ //    500 失败
