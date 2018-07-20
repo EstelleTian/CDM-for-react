@@ -1106,35 +1106,17 @@ const convertData = function( flight, generateTime ){
     function setFlowcontrolStatusAttrs(key,obj){
         let titlekey = key + "_title";
         let titlestr = '';
-        let flowcontrolInfo = '';
-        let processMap = obj.processMap || '';
-        if(isValidVariable(processMap)){
-            for ( let id in processMap) {
-                if(isValidVariable(processMap[id]) && isValidVariable(processMap[id]).value){
-                    let fc = processMap[id].value.split("$");
-                    let fcname = fc[0];
-                    let fctype = fc[1];
-                    let fcreason = fc[2];
-                    let flowcontrolType = fc[3];
-                    let flowcontrolValue = fc[4];
-                    if (!showLongFlowcontrol && flowcontrolType == 0) {
-                        continue;
-                    }
-                    flowcontrolInfo += '[ ' + fcname + ' '
-                        + FlowcontrolUtils.getReasonZh(fcreason) + ' '
-                        + FlowcontrolUtils.getTypeZh(fctype) + ' ';
-                    if(fctype == FlowcontrolUtils.TYPE_TIME){
-                        flowcontrolInfo += flowcontrolValue + '分钟  ]\n';
-                    } else {
-                        flowcontrolInfo += ']\n';
-                    }
-                }
-            }
+        let value = obj.value || '';
+        let valueStr = ''
+        if( value == 'ISCONT' ){
+            valueStr = '受控';
+        }else if( value == 'ISGS' ){
+            valueStr = '停止';
+        }else if( value == 'ISREQ' ){
+            valueStr = '申请';
         }
-        if(obj.source != 'DEFAULT'){
-            titlestr = ('受影响流控:\n' + flowcontrolInfo);
-        }
-        data[titlekey] = titlestr;
+        data[key] = valueStr;
+        data[titlekey] = valueStr;
     };
 
     //配置 普通信息  title信息

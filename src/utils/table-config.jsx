@@ -1,12 +1,12 @@
 //表格列名
 import React from 'react';
 import {isValidObject, isValidVariable} from "./basic-verify";
-import { Icon, Input, Button, Checkbox } from 'antd';
+import { Checkbox } from 'antd';
 
 //需要日期格式化的列
 const DataColumns = [ "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "POSITION","CTO2", "CTO", "SLOT_STATUS", "TAXI_WAIT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT_PASSTIME", "EFPS_REQTIME", "EFPS_PUSTIME", "FORMER_CTOT", "FORMER_DEP", "FORMER_ARR", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_TAXTIME", "GSOBT", "TOBT_UPDATE_TIME"];
 //需要排序的列
-const SortColumns = [ "FLIGHTID", "AGCT", "AOBT", "CTOT", "ATOT", "ALDT" ];
+const SortColumns = [ "FLIGHTID", "AGCT", "AOBT", "COBT", "CTOT", "ATOT", "ALDT" ];
 
 //处理单元格样式方法
 const handleStyleFunc = ( style ) => {
@@ -210,7 +210,22 @@ const handleColumnWidth = ( type, title ) => {
     return width;
 
 
-}
+};
+
+/*
+ * 右键点击事件功能
+ * colunmName  列名
+ * record  行对象
+ */
+const handleRightClickFunc = (colunmName, record) => {
+    console.log(colunmName);
+    if( isValidVariable(colunmName) ){
+        //根据列名和行对象，获取选中单元格的值
+        const value = record[colunmName] || "";
+        console.log(colunmName, value);
+    }
+
+};
 //根据表格列名，配置表格专用列数据格式
 const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
     let width = 0;
@@ -240,7 +255,18 @@ const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
                     title: colTitle[colunmName]
                 }
             }
+
         };
+        //处理表格右键功能
+        obj["onCell"] = (record) =>{
+            return {
+                //右键
+                onContextMenu: ( e ) => {
+                    e.preventDefault();
+                    handleRightClickFunc(colunmName, record);
+                },
+            }
+        }
         //处理数据格式化，当列是DateColumns，且value为12位时间格式，做日期格式化
         if( SortColumns.indexOf(colunmName) > -1 ){
             obj["sorter"] = (d1, d2) => {

@@ -37,14 +37,9 @@ class TableMenu extends React.Component{
     }
 
     render(){
-        const { isAutoScroll, generateInfo } = this.props;
+        const { generateInfo } = this.props;
         const { autoScroll } = this.state;
-
-        const { ALL_NUM ='',
-            ARR_NUM='',
-            DEP_NUM='',
-            GROUND_NUM = ''
-            } = generateInfo;
+        const { ALL_NUM ='-', ARR_NUM='-', DEP_NUM='-', GROUND_NUM = '-' } = generateInfo;
         return (
             <Col span={24} className="operation">
                 <Col span={11} className="tools">
@@ -60,12 +55,23 @@ class TableMenu extends React.Component{
                         onChange={ this.onAutoScrollChange}
                     >自动滚动</Checkbox>
                 </Col>
-                <Col span={12} className="total">
-
-                    <span>未起飞 <label> { GROUND_NUM }</label>架次</span>
-                    <span>已起飞 <label> { DEP_NUM }</label>架次</span>
-                    <span>已落地 <label> { ARR_NUM }</label>架次</span>
-                    <span>总计 <label> { ALL_NUM }</label>架次</span>
+                <Col span={13} className="total">
+                    <span>
+                        <label> { GROUND_NUM }</label>
+                        <span>未起飞</span>
+                    </span>
+                    <span>
+                        <label> { DEP_NUM }</label>
+                        <span>已起飞</span>
+                    </span>
+                    <span>
+                        <label> { ARR_NUM }</label>
+                        <span>已落地</span>
+                    </span>
+                    <span>
+                        <label> { ALL_NUM }</label>
+                        <span>总计</span>
+                    </span>
                 </Col>
             </Col>
         )

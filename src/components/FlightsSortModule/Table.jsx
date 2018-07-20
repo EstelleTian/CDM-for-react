@@ -35,12 +35,12 @@ class Table extends React.Component{
 
     //获取机场请求url 需要拼接的请求参数
     getAirportsParams(){
-        // const { userId, history } = this.props;
-        // if( !isValidVariable(userId) ){
-        //     //跳转回登录页面
-        //     history.push('/');
-        // }
-        const userId = 42;
+        const { userId, history } = this.props;
+        if( !isValidVariable(userId) ){
+            //跳转回登录页面
+            history.push('/');
+        }
+        // const userId = 42;
         let params = {
             userId,
             start: '',
@@ -54,17 +54,17 @@ class Table extends React.Component{
         month = month < 10 ? '0' + month : '' + month;
         day = day < 10 ? '0' + day : '' + day;
         let fullTime = year + month + day;
-        // params['start'] = fullTime + '0000';
-        params['start'] = fullTime + '1500';
-        // params['end'] = fullTime + '2359';
-        params['end'] = fullTime + '1800';
+        params['start'] = fullTime + '0000';
+        // params['start'] = fullTime + '0930';
+        params['end'] = fullTime + '2359';
+        // params['end'] = fullTime + '1130';
 
         return params;
     };
     //更新航班数据
     refreshAirportsList( res ){
         // console.log("refreshAirportsList");
-        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateSubTableDatas } = this.props;
+        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};
@@ -113,24 +113,25 @@ class Table extends React.Component{
             dataMap[id] = data;
         }
         //保存航班数据
-        console.time("updateTableDatas----------");
-        //更新表格航班数据
-        updateTableDatas( dataMap );
+        // console.time("updateTableDatas----------");
+        //更新数据生成时间
+        updateGenerateTime({time : generateTime});
         //更新自动滚动航班id值
         updateTableConditionScrollId( mintime_flight_id );
-        console.timeEnd("updateTableDatas----------");
+        //更新表格航班数据
+        updateTableDatas( dataMap );
+        //更新统计数据
+        updateGenerateInfo(generateInfo);
+        // console.timeEnd("updateTableDatas----------");
 
-        console.time("updateOtherTableDatas----------");
+        // console.time("updateOtherTableDatas----------");
         this.handleSubTableDatas(res, 'expired', this.convertExpiredData, generateTime);
         this.handleSubTableDatas(res, 'pool', this.convertData, generateTime);
         this.handleSubTableDatas(res, 'alarm', this.convertAlarmData, generateTime);
         this.handleSubTableDatas(res, 'special', this.converSpecialtData, generateTime);
         this.handleSubTableDatas(res, 'todo', this.convertTodoData, generateTime);
-        console.timeEnd("updateOtherTableDatas----------");
-        //更新统计数据
-        updateGenerateInfo(generateInfo);
-        //更新数据生成时间
-        updateGenerateTime({time : generateTime})
+        // console.timeEnd("updateOtherTableDatas----------");
+
 
         // const airportTimerId = setTimeout(() => {
         //     //获取机场航班
@@ -201,7 +202,8 @@ class Table extends React.Component{
             this.convertUserProperty( res.userPropertyList );
         }else{
             //TODO 错误提示
-            console.error(res.error.message || "");
+            const { error = {} } = res;
+            console.error( error.message || "" );
         }
     }
     //转化用户配置信息
@@ -379,7 +381,7 @@ class Table extends React.Component{
             const antScroll = $scroll.height() || 0;
             const antBody = $(".ant-table-body", $scroll).height() || 0;
             const antHead = $(".ant-table-header", $scroll).height() || 0;
-            if( antBody + antHead < antScroll ){
+            if( antBody + antHead + 5 < antScroll ){
                 $fixedLeft.removeClass('overflow');
             }
         }
@@ -391,12 +393,12 @@ class Table extends React.Component{
     componentDidMount(){
         // console.timeEnd("componentMountt");
         //获取用户配置
-        // const { userId, history } = this.props;
-        // if( !isValidVariable(userId) ){
-        //     //跳转回登录页面
-        //     history.push('/');
-        // }
-        const userId = 42;
+        const { userId, history } = this.props;
+        if( !isValidVariable(userId) ){
+            //跳转回登录页面
+            history.push('/');
+        }
+        // const userId = 42;
         const keys =[
             'grid_col_style',
             'grid_col_names',
@@ -464,16 +466,15 @@ class Table extends React.Component{
         const thisTableDatas = this.props.tableDatas || [];
         const nextTableDatas = nextProps.tableDatas || [];
         const isDiff = shallowequal(thisTableDatas, nextTableDatas);
-        // console.log(thisTableDatas, nextTableDatas);
         if( !isDiff ){  //只有tableDatas改变了才重新render，目前是浅拷贝方式
-            console.log("tableDatas改变了");
+            // console.log("tableDatas改变了");
             return true;
         }else{
             return false;
         }
     }
     render(){
-        console.log('table render~~');
+        // console.log('table render~~');
         const { tableDatas, tableColumns, scrollX} = this.props;
         return(
             <Col span={24} className="main-table">
@@ -489,12 +490,13 @@ class Table extends React.Component{
                     pagination = { false }
                     onChange = { this.tableOnChange }
                     onRow = {(record, index) =>{
-                        const id = record["ID"] || "";
-                        return {
-                            flightid: id,
-                            rowid: index*1+1
-                        }
-                    }}
+                         const id = record["ID"] || "";
+                         //用于自动滚动定位，对tr增加属性值 index为行号
+                         return {
+                             flightid: id,
+                             rowid: index*1+1
+                         }
+                     }}
                 />
             </Col>
         )
