@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 
 import { Layout, Row, Col, Menu, Icon, Avatar  } from 'antd'
-import { systemConfig, loginUserInfo, updateUserInfo } from '../views/LoginRedux'
+import { userLogout } from '../views/LoginRedux'
 import './Head.less'
 // import Row from "antd/lib/grid/row.d";
 
@@ -16,16 +16,10 @@ class Head extends React.Component{
     }
     // 登出
     handleLogout(){
-        const { updateUserInfo, history } = this.props;
+        const {  userLogout, history } = this.props;
 
-        let params = {
-            username : '',
-            loginStatus: false,
-            userId : '',
-            allAuthority : []
-        }
-        // 更新用户信息
-        updateUserInfo(params);
+        // 用户登出
+        userLogout();
         // 跳转到主页面
         history.push('/');
     }
@@ -96,9 +90,9 @@ const mapStateToProps = ( state ) => ({
     loginUserInfo : state.loginUserInfo,
 })
 
-const mapDispatchToProps = () => ({
-    updateUserInfo,
-})
+const mapDispatchToProps = {
+    userLogout,
+}
 //导航栏容器
 const HeadContainer = connect(
     mapStateToProps,

@@ -2,6 +2,7 @@
 const UPDATE_USERINFO = 'loginUserInfo/update';
 const UPDATE_SYSTEMCONFIG = 'systemConfig/update';
 const UPDATE_FLOWCONTROL_PARAMS = 'flowcontrolParams/update';
+const USER_LOGOUT = 'userLogout';
 
 //action-creator
 //存储用户信息（用户名  密码）
@@ -10,6 +11,11 @@ const updateUserInfo = userObj => ({
     userObj
 })
 
+//用户登出
+const userLogout = userObj => ({
+    type: USER_LOGOUT,
+    userObj
+})
 
 //reducer user info
 const obj = {
@@ -31,6 +37,10 @@ const loginUserInfo = ( state = obj, action ) => {
                 errmsg: action.userObj.errmsg || '',
                 allAuthority: action.userObj.allAuthority || [],
             }
+        }
+
+        case USER_LOGOUT:{
+            return obj
         }
         default:
             return state;
@@ -99,4 +109,6 @@ const flowcontrolParams = ( state = params, action ) => {
     }
 }
 
-export { updateUserInfo, loginUserInfo, updateSystemConfig, systemConfig, updateFlowcontrolParams, flowcontrolParams}
+
+
+export { updateUserInfo, loginUserInfo, updateSystemConfig, systemConfig, updateFlowcontrolParams, flowcontrolParams, userLogout}
