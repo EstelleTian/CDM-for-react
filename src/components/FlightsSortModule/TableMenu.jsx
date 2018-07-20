@@ -39,7 +39,7 @@ class TableMenu extends React.Component{
     render(){
         const { generateInfo } = this.props;
         const { autoScroll } = this.state;
-        const { ALL_NUM ='-', ARR_NUM='-', DEP_NUM='-', GROUND_NUM = '-' } = generateInfo;
+        const { ALL_NUM ='-', ARR_NUM='-', DEP_NUM='-', GROUND_NUM = '-', CNL_NUM = '-' } = generateInfo;
         return (
             <Col span={24} className="operation">
                 <Col span={11} className="tools">
@@ -68,6 +68,11 @@ class TableMenu extends React.Component{
                         <label> { ARR_NUM }</label>
                         <span>已落地</span>
                     </span>
+                    <span>
+                        <label> { CNL_NUM }</label>
+                        <span>已取消</span>
+                    </span>
+
                     <span>
                         <label> { ALL_NUM }</label>
                         <span>总计</span>
