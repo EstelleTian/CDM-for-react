@@ -1,0 +1,18 @@
+@import "../../style/base";
+@import "../../style/theme-color";
+
+.page-loader {
+  background-color: @bc-black-30;
+  position: absolute;
+  z-index: 9999;
+  top:0;
+  left: 0;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  flex-direction: column;
+  justify-content: center;
+  .ant-spin-dot i {
+    background-color: #1890ff;
+  }
+}
