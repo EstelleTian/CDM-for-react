@@ -16,6 +16,9 @@ class FlowcontrolList extends React.Component{
         this.getParams = this.getParams.bind(this);
         this.getFlowcontrolDatas = this.getFlowcontrolDatas.bind(this);
         this.handleUpdateFlowcontrolData = this.handleUpdateFlowcontrolData.bind(this);
+        this.state = {
+            flowcontrolTimerId : 0
+        };
     }
     // 拼接获取流控数据请求中所需参数
     getParams (){
