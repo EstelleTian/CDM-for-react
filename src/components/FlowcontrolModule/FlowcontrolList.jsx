@@ -3,12 +3,10 @@
 import React from 'react';
 import { Row, Col } from 'antd';
 import { getFlowcontrolUrl } from '../../utils/request-urls';
-import { requestGet, request } from '../../utils/request-actions';
-import axios from 'axios';
+import {  request } from '../../utils/request-actions';
 
 import FlowcontrolItem from "./FlowcontrolItem";
 import './FlowcontrolList.less';
-
 
 class FlowcontrolList extends React.Component{
     constructor( props ){
