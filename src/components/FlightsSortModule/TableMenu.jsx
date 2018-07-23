@@ -53,7 +53,7 @@ class TableMenu extends React.Component{
                         className = "auto-scroll-check"
                         checked = { autoScroll }
                         onChange={ this.onAutoScrollChange}
-                    >自动滚动</Checkbox>
+                    >航班自动定位（关闭后上下滚动滚轮加载更多）</Checkbox>
                 </Col>
                 <Col span={13} className="total">
                     <span>

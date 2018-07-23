@@ -23,10 +23,10 @@ class FlowcontrolItem extends React.Component{
         return (
             <Col span={24} className="flow-item">
                 <Row className="title">
-                    <Col span={14} className={ statusClassName ? `${statusClassName} status` : 'status'}
+                    <Col span={17} className={ statusClassName ? `${statusClassName} status` : 'status'}
                          title={ `流控名称:${name}  ${status} ${casaStatus}`}
                     >
-                        <span className="number" >{indexNumber}</span>
+                        <span className="number"  title={placeType ? `${placeType}流控`: ''} >{indexNumber + " " + placeType }</span>
                         {name}
                         {/*<div className={ statusClassName ? `${statusClassName} status` : 'status'} >*/}
                             {/**/}
@@ -38,8 +38,8 @@ class FlowcontrolItem extends React.Component{
                             {/*/!*</span>*!/*/}
                         {/*</div>*/}
                     </Col>
-                    <Col  span={3} className="place-type" title={placeType ? `${placeType}流控`: ''} >{placeType}</Col>
-                    <Col  span={7} className="effective-time" title={effectiveDate ? `${effectiveDate}`: ''} >
+                    <Col  span={1} ></Col>
+                    <Col  span={6} className="effective-time" title={effectiveDate ? `${effectiveDate}`: ''} >
                         <i className="iconfont icon-time" title="生效时间" />
                         <span>{effectiveTime}</span>
                     </Col>

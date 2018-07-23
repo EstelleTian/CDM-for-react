@@ -140,6 +140,8 @@ const UPDATE_TABLE_CONDITION_SCROLL= 'tableCondition/update/scroll';
 const UPDATE_TABLE_CONDITION_SCROLL_ID= 'tableCondition/update/scrollId';
 const UPDATE_TABLE_CONDITION_ORDER_BY= 'tableCondition/update/orderBy';
 const UPDATE_TABLE_CONDITION_QUICKLY_FILTERS= 'tableCondition/update/quicklyFilters';
+const UPDATE_TABLE_CONDITION_RANGE= 'tableCondition/update/range';
+const UPDATE_TABLE_CONDITION_RANGE_BY_KEY= 'tableCondition/update/rangebykey';
 //更新表格当前是否是自动滚动
 const updateTableConditionScroll = flag => ({
     type: UPDATE_TABLE_CONDITION_SCROLL,
@@ -160,11 +162,24 @@ const updateTableConditionQuicklyFilters = data => ({
     type: UPDATE_TABLE_CONDITION_QUICKLY_FILTERS,
     data
 });
+//更新表格显示数据范围
+const updateTableConditionRangeByKey = key => ({
+    type: UPDATE_TABLE_CONDITION_RANGE_BY_KEY,
+    key
+});
+//更新表格显示数据范围(传范围)
+const updateTableConditionRange = ( start, end ) => ({
+    type: UPDATE_TABLE_CONDITION_RANGE,
+    start,
+    end
+});
 const initTableCondition = {
     scroll : true, // 是否自动滚动
     scrollId: '', //表格自动滚动定位航班id
     orderBy: 'ATOT', //表格排序字段
     quicklyFilters: '', //表格快速过滤数值
+    start: 0,
+    end: 50
 };
 //store table data 表格数据-- 数据生成时间、统计各个数值
 const tableCondition = (state = initTableCondition, action) => {
@@ -199,6 +214,35 @@ const tableCondition = (state = initTableCondition, action) => {
                 quicklyFilters: action.data
             }
         }
+        case UPDATE_TABLE_CONDITION_RANGE_BY_KEY: {
+            let { start, end } = state;
+            const key = action.key * 1;
+            //下一页
+            if( key == 1 ){
+                start += 25;
+                end += 25;
+            }else if( key == -1 ){ //上一页
+                start -= 25;
+                end -= 25;
+                if( start < 0 ){
+                    start = 0;
+                    end = 50;
+                }
+            }
+            return {
+                ...state,
+                start,
+                end
+            }
+        }
+        case UPDATE_TABLE_CONDITION_RANGE: {
+            let { start, end } = action;
+            return {
+                ...state,
+                start,
+                end
+            }
+        }
 
         default:
             return state;
@@ -208,5 +252,6 @@ const tableCondition = (state = initTableCondition, action) => {
 export {
     tableDatas, updateTableDatas, updateTableDatasProperty, updateTableDatasColumns,
     generateInfo, updateGenerateInfo, generateTime, updateGenerateTime,
-    tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy, updateTableConditionQuicklyFilters
+    tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy, updateTableConditionQuicklyFilters,
+    updateTableConditionRangeByKey, updateTableConditionRange
 };

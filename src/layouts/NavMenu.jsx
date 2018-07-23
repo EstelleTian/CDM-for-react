@@ -88,20 +88,20 @@ class NavMenu extends React.Component{
                                     <CheckboxGroup options={options} onChange={this.onCheckboxChange} />
                                 </Menu.Item>
                             </MenuItemGroup>
-                            <MenuItemGroup title="时间范围">
-                                <Menu.Item>
-                                    <RadioGroup
-                                        onChange={this.onRadioChange}
-                                        value={filterMatches.scopeFilter}
-                                    >
-                                        <Radio value={30}>30分钟</Radio>
-                                        <Radio value={45}>45分钟</Radio>
-                                        <Radio value={60}>60分钟</Radio>
-                                        <Radio value={120}>120分钟</Radio>
-                                        <Radio value={"all"}>全部</Radio>
-                                    </RadioGroup>
-                                </Menu.Item>
-                            </MenuItemGroup>
+                            {/*<MenuItemGroup title="时间范围">*/}
+                                {/*<Menu.Item>*/}
+                                    {/*<RadioGroup*/}
+                                        {/*onChange={this.onRadioChange}*/}
+                                        {/*value={filterMatches.scopeFilter}*/}
+                                    {/*>*/}
+                                        {/*<Radio value={30}>30分钟</Radio>*/}
+                                        {/*<Radio value={45}>45分钟</Radio>*/}
+                                        {/*<Radio value={60}>60分钟</Radio>*/}
+                                        {/*<Radio value={120}>120分钟</Radio>*/}
+                                        {/*<Radio value={"all"}>全部</Radio>*/}
+                                    {/*</RadioGroup>*/}
+                                {/*</Menu.Item>*/}
+                            {/*</MenuItemGroup>*/}
                         </SubMenu>
                         {/*<SubMenu*/}
                         {/*key="reset"*/}

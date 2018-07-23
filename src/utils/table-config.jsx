@@ -85,12 +85,21 @@ const handleColumnRender = (value, row, index, colunmName) => {
     //获取标题
     const title = row[colunmName + "_title"] || "";
     //若是多选操作，转换为dom
-    if( colunmName == "MULTI_OPERATE" && isValidVariable(value) ){
-        const className = "clear-locked-time clear-" + value;
-        return {
-            children: <Checkbox className= {className} ></Checkbox>,
-            props:{
-                title: title
+    if( colunmName == "MULTI_OPERATE" && isValidVariable(value)){
+        if( value == "1" || value == '2' ){
+            const className = "clear-locked-time clear-" + value;
+            return {
+                children: <Checkbox className= {className} ></Checkbox>,
+                props:{
+                    title: title
+                }
+            }
+        }else{
+            return {
+                children: "",
+                props:{
+                    title: title
+                }
             }
         }
     }
@@ -153,6 +162,8 @@ const handleColumnWidth = ( type, title ) => {
         width = 80;
     }else if( title == 'ID' || title.length < 3 ){
         width = 55;
+    }else if( title.length == 0 ){
+        width = 35;
     }else{
         width = title.length * 20;
     }
@@ -233,13 +244,20 @@ const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
     let i = 0;
     for(let key in colNames){
         const colunmName = key;
+        //去掉ID列
+        if( colunmName == "ID" ){
+            continue;
+        }
         //如果colEdit当前的列名值为1，则添加，否则不添加
         if( !isValidObject(colDisplay)){
             continue;
         }else if( !isValidVariable(colDisplay[colunmName]) || colDisplay[colunmName]['display']*1 != 1){ //为0不显示
             continue;
         }
-        const title = colNames[colunmName].cn || colunmName;
+        let title = colNames[colunmName].cn || colunmName;
+        if( title == "批量操作"){
+            title = "";
+        }
 
         let obj = {
             title: title,
@@ -281,7 +299,7 @@ const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
 
         // 冻结列,等待池不加冻结
         if( type == ""){
-            if( i < 3){
+            if( colunmName == "ID" || colunmName == "FLIGHTID" || colunmName == "MULTI_OPERATE" ){
                 obj['fixed'] = 'left';
             }
         }

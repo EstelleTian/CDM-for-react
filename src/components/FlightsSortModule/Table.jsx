@@ -20,6 +20,8 @@ class Table extends React.Component{
         this.scrollToRow = this.scrollToRow.bind(this);
         this.resetFrozenTableStyle = this.resetFrozenTableStyle.bind(this);
         this.handleSubTableDatas = this.handleSubTableDatas.bind(this);
+        this.onListenTableScroll = this.onListenTableScroll.bind(this);
+        this.sortDataMap = this.sortDataMap.bind(this);
         this.convertData = convertData.bind(this);
         this.convertAlarmData = convertAlarmData.bind(this);
         this.convertExpiredData = convertExpiredData.bind(this);
@@ -57,14 +59,14 @@ class Table extends React.Component{
         params['start'] = fullTime + '0000';
         // params['start'] = fullTime + '0930';
         params['end'] = fullTime + '2359';
-        // params['end'] = fullTime + '1130';
+        // params['end'] = fullTime + '1000';
 
         return params;
     };
     //更新航班数据
     refreshAirportsList( res ){
         // console.log("refreshAirportsList");
-        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll } = this.props;
+        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateTableConditionRange } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};
@@ -113,24 +115,40 @@ class Table extends React.Component{
             dataMap[id] = data;
         }
         //保存航班数据
-        // console.time("updateTableDatas----------");
         //更新数据生成时间
         updateGenerateTime({time : generateTime});
         //更新自动滚动航班id值
         updateTableConditionScrollId( mintime_flight_id );
+        //表格数据进行排序，排序后再存储
+        const sortedDataArr = this.sortDataMap( dataMap );
+        //如果自动滚动开启，根据定位航班id获取在排序数据中index
+        if( autoScroll ){
+            let start;
+            let end;
+            for(let i = 0, len = sortedDataArr.length; i < len; i++){
+                const tableData = sortedDataArr[i];
+                if( isValidVariable(tableData["ID"]) && tableData["ID"] == mintime_flight_id ){
+                    start = ( i - 25 ) < 0 ? 0 : ( i - 25 );
+                    end = ( i + 25 ) > len ? len : ( i + 25 );
+                    break;
+                }
+            };
+            updateTableConditionRange( start, end );
+        };
         //更新表格航班数据
+        console.time("updateTableDatas----------");
         updateTableDatas( dataMap );
+        console.timeEnd("updateTableDatas----------");
+        console.time("updateOtherTableDatas----------");
         //更新统计数据
         updateGenerateInfo(generateInfo);
-        // console.timeEnd("updateTableDatas----------");
 
-        // console.time("updateOtherTableDatas----------");
         this.handleSubTableDatas(res, 'expired', this.convertExpiredData, generateTime);
         this.handleSubTableDatas(res, 'pool', this.convertData, generateTime);
         this.handleSubTableDatas(res, 'alarm', this.convertAlarmData, generateTime);
         this.handleSubTableDatas(res, 'special', this.converSpecialtData, generateTime);
         this.handleSubTableDatas(res, 'todo', this.convertTodoData, generateTime);
-        // console.timeEnd("updateOtherTableDatas----------");
+        console.timeEnd("updateOtherTableDatas----------");
 
 
         const airportTimerId = setTimeout(() => {
@@ -142,7 +160,34 @@ class Table extends React.Component{
             airportTimerId
         });
 
-    }
+    };
+    //表格数据排序
+    sortDataMap( dataMap ){
+        //默认排序队列
+        const sortArr = ["ATOT", "CTOT", "TOBT", "EOBT", "SOBT", "ID"];
+        let tableDatas = Object.values( dataMap ); //转为数组
+        //排序
+        tableDatas = tableDatas.sort((d1, d2) => {
+            for (let index in sortArr) {
+                let sortColumnName = sortArr[index];
+                let data1 = d1[sortColumnName] + "";
+                let data2 = d2[sortColumnName] + "";
+                if (isValidVariable(data1) && isValidVariable(data2)) {
+                    let res = data1.localeCompare(data2);
+                    if (0 != res) {
+                        return res;
+                    }
+                } else if (isValidVariable(data1)) {
+                    return -1;
+                } else if (isValidVariable(data2)) {
+                    return 1;
+                } else {
+                    continue;
+                }
+            }
+        });
+        return tableDatas;
+    };
     /* 处理副表数据后保存到store中
      * data : 全部航班数据集合
      * tableName ： 表名称
@@ -202,8 +247,12 @@ class Table extends React.Component{
             this.convertUserProperty( res.userPropertyList );
         }else{
             //TODO 错误提示
-            const { error = {} } = res;
-            console.error( error.message || "" );
+            const error = res.error || {};
+            if( error.hasOwnProperty("message") ){
+                console.error( error.message || "" );
+            }else{
+                console.error( "获取参数接口失败，错误未知." );
+            }
         }
     }
     //转化用户配置信息
@@ -371,7 +420,13 @@ class Table extends React.Component{
             //滚动到指定位置
             $(".ant-table-scroll .ant-table-body").scrollTop(top);
         }
-    }
+    };
+    //
+    resetDataRange(){
+        const { tableDatas } = this.props;
+
+    };
+    //重置冻结表样式
     resetFrozenTableStyle(){
         const $fixedLeft = $(".ant-table-fixed-left");
         if( $fixedLeft.length > 0 ){
@@ -387,9 +442,44 @@ class Table extends React.Component{
         }
 
     }
-    // componentWillMount(){
-    //     console.time("componentMountt");
-    // }
+
+    onListenTableScroll(){
+        const $scrollDom = $(".ant-table-body");
+        const { updateTableConditionRangeByKey, autoScroll } = this.props;
+        $scrollDom.off("mousewheel").on("mousewheel", ( e ) => {
+            if( !autoScroll ){
+                //表格实际高度（有滚动条超出视图范围）
+                const $tbodyDom = $(".ant-table-tbody", $scrollDom);
+                const maxHeight = $tbodyDom.height();
+                //表格容器实际高度
+                const clientHeight = $scrollDom.height();
+                //滚动的高度
+                const scrollHeight = $scrollDom[0].scrollTop;
+                // console.log(scrollHeight, clientHeight, maxHeight);
+                const diff = 30;
+                //maxHeight = clientHeight + scrollHeight 差距30，当小于30 或者 scrollHeight<30时候，加载上页或者下一页
+                // scrollHeight < diff时候 加载上一页
+                if( scrollHeight <= diff ){
+                    //加载上一页
+                    // console.log("加载上一页");
+                    updateTableConditionRangeByKey( -1 );
+                }else if( clientHeight + scrollHeight + diff > maxHeight ){
+                    //加载下一页
+                    // console.log("加载下一页");
+                    updateTableConditionRangeByKey( 1 );
+                }
+            }
+        })
+    }
+
+    componentWillMount(){
+        const { userId, history } = this.props;
+        if( !isValidVariable(userId) ){
+            //跳转回登录页面
+            history.push('/');
+        }
+    }
+
     componentDidMount(){
         // console.timeEnd("componentMountt");
         //获取用户配置
@@ -445,23 +535,27 @@ class Table extends React.Component{
         clearTimeout( airportTimerId );
     }
 
-    // componentWillUpdate(){
-    //     console.log("componentWillUpdate");
-    //     console.time("componentUpdate");
-    // }
-
     componentDidUpdate(){
         // console.log("componentDidUpdate");
         // console.timeEnd("componentUpdate");
         //表格滚动到当前的行
         this.scrollToRow();
+        //根据定位航班id获取数据范围
+        this.resetDataRange();
         //处理冻结表格样式
         this.resetFrozenTableStyle();
+        //监听滚动
+        this.onListenTableScroll();
     }
 
     shouldComponentUpdate( nextProps, nextState ){
+        // console.log("shouldComponentUpdate");
         if( nextProps.tableColumns.length < 0 ){
             return false;
+        }
+        //如果autoscroll不一样，更新
+        if( this.props.autoScroll != nextProps.autoScroll ){
+            return true;
         }
         const thisTableDatas = this.props.tableDatas || [];
         const nextTableDatas = nextProps.tableDatas || [];
