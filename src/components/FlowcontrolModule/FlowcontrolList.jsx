@@ -21,6 +21,7 @@ class FlowcontrolList extends React.Component{
     // 拼接获取流控数据请求中所需参数
     getParams (){
         const { startWaypoints, waypoints, system, systemProgram} = this.props.flowcontrolParams;
+        const { userId } = this.props;
         // 暂时取客户端当前日期
         const date = new Date();
         let year = date.getFullYear();
@@ -38,6 +39,7 @@ class FlowcontrolList extends React.Component{
             "systemProgram": systemProgram,
             "waypoints" : waypoints,
             "startWaypoints" : startWaypoints,
+            "userId" : userId,
         };
         return params;
     }

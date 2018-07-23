@@ -130,8 +130,10 @@ const mapStateToProps = ( state ) => {
     const {time:flowGenerateTime} = state.flowGenerateTime;
     // 获取流控数据请求中所需参数
     const flowcontrolParams = state.flowcontrolParams;
-
+    // 用户id
+    const { userId } = state.loginUserInfo;
     return ({
+        userId, // 用户id
         flowcontrolParams, // 获取流控数据所需参数
         flowGenerateTime, // 流控数据生成时间
         flowcontrolDataMap, // 流控数据
