@@ -57,9 +57,9 @@ class Table extends React.Component{
         day = day < 10 ? '0' + day : '' + day;
         let fullTime = year + month + day;
         params['start'] = fullTime + '0000';
-        // params['start'] = fullTime + '0930';
+        // params['start'] = fullTime + '1330';
         params['end'] = fullTime + '2359';
-        // params['end'] = fullTime + '1000';
+        // params['end'] = fullTime + '1500';
 
         return params;
     };

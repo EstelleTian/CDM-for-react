@@ -49,11 +49,15 @@ class TableHeader extends React.Component{
     onMenuTitleSelect(key, domEvent){
         let { clientX = 0, clientY = 0 }  = domEvent;
         let show = this.state[key].show;
+        const dom = $(".flight-menu");
+        const height = dom.height();
+        const domLeft = dom[0].offsetLeft || 0;
+        const domTop = dom[0].offsetTop || 0;
         this.setState({
             [key]: {
                 show: !show,
-                x: clientX - 90,
-                y: 0
+                x: clientX - domLeft,
+                y: height + domTop
             }
         });
 
@@ -85,13 +89,13 @@ class TableHeader extends React.Component{
         const { expired, special, pool, alarm, todo } = this.state;
 
         return (
-            <Col span={24} className="header">
-                <div className="title">
-                    <span>航班起飞排序</span>
-                    {
-                        ( time ) ? <span>{time}</span> : ''
-                    }
-                </div>
+            <div className="header">
+                {/*<div className="title">*/}
+                    {/*<span>航班起飞排序</span>*/}
+                    {/*{*/}
+                        {/*( time ) ? <span>{time}</span> : ''*/}
+                    {/*}*/}
+                {/*</div>*/}
                 <div className="flight-menu">
                     <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('expired', e)} }>
                         <Badge count={ Object.keys( expiredData.datas || {} ).length } className="badge-icon">
@@ -226,8 +230,7 @@ class TableHeader extends React.Component{
                             clickCloseBtn = { this.onCloseBtn }
                         /> : ""
                 }
-
-            </Col>
+            </div>
         )
     }
 };

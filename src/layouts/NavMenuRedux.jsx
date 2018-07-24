@@ -46,8 +46,6 @@ const filterMatches = (state = initFilterMatches, action) => {
                 ...state,
                 statusFilter: newValue
             }
-
-
         }
         default:
             return state;

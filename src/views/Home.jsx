@@ -3,7 +3,6 @@ import { connect,  } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { Layout, Card, Col, Row, Spin  } from 'antd'
 import Head from "../layouts/Head";
-import NavMenuContainer from "../layouts/NavMenuContainer";
 import FlightsSortModule from '../components/FlightsSortModule/FlightsSortModule';
 import FlowcontrolModule from '../components/FlowcontrolModule/FlowcontrolModule';
 import Loader from '../components/Loader/Loader';
@@ -22,7 +21,6 @@ class HomePage extends React.Component{
             <Fragment >
                 <Layout className="air-layout">
                     <Head />
-                    <NavMenuContainer/>
                     <Content>
                         <Row className="no-margin" gutter={16}>
                             <FlightsSortModule/>

@@ -23,7 +23,6 @@ class DraggableModal extends React.Component {
     render() {
         const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
         const { x, y } = this.props;
-        // console.log( x, y );
         return (
             <Draggable
                 defaultPosition={{ x, y }}
