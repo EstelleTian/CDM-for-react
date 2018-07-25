@@ -29,6 +29,7 @@ class NavMenu extends React.Component{
         this.onMenuTitleSelect = this.onMenuTitleSelect.bind(this);
         this.onCloseBtn = this.onCloseBtn.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
+        this.handleUpdateSidebar = this.handleUpdateSidebar.bind(this);
         this.logout = this.logout.bind(this);
         this.state = {
             apPublish: {
@@ -78,16 +79,43 @@ class NavMenu extends React.Component{
     };
     //导航栏目选中
     onMenuTitleSelect({item, key, domEvent, keyPath }){
-        console.log( key );
-        let { clientX = 0, clientY = 0 }  = domEvent;
-        let show = this.state[key].show;
-        this.setState({
-            [key]: {
-                show: !show,
-                x: 0,
-                y: 0
+        let obj = this.state[key];
+        if(obj){
+            let show = this.state[key].show;
+            this.setState({
+                [key]: {
+                    show: !show,
+                    x: 0,
+                    y: 0
+                }
+            });
+        }
+
+        if('flowcontrol-info' == key || 'toggle-siderbar' == key ){
+            this.handleUpdateSidebar(key);
+        }
+    }
+
+    // 处理更新侧边栏
+    handleUpdateSidebar(selectKey){
+        const { updateSidebarKey, updateSidebarStatus, sidebarConfig } = this.props;
+        const {show, key} = sidebarConfig;
+        if(selectKey == 'toggle-siderbar'){
+            updateSidebarStatus(!show);
+        }else {
+            // 若侧边栏当前未显示，则切换侧边栏为显示状态
+            if(!show){
+                updateSidebarStatus(true);
             }
-        });
+            // 若选中的菜单栏key值与侧边栏当前显示的模块key值不同,则切换显示模块
+            if(selectKey != key ){
+                updateSidebarKey(key);
+            }
+        }
+
+
+
+
     }
 
     //当点击关闭按钮时，type: 类型
@@ -110,8 +138,9 @@ class NavMenu extends React.Component{
     }
 
     render(){
-        const { filterMatches, loginUserInfo } = this.props;
+        const { filterMatches, loginUserInfo, sidebarConfig } = this.props;
         const count = this.getFilterCount();
+        const { show } = sidebarConfig;
         const { apPublish } = this.state;
         return (
             <Menu
@@ -119,6 +148,16 @@ class NavMenu extends React.Component{
                 theme="dark"
                 className="menu-right"
             >
+                <SubMenu key="toggle-siderbar"
+                         title={
+                             <span title={ show ? '关闭侧边栏' : '开启侧边栏'}>
+                                <Icon
+                                    className="trigger"
+                                    type={ show ? 'menu-unfold' : 'menu-fold'}
+                                />
+                            </span>
+                         }
+                         onTitleClick={ this.onMenuTitleSelect } />
                 <SubMenu key="navigator-flight-search"
                          title={
                              <span title="航班查询">
