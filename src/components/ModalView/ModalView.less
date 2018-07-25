@@ -1,0 +1,83 @@
+@import "../../style/theme-color";
+.close-target{
+  display: inline-block;
+  float: right;
+  >i{
+    font-size: 1.25rem;
+  }
+}
+.close-target:hover{
+  cursor: pointer;
+}
+.dialog-wrapper {
+  display: flex;
+  background: @bc-black-90;
+  border: 0.08rem solid @bc-black-30;
+  border-radius: 0.25rem;
+  max-height: 60rem;
+  padding: 0 0.5rem 0.5rem;
+  position: absolute;
+  z-index: 999;
+}
+
+.dialog{
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  .title{
+    padding: 0.75rem .5rem;
+    border-bottom: 1px solid @c-white-50;
+    span{
+      font-size: 1.25rem;
+    }
+  }
+  .content {
+    height: 100%;
+    display: flex;
+    overflow: auto;
+    padding: 1rem 0;
+    .card {
+      background: @bc-black-20;
+      -webkit-box-shadow: 0 0.083rem 0.5rem @bc-black-20;
+      margin: 0 0.5rem 1rem;
+    }
+    .comments {
+      width: 100%;
+      background-color: @bc-black-10;
+    }
+  }
+  .footer {
+    //height: 50px;
+    //background-color: #7D7B7B;
+    border-top: 1px solid rgba(255, 255, 255, 0.5);
+    .ant-btn {
+      float: right;
+      margin: 0.5rem 1rem;
+     span {
+       font-size: 1.25rem;
+     }
+    }
+  }
+
+  .ant-btn {
+    color: #333333;
+    background-color: #c1c1c1;
+    border-color: #c1c1c1;
+  }
+  .ant-btn:hover {
+    background-color: #e0e0e0;
+  }
+  .ant-btn-primary {
+    color: #fff;
+    background-color: #1890ff;
+    border-color: #1890ff;
+  }
+  .ant-input:hover, .ant-input:focus,.ant-input-affix-wrapper:hover .ant-input:not(.ant-input-disabled) {
+    border-color: #40a9ff;
+  }
+  .ant-btn-primary:hover, .ant-btn-primary:focus {
+    color: #fff;
+    background-color: #40a9ff;
+    border-color: #40a9ff;
+  }
+}

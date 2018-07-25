@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Menu, Checkbox, Radio, Icon, Row, Col, Badge } from 'antd';
 import $ from 'jquery';
+import ModalView from "../components/ModalView/ModalView";
 import './NavMenu.less';
 
 const SubMenu = Menu.SubMenu;
@@ -22,7 +23,15 @@ class NavMenu extends React.Component{
         this.onRadioChange = this.onRadioChange.bind(this);
         this.onCheckboxChange = this.onCheckboxChange.bind(this);
         this.onMenuTitleSelect = this.onMenuTitleSelect.bind(this);
+        this.onCloseBtn = this.onCloseBtn.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
+        this.state = {
+            apPublish: {
+                show: false,
+                x: 0,
+                y:0
+            }
+        }
 
     }
     // 登出
@@ -45,8 +54,26 @@ class NavMenu extends React.Component{
         this.props.updateStatusFilter( checkedValues );
     };
     //导航栏目选中
-    onMenuTitleSelect({ key, domEvent }){
+    onMenuTitleSelect({item, key, domEvent, keyPath }){
         console.log( key );
+        let { clientX = 0, clientY = 0 }  = domEvent;
+        let show = this.state[key].show;
+        this.setState({
+            [key]: {
+                show: !show,
+                x: 0,
+                y: 0
+            }
+        });
+    }
+
+    //当点击关闭按钮时，type: 类型
+    onCloseBtn( type ){
+        this.setState({
+            [type]: {
+                show: false
+            }
+        });
     }
     //获取过滤条件判断是否计数，用于判断是否显示过滤提示红点
     getFilterCount() {
@@ -76,6 +103,7 @@ class NavMenu extends React.Component{
     render(){
         const { filterMatches, loginUserInfo } = this.props;
         const count = this.getFilterCount();
+        const { apPublish } = this.state;
         return (
             <Menu
                 mode="horizontal"
@@ -98,7 +126,12 @@ class NavMenu extends React.Component{
                     }
                     onTitleClick={ this.onMenuTitleSelect }
                 >
-                    <Menu.Item key="ap-publish"><label>发布机场受限</label></Menu.Item>
+                    <Menu.Item
+                        key="apPublish"
+                        onClick= {this.onMenuTitleSelect}
+                    >
+                        <label>发布机场受限</label>
+                    </Menu.Item>
                     <Menu.Item key="ap-gs-dep-publish"><label>发布低能见度受限</label></Menu.Item>
                     <Menu.Item key="point-publish"><label>发布航路受限</label></Menu.Item>
                     <Menu.Item key="composite-publish"><label>发布复合航路受限</label></Menu.Item>
@@ -212,7 +245,19 @@ class NavMenu extends React.Component{
                     </Menu.Item>
 
                 </SubMenu>
+                {
+                    (apPublish.show) ?
+                        <ModalView
+                            titleName = "发布机场受限"
+                            type = "apPublish"
+                            x = {apPublish.x}
+                            y = {apPublish.y}
+                            width = { 1200 }
+                            clickCloseBtn = { this.onCloseBtn }
+                        /> : ''
+                }
             </Menu>
+
 
         )
     }
