@@ -56,8 +56,8 @@ class TableHeader extends React.Component{
         this.setState({
             [key]: {
                 show: !show,
-                x: clientX - domLeft,
-                y: height + domTop
+                x: clientX - domLeft - 260,
+                y: height
             }
         });
 
