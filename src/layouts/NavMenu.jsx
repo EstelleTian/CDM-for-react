@@ -1,7 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Menu, Checkbox, Radio, Icon, Row, Col, Badge } from 'antd';
+import { Menu, Checkbox, Radio, Icon, Row, Col, Badge ,message} from 'antd';
 import $ from 'jquery';
+import { request } from '../utils/request-actions';
+import { logoutUrl } from '../utils/request-urls';
+
+
 import ModalView from "../components/ModalView/ModalView";
 import './NavMenu.less';
 
@@ -25,6 +29,7 @@ class NavMenu extends React.Component{
         this.onMenuTitleSelect = this.onMenuTitleSelect.bind(this);
         this.onCloseBtn = this.onCloseBtn.bind(this);
         this.handleLogout = this.handleLogout.bind(this);
+        this.logout = this.logout.bind(this);
         this.state = {
             apPublish: {
                 show: false,
@@ -34,14 +39,32 @@ class NavMenu extends React.Component{
         }
 
     }
-    // 登出
+    // 处理登出
     handleLogout(){
-        const {  userLogout, history } = this.props;
-        // 用户登出
-        userLogout();
-        // 跳转到主页面
-        history.push('/');
+        const {  loginUserInfo } = this.props;
+        const {  userId } = loginUserInfo;
+        const params = {
+            "userId":userId,
+        };
+        request(logoutUrl,'POST',params,this.logout);
     }
+    // 用户登出
+    logout(res){
+        const {  userLogout, history } = this.props;
+        const { status = 0 } = res;
+        const warning = () => {
+            message.warning('登出失败,请稍后重试');
+        };
+        if(200 == status*1){ // 成功
+            // 用户登出
+            userLogout();
+            // 跳转到主页面
+            history.push('/');
+        }else { // 失败
+            warning();
+        }
+    }
+
     //过滤--单选--时间范围
     onRadioChange(e){
         // console.log('radio checked', e.target.value);
@@ -86,20 +109,6 @@ class NavMenu extends React.Component{
         return count;
     }
 
-
-    // onTitleClick({ key, domEvent }){
-    //     console.log(key);
-    //     switch (key){
-    //         case 'reset' : {
-    //             //清空过滤条件
-    //             this.props.updateTableConditionQuicklyFilters("");
-    //             break;
-    //         }
-    //         default:
-    //             break;
-    //     }
-    //
-    // }
     render(){
         const { filterMatches, loginUserInfo } = this.props;
         const count = this.getFilterCount();

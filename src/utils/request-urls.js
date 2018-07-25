@@ -16,5 +16,9 @@ const getFlowcontrolUrl = `http://192.168.243.120:38181/flow/retrieveFlowcontrol
 
 // 用户登录
 const loginUrl = `${host}/userLogon.bo`;
+// 用户登出
+const logoutUrl = `${host}/userLogout.bo`;
 
-export {getSystemConfigUrl, getAllAirportsUrl, getUserPropertyUrl, loginUrl, getFlowcontrolUrl };
+
+
+export {getSystemConfigUrl, getAllAirportsUrl, getUserPropertyUrl, loginUrl, getFlowcontrolUrl, logoutUrl };
