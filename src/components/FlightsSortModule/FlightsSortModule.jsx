@@ -7,13 +7,11 @@ import TableContainer from './TableContainer';
 import './FlightsSortModule.less';
 
 const FlightsSortModule = () => (
-        <Col className="card all-flights-card bc-1" xs={24} sm={24} md={24} lg={24} xl={18} xxl={18}>
-            <Row className="container">
-                {/*<TableHeaderContainer/>*/}
-                <TableMenuContainer/>
-                <TableContainer/>
-            </Row>
-        </Col>
+    <Row className="container">
+        {/*<TableHeaderContainer/>*/}
+        <TableMenuContainer/>
+        <TableContainer/>
+    </Row>
 )
 
 export default FlightsSortModule;
