@@ -419,6 +419,13 @@ class Table extends React.Component{
             let top = rowid * heigth;
             //滚动到指定位置
             $(".ant-table-scroll .ant-table-body").scrollTop(top);
+        }else{
+            //滚动到中间位置
+            const $scrollDom = $(".ant-table-body");
+            const clientHeight = $scrollDom.height();
+            //滚动的高度
+            $scrollDom.scrollTop(clientHeight/2);
+
         }
     };
     //
@@ -446,6 +453,7 @@ class Table extends React.Component{
     onListenTableScroll(){
         const $scrollDom = $(".ant-table-body");
         const { updateTableConditionRangeByKey, autoScroll } = this.props;
+        let scrollTimer;
         $scrollDom.off("mousewheel").on("mousewheel", ( e ) => {
             if( !autoScroll ){
                 //表格实际高度（有滚动条超出视图范围）
@@ -454,20 +462,30 @@ class Table extends React.Component{
                 //表格容器实际高度
                 const clientHeight = $scrollDom.height();
                 //滚动的高度
-                const scrollHeight = $scrollDom[0].scrollTop;
+                let scrollHeight = $scrollDom[0].scrollTop;
                 // console.log(scrollHeight, clientHeight, maxHeight);
                 const diff = 30;
-                //maxHeight = clientHeight + scrollHeight 差距30，当小于30 或者 scrollHeight<30时候，加载上页或者下一页
-                // scrollHeight < diff时候 加载上一页
-                if( scrollHeight <= diff ){
-                    //加载上一页
-                    // console.log("加载上一页");
-                    updateTableConditionRangeByKey( -1 );
-                }else if( clientHeight + scrollHeight + diff > maxHeight ){
-                    //加载下一页
-                    // console.log("加载下一页");
-                    updateTableConditionRangeByKey( 1 );
-                }
+                let t1 = scrollHeight;
+                let t2 = 0;
+                clearTimeout( scrollTimer );
+                scrollTimer = setTimeout(function(){
+                    t2 = $scrollDom[0].scrollTop;
+                    scrollHeight = t2;
+                    // console.log("进入timer");
+                    if( t2 - t1 > diff || t1 - t2 > diff){
+                        //maxHeight = clientHeight + scrollHeight 差距30，当小于30 或者 scrollHeight<30时候，加载上页或者下一页
+                        // scrollHeight < diff时候 加载上一页
+                        if( scrollHeight <= diff ){
+                            //加载上一页
+                            // console.log("加载上一页");
+                            updateTableConditionRangeByKey( -1 );
+                        }else if( clientHeight + scrollHeight + diff > maxHeight ){
+                            //加载下一页
+                            // console.log("加载下一页");
+                            updateTableConditionRangeByKey( 1 );
+                        }
+                    }
+                }, 300);
             }
         })
     }
