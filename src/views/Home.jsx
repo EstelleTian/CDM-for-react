@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { Layout, Card, Col, Row, Spin  } from 'antd'
 import Head from "../layouts/Head";
 import FlightsSortModule from '../components/FlightsSortModule/FlightsSortModule';
-import FlowcontrolModule from '../components/FlowcontrolModule/FlowcontrolModule';
+import SidebarContainer from '../components/Sidebar/SidebarContainer';
 import Loader from '../components/Loader/Loader';
 import "./Home.less";
 
