@@ -2,8 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Menu, Checkbox, Radio, Icon, Row, Col, Badge ,message} from 'antd';
 import $ from 'jquery';
-import { request } from '../utils/request-actions';
-import { logoutUrl } from '../utils/request-urls';
+import { request } from 'utils/request-actions';
+import { logoutUrl } from 'utils/request-urls';
 
 
 import ModalView from "../components/ModalView/ModalView";

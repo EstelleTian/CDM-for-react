@@ -30,7 +30,7 @@ const mapStateToProps = ( state ) => {
     } )
 };
 
-const mapDispatchTopProps = {
+const mapDispatchToProps = {
     updateFlowcontrolConditionShieldLong,
     updateFlowcontrolConditionScope, updateFlowcontrolConditionPlaceType,
     updateFlowcontrolConditionOrderBy, updateFlowcontrolConditionQuicklyFilters,
@@ -38,7 +38,7 @@ const mapDispatchTopProps = {
 
 const FlowcontrolHeaderContainer = connect(
     mapStateToProps,
-    mapDispatchTopProps
+    mapDispatchToProps
 )(FlowcontrolHeader);
 
 export default withRouter( FlowcontrolHeaderContainer );

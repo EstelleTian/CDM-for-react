@@ -2,8 +2,7 @@
 
 import React from 'react';
 import { Col, Icon, Input, Select, Checkbox, Radio, Menu   } from 'antd';
-import { isValidVariable } from '../../utils/basic-verify';
-
+import { isValidVariable } from 'utils/basic-verify';
 
 import './FlowcontrolHeader.less';
 

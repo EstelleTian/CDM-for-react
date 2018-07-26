@@ -3,9 +3,9 @@ import { connect,  } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { Layout, Card, Col, Row, Spin  } from 'antd'
 import Head from "../layouts/Head";
-import FlightsSortModule from '../components/FlightsSortModule/FlightsSortModule';
-import FlowcontrolModule from '../components/FlowcontrolModule/FlowcontrolModule';
-import Loader from '../components/Loader/Loader';
+import FlightsSortModule from 'components/FlightsSortModule/FlightsSortModule';
+import FlowcontrolModule from 'components/FlowcontrolModule/FlowcontrolModule';
+import Loader from 'components/Loader/Loader';
 import "./Home.less";
 
 const { Content } = Layout;
@@ -53,14 +53,14 @@ const mapStateToProps = ( state ) => {
     })
 };
 
-const mapDispatchTopProps = {
+const mapDispatchToProps = {
     // updateGenerateTime :  updateGenerateTime,
     // updateFlowGenerateTime : updateFlowGenerateTime,
 };
 
 const Home = connect(
     mapStateToProps,
-    mapDispatchTopProps
+    mapDispatchToProps
 )(HomePage);
 
 export default withRouter( Home );

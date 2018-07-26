@@ -1,4 +1,4 @@
-//航班起飞排序---菜单操作功能
+//导航--失效、特殊、等待、告警、待办航班 小表格
 import React from 'react';
 import { Row, Table, Icon } from 'antd';
 import DraggableModule from '../DraggableModule/DraggableModule';

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Row, Col } from 'antd';
-import { getFlowcontrolUrl } from '../../utils/request-urls';
-import {  request } from '../../utils/request-actions';
+import { getFlowcontrolUrl } from 'utils/request-urls';
+import {  request } from 'utils/request-actions';
 
 import FlowcontrolItem from "./FlowcontrolItem";
 import './FlowcontrolList.less';

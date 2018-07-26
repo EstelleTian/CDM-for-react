@@ -2,11 +2,11 @@ import React from 'react';
 import { Table as AntTable, Col } from 'antd';
 import $ from 'jquery';
 import shallowequal from 'shallowequal';
-import { requestGet } from '../../utils/request-actions';
-import { getAllAirportsUrl, getUserPropertyUrl } from '../../utils/request-urls';
-import { isValidVariable, isValidObject, calculateStringTimeDiff } from '../../utils/basic-verify';
-import { TableColumns } from "../../utils/table-config";
-import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize, convertAlarmData, convertExpiredData, converSpecialtData, convertTodoData } from "../../utils/flight-grid-table-data-util";
+import { requestGet } from 'utils/request-actions';
+import { getAllAirportsUrl, getUserPropertyUrl } from 'utils/request-urls';
+import { isValidVariable, isValidObject, calculateStringTimeDiff } from 'utils/basic-verify';
+import { TableColumns } from "utils/table-config";
+import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize, convertAlarmData, convertExpiredData, converSpecialtData, convertTodoData } from "utils/flight-grid-table-data-util";
 import './Table.less';
 
 class Table extends React.Component{
@@ -30,6 +30,7 @@ class Table extends React.Component{
         this.getDisplayStyle = getDisplayStyle.bind(this);
         this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
         this.getDisplayFontSize = getDisplayFontSize.bind(this);
+        this.TableColumns = TableColumns.bind(this);
         this.state = {
             airportTimerId : 0
         };
@@ -389,7 +390,7 @@ class Table extends React.Component{
             updateSubTableDatasProperty( subTableConfigParams );
             //转换为表头列数据
             const { colDisplay, colNames, colTitle } = configParams;
-            const { columns, width } = TableColumns( "", colDisplay, colNames, colTitle );
+            const { columns, width } = this.TableColumns( "", colDisplay, colNames, colTitle );
             //更新表头数据
             updateTableDatasColumns( columns, width );
             //获取机场航班

@@ -1,4 +1,4 @@
-//机场流控发布---菜单操作功能
+//机场流控发布
 import React from 'react';
 import { Row, Col, Icon, Button, Card, Form, Input, Checkbox, Select, Radio, DatePicker, TimePicker     } from 'antd';
 import moment from 'moment';
@@ -12,8 +12,6 @@ const Search = Input.Search;
 const Option = Select.Option;
 const RadioGroup = Radio.Group;
 const { MonthPicker, RangePicker } = DatePicker;
-
-
 
 class ModalView extends React.Component{
     constructor( props ){

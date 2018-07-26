@@ -90,8 +90,6 @@ const subTableDatas = ( state = initData, action) => {
     }
 };
 
-
-
 export {
     subTableDatas, updateSubTableDatas, updateSubTableDatasProperty
 };
