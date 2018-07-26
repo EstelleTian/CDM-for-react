@@ -9,6 +9,7 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 //代码压缩用ParallelUglifyPlugin代替自带的 UglifyJsPlugin插件
 const ParallelUglifyPlugin = require('webpack-parallel-uglify-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const port = 3033;
 
 module.exports = {
@@ -37,35 +38,52 @@ module.exports = {
                  }]
             },
             {
-                test: /\.less|css$/,
-                use: [{
-                    loader:'style-loader'
-                    },
-                    {
-                        loader:'css-loader?#sourceMap'
-                    },
-                    {
-                        loader:'postcss-loader'
-                    },
-                    {
-                        loader:'less-loader',
-                        options: {
-                            javascriptEnabled: true,
-                            modifyVars:{
-                                "primary-color":"rgba(0, 0, 0, .7)",
-                                "heading-color": "#fff",
-                                "text-color": "#fff",
-                                "text-color-secondary": "#fff",
-                                "input-bg": "rgba(0, 0, 0, 0)",
-                                "layout-body-background": "rgba(0, 0, 0, 0)",
-                                "layout-header-background ": "rgba(0, 0, 0, 0)",
-                                "layout-sider-background-light": "rgba(0, 0, 0, 0)",
-                                "component-background": "rgba(0, 0, 0, 0)",
-                                "border-color-split ": "rgba(255,255,255,.125)",
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [
+                        {
+                            loader:'css-loader'
+                        },
+                        {
+                            loader:'postcss-loader'
+                        }
+                    ]
+
+                }),
+            },
+            {
+                test: /\.less$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [
+                        {
+                            loader:'css-loader'
+                        },
+                        {
+                            loader:'postcss-loader'
+                        },
+                        {
+                            loader:'less-loader',
+                            options: {
+                                javascriptEnabled: true,
+                                modifyVars:{
+                                    "primary-color":"rgba(0, 0, 0, .7)",
+                                    "heading-color": "#fff",
+                                    "text-color": "#fff",
+                                    "text-color-secondary": "#fff",
+                                    "input-bg": "rgba(0, 0, 0, 0)",
+                                    "layout-body-background": "rgba(0, 0, 0, 0)",
+                                    "layout-header-background ": "rgba(0, 0, 0, 0)",
+                                    "layout-sider-background-light": "rgba(0, 0, 0, 0)",
+                                    "component-background": "rgba(0, 0, 0, 0)",
+                                    "border-color-split ": "rgba(255,255,255,.125)",
+                                }
                             }
                         }
-                    }
-                ],
+                    ]
+
+                }),
             },
             {
                 test: /\.eot|woff|eot|ttf|svg$/,
@@ -75,7 +93,14 @@ module.exports = {
                 test: /\.jpg|png$/,
                 use: ['url-loader']
             }
-        ],
+        ]
+    },
+    resolve : {
+        extensions: [".js", ".jsx", ".less", ".css", ".json"],
+        alias:{
+            utils: path.resolve(__dirname, 'src/utils'),
+            components: path.resolve(__dirname, 'src/components'),
+        }
     },
     plugins: [
         new OpenBrowserPlugin({
@@ -103,7 +128,11 @@ module.exports = {
                     warnings: false
                 }
             }
-        })
+        }),
+        new ExtractTextPlugin({
+            filename: 'css/[name][hash:8].css',
+            allChunks: true
+        }),
     ],
     devServer: {
         compress: false, // 启用gzip压缩

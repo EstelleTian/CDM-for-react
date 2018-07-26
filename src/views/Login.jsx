@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom'
 import { updateUserInfo, updateSystemConfig,  updateFlowcontrolParams } from './LoginRedux'
-import LoginForm from '../components/Login/Form'
+import LoginForm from 'components/Login/Form'
 
 const mapStateToProps = ( state ) => ({
     loginUserInfo : state.loginUserInfo, // 登录用户信息

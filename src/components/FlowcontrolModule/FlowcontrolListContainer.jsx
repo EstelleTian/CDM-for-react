@@ -7,8 +7,8 @@ import { updateFlowcontrolDatas,  updateFlowcontrolConditionShieldLong,
     updateFlowGenerateTime, } from './Redux';
 
 import FlowcontrolList from './FlowcontrolList';
-import { isValidVariable, isValidObject } from '../../utils/basic-verify';
-import { isEffective, FlowcontroConstant } from '../../utils/flowcontrol-data-util';
+import { isValidVariable, isValidObject } from 'utils/basic-verify';
+import { isEffective, FlowcontroConstant } from 'utils/flowcontrol-data-util';
 
 
 /**
@@ -146,7 +146,7 @@ const mapStateToProps = ( state ) => {
     } )
 };
 
-const mapDispatchTopProps = {
+const mapDispatchToProps = {
     updateFlowcontrolDatas, updateFlowcontrolConditionShieldLong,
     updateFlowcontrolConditionScope, updateFlowcontrolConditionPlaceType,
     updateFlowcontrolConditionOrderBy, updateFlowcontrolConditionQuicklyFilters,
@@ -155,7 +155,7 @@ const mapDispatchTopProps = {
 
 const FlowcontrolListContainer = connect(
     mapStateToProps,
-    mapDispatchTopProps
+    mapDispatchToProps
 )(FlowcontrolList);
 
 export default withRouter( FlowcontrolListContainer );

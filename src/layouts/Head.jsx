@@ -4,7 +4,7 @@ import { withRouter } from 'react-router-dom';
 import { Layout, Row, Col } from 'antd'
 import { userLogout } from '../views/LoginRedux'
 import NavMenuContainer from "./NavMenuContainer";
-import TableHeaderContainer from '../components/FlightsSortModule/TableHeaderContainer';
+import TableHeaderContainer from 'components/FlightsSortModule/TableHeaderContainer';
 import './Head.less'
 
 const { Header } = Layout;

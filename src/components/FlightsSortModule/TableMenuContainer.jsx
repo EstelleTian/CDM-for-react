@@ -18,7 +18,7 @@ const mapStateToProps = ( state ) => ({
     generateInfo: calculateGroundNumber(state.generateInfo),
 });
 
-const mapDispatchTopProps = {
+const mapDispatchToProps = {
     updateTableConditionOrderBy,
     updateGenerateInfo,
     updateTableConditionScroll,
@@ -27,7 +27,7 @@ const mapDispatchTopProps = {
 
 const TableMenuContainer = connect(
     mapStateToProps,
-    mapDispatchTopProps
+    mapDispatchToProps
 )(TableMenu);
 
 export default withRouter( TableMenuContainer );

@@ -1,11 +1,12 @@
 import { combineReducers } from 'redux';
 import { filterMatches } from "../layouts/NavMenuRedux"
 import { loginUserInfo, systemConfig, flowcontrolParams } from "../views/LoginRedux"
-import { tableDatas, tableCondition,  generateInfo, generateTime } from "../components/FlightsSortModule/Redux"
-import { flowcontrolDatas, flowcontrolCondition, flowGenerateTime } from "../components/FlowcontrolModule/Redux"
-import { subTableDatas } from "../components/SubTable/Redux"
-import { sidebarConfig } from "../components/Sidebar/Redux"
 
+import { tableDatas, tableCondition,  generateInfo, generateTime } from "components/FlightsSortModule/Redux"
+import { flowcontrolDatas, flowcontrolCondition, flowGenerateTime } from "components/FlowcontrolModule/Redux"
+import { subTableDatas } from "components/SubTable/Redux"
+import { operationDatas } from "components/OperationDialog/Redux"
+import { sidebarConfig } from "/components/Sidebar/Redux"
 const appReducer = combineReducers({
     loginUserInfo, systemConfig, flowcontrolParams,
     tableDatas, tableCondition, generateInfo, generateTime,
@@ -13,6 +14,8 @@ const appReducer = combineReducers({
     subTableDatas,
     flowcontrolDatas, flowcontrolCondition, flowGenerateTime,
     sidebarConfig,
+    flowcontrolDatas, flowcontrolCondition, flowGenerateTime,
+    operationDatas
 });
 
 

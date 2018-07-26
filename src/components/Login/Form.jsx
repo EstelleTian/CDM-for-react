@@ -1,10 +1,9 @@
 import React from 'react';
 import {Form, Icon, Input, Button, Alert,Row, Col} from 'antd'
 import { Base64 } from 'js-base64';
-import axios from 'axios'
 import './Form.less'
-import { loginUrl, getSystemConfigUrl } from '../../utils/request-urls';
-import { requestGet, request } from '../../utils/request-actions';
+import { loginUrl, getSystemConfigUrl } from 'utils/request-urls';
+import { requestGet, request } from 'utils/request-actions';
 const FormItem = Form.Item;
 
 class Loginform extends React.Component{

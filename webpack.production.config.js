@@ -6,6 +6,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
 module.exports = {
     entry: {
         bundle: './app/router.jsx',
@@ -26,23 +27,52 @@ module.exports = {
                 use: 'babel-loader',
             },
             {
-                test: /\.less|css$/,
-                use: [{
-                    loader:'style-loader'
-                },
-                    {
-                        loader:'css-loader?#sourceMap'
-                    },
-                    {
-                        loader:'postcss-loader'
-                    },
-                    {
-                        loader:'less-loader',
-                        options: {
-                            javascriptEnabled: true
+                test: /\.css$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [
+                        {
+                            loader:'css-loader'
+                        },
+                        {
+                            loader:'postcss-loader'
                         }
-                    }
-                ],
+                    ]
+
+                }),
+            },
+            {
+                test: /\.less$/,
+                use: ExtractTextPlugin.extract({
+                    fallback: 'style-loader',
+                    use: [
+                        {
+                            loader:'css-loader'
+                        },
+                        {
+                            loader:'postcss-loader'
+                        },
+                        {
+                            loader:'less-loader',
+                            options: {
+                                javascriptEnabled: true,
+                                modifyVars:{
+                                    "primary-color":"rgba(0, 0, 0, .7)",
+                                    "heading-color": "#fff",
+                                    "text-color": "#fff",
+                                    "text-color-secondary": "#fff",
+                                    "input-bg": "rgba(0, 0, 0, 0)",
+                                    "layout-body-background": "rgba(0, 0, 0, 0)",
+                                    "layout-header-background ": "rgba(0, 0, 0, 0)",
+                                    "layout-sider-background-light": "rgba(0, 0, 0, 0)",
+                                    "component-background": "rgba(0, 0, 0, 0)",
+                                    "border-color-split ": "rgba(255,255,255,.125)",
+                                }
+                            }
+                        }
+                    ]
+
+                }),
             },
             {
                 test: /\.eot|woff|eot|ttf|svg$/,
@@ -59,14 +89,18 @@ module.exports = {
             title: 'CDM机场协同放行',//根据模板插入css/js等生成最终HTML
             filename:'index.html',    //生成的html存放路径，相对于 path
             // template:'./app/index.html',    //html模板路径
-            favicon: './app/favicon.ico',
+            // favicon: './app/favicon.ico',
             inject:true,    //允许插件修改哪些内容，包括head与body
             // hash:true,    //为静态资源生成hash值
             minify:{    //压缩HTML文件
                 removeComments:true,    //移除HTML中的注释
                 collapseWhitespace:false    //删除空白符与换行符
             }
-        })
+        }),
+        new ExtractTextPlugin({
+            filename: 'css/[name][hash:8].css',
+            allChunks: true
+        }),
     ],
     optimization: {
         splitChunks: {

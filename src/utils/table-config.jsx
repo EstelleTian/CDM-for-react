@@ -89,7 +89,7 @@ const handleColumnRender = (value, row, index, colunmName) => {
         if( value == "1" || value == '2' ){
             const className = "clear-locked-time clear-" + value;
             return {
-                children: <Checkbox className= {className} ></Checkbox>,
+                children: <Checkbox className= {className}></Checkbox>,
                 props:{
                     title: title
                 }
@@ -135,6 +135,7 @@ const handleColumnRender = (value, row, index, colunmName) => {
         }
     }
     resStyleObj['fontSize'] = styleObj['fontSize'] || "";
+
 
     return {
         children: value,
@@ -228,17 +229,24 @@ const handleColumnWidth = ( type, title ) => {
  * colunmName  列名
  * record  行对象
  */
-const handleRightClickFunc = (colunmName, record) => {
-    console.log(colunmName);
+const handleRightClickFunc = function( thisProxy, colunmName, record, x, y ){
     if( isValidVariable(colunmName) ){
         //根据列名和行对象，获取选中单元格的值
         const value = record[colunmName] || "";
         console.log(colunmName, value);
+        //航班号列
+        // if( "FLIGHTID" == colunmName ){
+            //显示航班协调窗口
+
+            //更新数据，需要展开的协调窗口名称和位置
+            thisProxy.props.updateOperationDatasShowNameAndPosition("flightid", x, y-36);
+        // }
     }
 
 };
 //根据表格列名，配置表格专用列数据格式
-const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
+const TableColumns = function( type, colDisplay, colNames, colTitle ){
+    let thisProxy = this;
     let width = 0;
     let columns = [];
     let i = 0;
@@ -281,8 +289,16 @@ const TableColumns = ( type, colDisplay, colNames, colTitle ) => {
                 //右键
                 onContextMenu: ( e ) => {
                     e.preventDefault();
-                    handleRightClickFunc(colunmName, record);
+                    //点击时候的位置
+                    const x = e.clientX;
+                    const y = e.clientY;
+                    handleRightClickFunc(thisProxy, colunmName, record, x, y);
                 },
+                //左键
+                onClick: ( e )=>{
+                    console.log("选中行" + record["FLIGHTID"]);
+
+                }
             }
         }
         //处理数据格式化，当列是DateColumns，且value为12位时间格式，做日期格式化

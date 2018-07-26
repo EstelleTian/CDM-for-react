@@ -8,13 +8,13 @@ const mapStateToProps = ( state ) => ({
     flowGenerateTime : state.flowGenerateTime
 });
 
-const mapDispatchTopProps = {
+const mapDispatchToProps = {
     // updateGenerateTime,
 };
 
 const FlowcontrolItemContainer = connect(
     mapStateToProps,
-    mapDispatchTopProps
+    mapDispatchToProps
 )(FlowcontrolItem);
 
 export default withRouter( FlowcontrolItemContainer );

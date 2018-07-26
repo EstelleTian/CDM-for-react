@@ -11,13 +11,13 @@ const mapStateToProps = ( state, props ) => {
     }
 };
 
-const mapDispatchTopProps = {
+const mapDispatchToProps = {
 
 };
 
 const SubTableContainer = connect(
     mapStateToProps,
-    mapDispatchTopProps
+    mapDispatchToProps
 )(SubTable);
 
 export default withRouter( SubTableContainer );

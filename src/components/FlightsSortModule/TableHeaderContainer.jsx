@@ -25,13 +25,13 @@ const mapStateToProps = ( state ) => ({
     subTableDatas: state.subTableDatas
 });
 
-const mapDispatchTopProps = {
+const mapDispatchToProps = {
     updateGenerateTime,
 };
 
 const TableHeaderContainer = connect(
     mapStateToProps,
-    mapDispatchTopProps
+    mapDispatchToProps
 )(TableHeader);
 
 export default withRouter( TableHeaderContainer );

@@ -3,7 +3,7 @@
 import React from 'react';
 import { Row, Col, Input, Checkbox } from 'antd';
 import './TableMenu.less';
-import {isValidVariable} from "../../utils/basic-verify";
+import {isValidVariable} from "utils/basic-verify";
 
 const Search = Input.Search;
 

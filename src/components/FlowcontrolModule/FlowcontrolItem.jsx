@@ -3,7 +3,7 @@
 import React from 'react';
 import { Row, Col, Icon } from 'antd';
 import './FlowcontrolItem.less';
-import { convertFlowcontrolData } from '../../utils/flowcontrol-data-util';
+import { convertFlowcontrolData } from 'utils/flowcontrol-data-util';
 
 class FlowcontrolItem extends React.Component{
     constructor( props ){
