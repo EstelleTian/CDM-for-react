@@ -90,16 +90,21 @@ class NavMenu extends React.Component{
                 }
             });
         }
-
-        if('flowcontrol-info' == key || 'toggle-siderbar' == key ){
+        if('toggle-siderbar' == key // 侧边栏切换显示按钮
+            || 'flowcontrol-info' == key // 流控
+            || 'restriction-info' == key // 限制信息
+            || 'notice-info' == key // 通告信息
+        ){
             this.handleUpdateSidebar(key);
         }
+
     }
 
     // 处理更新侧边栏
     handleUpdateSidebar(selectKey){
         const { updateSidebarKey, updateSidebarStatus, sidebarConfig } = this.props;
         const {show, key} = sidebarConfig;
+        // 侧边栏切换显示按钮
         if(selectKey == 'toggle-siderbar'){
             updateSidebarStatus(!show);
         }else {
@@ -109,7 +114,7 @@ class NavMenu extends React.Component{
             }
             // 若选中的菜单栏key值与侧边栏当前显示的模块key值不同,则切换显示模块
             if(selectKey != key ){
-                updateSidebarKey(key);
+                updateSidebarKey(selectKey);
             }
         }
 

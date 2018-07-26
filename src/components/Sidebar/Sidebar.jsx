@@ -18,6 +18,13 @@ class Sidebar extends React.Component{
                 {
                     ( key == 'flowcontrol-info' ) ? <FlowcontrolModule/> : ''
                 }
+                {
+                    ( key == 'notice-info' ) ? '通告信息' : ''
+                }
+                {
+                    ( key == 'restriction-info' ) ? '限制信息' : ''
+                }
+
 
             </Col>
         )
