@@ -4,6 +4,7 @@
 import { isValidVariable } from "../../utils/basic-verify";
 
 const UPDATE_OPERATION_DATAS_SHOWNAME_AND_POSITION= 'operationDatas/update/showNameAndPosition';
+const UPDATE_OPERATION_DATAS_AUTH= 'operationDatas/update/auth';
 //action-creator
 //更新显示协调窗口名称和位置
 const updateOperationDatasShowNameAndPosition = ( name, x, y ) => ({
@@ -12,7 +13,12 @@ const updateOperationDatasShowNameAndPosition = ( name, x, y ) => ({
     x,
     y
 });
-
+//更新显示协调窗口权限数据
+const updateOperationDatasAuth = ( auth, rowData ) => ({
+    type: UPDATE_OPERATION_DATAS_AUTH,
+    auth,
+    rowData
+});
 
 //reducer 协调窗口数据
 const initData = {
@@ -20,7 +26,8 @@ const initData = {
     x: 0, //需要展示窗口x坐标值
     y: 0, //需要展示窗口y坐标值
     flightid: "", //航班号
-    auth: {}, //航班对应权限对象集合
+    auth: [], //航班对应权限对象集合
+    rowData: {}, //航班行数据对象集合
 };
 //store 协调窗口数据--
 const operationDatas = ( state = initData, action) => {
@@ -33,6 +40,13 @@ const operationDatas = ( state = initData, action) => {
                 y: action.y || 0,
             }
         }
+        case UPDATE_OPERATION_DATAS_AUTH: {
+            return {
+                ...state,
+                auth: action.auth || [],
+                rowData: action.rowData || [],
+            }
+        }
         default:
             return state;
     }
@@ -40,5 +54,5 @@ const operationDatas = ( state = initData, action) => {
 
 export {
     operationDatas,
-    updateOperationDatasShowNameAndPosition
+    updateOperationDatasShowNameAndPosition, updateOperationDatasAuth
 };

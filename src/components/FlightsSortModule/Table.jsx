@@ -91,8 +91,10 @@ class Table extends React.Component{
             //获取航班对象
             const flight = flightViewMap[id] || {};
             //转化后的数据
-            const flightFieldViewMap = flight.flightFieldViewMap;
-            const data = this.convertData( flightFieldViewMap, generateTime );
+            const flightFieldViewMap = flight.flightFieldViewMap || {};
+            //获取航班对应的可操作权限
+            const flightAuthMap = flight.flightAuthMap || {};
+            const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
             //将航班原数据补充到航班对象中
             data.originalData = flight;
 
@@ -152,14 +154,14 @@ class Table extends React.Component{
         console.timeEnd("updateOtherTableDatas----------");
 
 
-        const airportTimerId = setTimeout(() => {
-            //获取机场航班
-            const params = this.getAirportsParams();
-            requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
-        }, 30*1000);
-        this.setState({
-            airportTimerId
-        });
+        // const airportTimerId = setTimeout(() => {
+        //     //获取机场航班
+        //     const params = this.getAirportsParams();
+        //     requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
+        // }, 30*1000);
+        // this.setState({
+        //     airportTimerId
+        // });
 
     };
     //表格数据排序
@@ -437,17 +439,27 @@ class Table extends React.Component{
     //重置冻结表样式
     resetFrozenTableStyle(){
         const $fixedLeft = $(".ant-table-fixed-left");
-        if( $fixedLeft.length > 0 ){
-            $fixedLeft.addClass('overflow');
-            const $scroll = $(".ant-table-scroll");
+        const $fixedRight = $(".ant-table-fixed-right");
 
-            const antScroll = $scroll.height() || 0;
-            const antBody = $(".ant-table-body", $scroll).height() || 0;
-            const antHead = $(".ant-table-header", $scroll).height() || 0;
-            if( antBody + antHead + 5 < antScroll ){
-                $fixedLeft.removeClass('overflow');
+        const handleOverflow = ( $dom ) => {
+            if( $dom.length > 0 ){
+                $dom.addClass('overflow');
+                const $scroll = $(".ant-table-scroll");
+
+                const antScroll = $scroll.height() || 0;
+                const antBody = $(".ant-table-body", $scroll).height() || 0;
+                const antHead = $(".ant-table-header", $scroll).height() || 0;
+                if( antBody + antHead + 5 < antScroll ){
+                    $dom.removeClass('overflow');
+                }
             }
         }
+        handleOverflow( $fixedLeft );
+        handleOverflow( $fixedRight );
+
+
+
+
 
     }
 

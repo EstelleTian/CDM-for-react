@@ -12,7 +12,7 @@
     "build": "webpack --mode production"
   },
   "devDependencies": {
-    "antd": "^3.6.2",
+    "antd": "^3.7.2",
     "axios": "^0.18.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^7.1.4",

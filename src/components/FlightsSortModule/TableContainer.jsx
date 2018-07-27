@@ -4,7 +4,8 @@ import { withRouter } from 'react-router-dom';
 import {isValidObject, isValidVariable} from 'utils/basic-verify';
 import { updateTableDatas, updateTableDatasProperty, updateTableDatasColumns, updateTableConditionScrollId, updateGenerateInfo, updateGenerateTime, updateTableConditionRangeByKey, updateTableConditionRange } from './Redux';
 import { updateSubTableDatasProperty, updateSubTableDatas } from '../SubTable/Redux';
-import { updateOperationDatasShowNameAndPosition } from '../OperationDialog/Redux';
+import { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } from '../OperationDialog/Redux';
+import { updateDetailModalDatasVisible, updateDetailModalDatasByName } from '../DetailModule/Redux';
 import Table from './Table';
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
@@ -176,7 +177,10 @@ const mapDispatchToProps = {
     updateSubTableDatas,
     updateTableConditionRangeByKey,
     updateTableConditionRange,
-    updateOperationDatasShowNameAndPosition
+    updateOperationDatasShowNameAndPosition,
+    updateOperationDatasAuth,
+    updateDetailModalDatasVisible,
+    updateDetailModalDatasByName
 };
 
 const TableContainer = connect(

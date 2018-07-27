@@ -1,8 +1,40 @@
 @import "../../style/theme-color";
-.collaborate-dialog{
+.collaborate-canvas{
   position: absolute;
-  background: @bc-black-90;
-  width: 10rem;
-  height: 10rem;
+  .collaborate-dialog{
+    background: @bc-black-90;
+    min-width: 13rem;
+    .title{
+      padding: 0.25rem;
+      >span{
+        font-size: 1.5rem;
+        padding-left: 0.5rem;
+      }
+      i{
+        font-size: 1.5rem;
+      }
+    }
+
+
+    .content{
+      >div{
+        color: #272a33;
+        background: #a9a3a3;
+        padding: .25rem .25rem .25rem 1rem;
+        margin: 0.25rem 0;
+        .word{
+          font-size: 1.35rem;
+          font-weight: bold;
+          padding-left: 0.5rem;
+        }
+      }
+      >div:hover{
+        cursor: pointer;
+        background: #38b48b;
+        color: #fff;
+      }
+    }
+  }
 }
+
 

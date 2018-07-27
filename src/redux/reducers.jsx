@@ -7,6 +7,7 @@ import { flowcontrolDatas, flowcontrolCondition, flowGenerateTime } from "compon
 import { subTableDatas } from "components/SubTable/Redux"
 import { operationDatas } from "components/OperationDialog/Redux"
 import { sidebarConfig } from "components/Sidebar/Redux"
+import { detailModalDatas } from "components/DetailModule/Redux"
 const appReducer = combineReducers({
     loginUserInfo, systemConfig, flowcontrolParams,
     tableDatas, tableCondition, generateInfo, generateTime,
@@ -14,8 +15,8 @@ const appReducer = combineReducers({
     subTableDatas,
     flowcontrolDatas, flowcontrolCondition, flowGenerateTime,
     sidebarConfig,
-    operationDatas
-
+    operationDatas,
+    detailModalDatas
 });
 
 

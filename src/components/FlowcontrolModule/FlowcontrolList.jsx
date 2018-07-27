@@ -63,13 +63,13 @@ class FlowcontrolList extends React.Component{
         // 更新流控数据
         updateFlowcontrolDatas(result);
         // 定时30秒后再次获取流控数据并更新
-        const flowcontrolTimerId = setTimeout(() => {
-            // 获取流控数据
-            this.getFlowcontrolDatas();
-        }, 30*1000);
-        this.setState({
-            flowcontrolTimerId
-        });
+        // const flowcontrolTimerId = setTimeout(() => {
+        //     // 获取流控数据
+        //     this.getFlowcontrolDatas();
+        // }, 30*1000);
+        // this.setState({
+        //     flowcontrolTimerId
+        // });
     }
 
     // 立即调用

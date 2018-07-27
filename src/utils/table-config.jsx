@@ -1,6 +1,8 @@
 //表格列名
 import React from 'react';
 import {isValidObject, isValidVariable} from "./basic-verify";
+import { getSingleAirportUrl } from "utils/request-urls";
+import { requestGet } from "utils/request-actions";
 import { Checkbox } from 'antd';
 
 //需要日期格式化的列
@@ -150,15 +152,15 @@ const handleColumnWidth = ( type, title ) => {
     let width = 0;
     const numReg = new RegExp("[A-Za-z]+");
     if( title == 'CallSign' || title == 'ACWakes' ){
-        width = 100;
+        width = 108;
     }else if( title == 'ACType' ){
         width = 85;
     }else if( title == 'RWY' ){
-        width = 60;
+        width = 65;
     }else if( !numReg.test(title) && title.length == 4 ){ //不是字母且是4位
         width = 90;
-    }else if( numReg.test(title) && title.length == 4 ){ //不是字母且是4位
-        width = 80;
+    }else if( numReg.test(title) && title.length == 4 ){ //是字母且是4位
+        width = 85;
     }else if( title.length == 3 ){
         width = 80;
     }else if( title == 'ID' || title.length < 3 ){
@@ -231,19 +233,66 @@ const handleColumnWidth = ( type, title ) => {
  */
 const handleRightClickFunc = function( thisProxy, colunmName, record, x, y ){
     if( isValidVariable(colunmName) ){
+        const { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } = thisProxy.props;
         //根据列名和行对象，获取选中单元格的值
         const value = record[colunmName] || "";
-        console.log(colunmName, value);
+        const optValue = record["OPERATION"] || [];
         //航班号列
         // if( "FLIGHTID" == colunmName ){
             //显示航班协调窗口
-
+            updateOperationDatasAuth(optValue, record);
             //更新数据，需要展开的协调窗口名称和位置
-            thisProxy.props.updateOperationDatasShowNameAndPosition("flightid", x, y-36);
+            updateOperationDatasShowNameAndPosition("flightid", x, y-36);
         // }
     }
 
 };
+//处理每列航班协调操作按钮
+const handleOperationColumn = function (value, row, index) {
+    let optval = "";
+    const len = value.length;
+    if( len > 0 ){
+        optval = (
+            <div className="opt-canvas">
+                {
+                    value.map((item, index) => {
+                        return (
+                            <span key = {index} title={item.cn}>
+                                <i className={`iconfont icon-${item.type}`}></i>
+                                <span className="word">{item.simple}</span>
+                            </span>
+                        )
+                    })
+                }
+            </div>
+        );
+    }
+    return {
+        children: optval
+    }
+}
+
+//处理点击航班出现航班详情
+const showDetailModal = function( thisProxy, record ){
+    const { updateDetailModalDatasVisible, updateDetailModalDatasByName } = thisProxy.props;
+    const id = record["ID"];
+
+    //根据航班id获取单条航班数据
+    requestGet( getSingleAirportUrl, {id: id}, function(res){
+        updateFlightDetailData(res, updateDetailModalDatasByName);
+    } );
+
+    //打开详情窗口
+    updateDetailModalDatasVisible("flight", true);
+};
+
+const updateFlightDetailData = function( res, updateDetailModalDatasByName ){
+    //TODO 发送请求获取航班详情数据
+    console.log( res );
+    // updateDetailModalDatasByName("flight", record);
+};
+
+
 //根据表格列名，配置表格专用列数据格式
 const TableColumns = function( type, colDisplay, colNames, colTitle ){
     let thisProxy = this;
@@ -291,13 +340,13 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
                     e.preventDefault();
                     //点击时候的位置
                     const x = e.clientX;
-                    const y = e.clientY;
+                    const y = e.clientY - 32;
                     handleRightClickFunc(thisProxy, colunmName, record, x, y);
                 },
                 //左键
                 onClick: ( e )=>{
                     console.log("选中行" + record["FLIGHTID"]);
-
+                    showDetailModal(thisProxy, record);
                 }
             }
         }
@@ -323,6 +372,30 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
         columns.push( obj );
         i++;
     }
+    //增加一列操作列
+    // if( type == ""){
+    //     let optObj = {
+    //         title: "操作",
+    //         dataIndex: "OPERATION",
+    //         align: 'center',
+    //         key: "OPERATION",
+    //         width: 260,
+    //         fixed: 'right',
+    //         render: (value, row, index) => {
+    //             return handleOperationColumn( value, row, index );
+    //         },
+    //         onHeaderCell: ( column ) => {
+    //             //配置表头属性，增加title值
+    //             return {
+    //                 title: "操作"
+    //             }
+    //         }
+    //     };
+    //     columns.push(optObj);
+    //     width += 260;
+    //     i++;
+    // }
+
     return {
         columns,
         width
