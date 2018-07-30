@@ -1,11 +1,12 @@
 import React, { Fragment} from 'react';
-import { connect,  } from 'react-redux';
+import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { Layout, Card, Col, Row, Spin  } from 'antd'
+import { Layout, Col, Row, Drawer } from 'antd';
 import Head from "../layouts/Head";
-import FlightsSortModule from '../components/FlightsSortModule/FlightsSortModule';
-import SidebarContainer from '../components/Sidebar/SidebarContainer';
-import Loader from '../components/Loader/Loader';
+import FlightsSortModule from 'components/FlightsSortModule/FlightsSortModule';
+import SidebarContainer from 'components/Sidebar/SidebarContainer';
+import DetailModuleContainer from 'components/DetailModule/DetailModuleContainer';
+import Loader from 'components/Loader/Loader';
 import "./Home.less";
 
 const { Content } = Layout;
@@ -29,9 +30,11 @@ class HomePage extends React.Component{
                                 xl={ show ? 18 : 24}
                                 xxl={ show ? 18 : 24}
                             >
-                            <FlightsSortModule/>
+                                <FlightsSortModule/>
+                                <DetailModuleContainer
+                                    name = "flight"
+                                />
                             </Col>
-
                             {
                                 show ? <SidebarContainer /> : ''
                             }

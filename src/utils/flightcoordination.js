@@ -1021,4 +1021,165 @@ const FlightCoordination = {
 
 };
 
-export default FlightCoordination;
+//系统告警类型
+const AlarmType = {
+
+    /**
+     * 航班延误接近90分钟
+     */
+    FLIGHT_DELAY : '1',
+
+    /**
+     * 航班接近HOBT未发关舱门
+     */
+    FLIGHT_CLOSE : '2',
+
+    /**
+     * 关舱门等待
+     */
+    FLIGHT_CLOSE_WAIT : '3',
+
+    /**
+     * 流控发布/变更
+     */
+    FLOW_CONTROL : '4',
+
+    /**
+     * 申请时间  > 计划时间 + 10分钟
+     */
+    FLIGHT_PDEPTIME : '5',
+
+    /**
+     * 实关时间 > 协关时间 + 5分钟
+     */
+    FLIGHT_HOBT : '6',
+
+    /**
+     * 时隙修改
+     */
+    FLIGHT_SLOT_UPDATE : '7'
+};
+
+//航班协调操作常量
+const OperationType = {
+    FLIGHT_DETAIL: {
+        en: "FLIGHT_DETAIL",
+        cn: "航班详情",
+        type: "detail",
+        simple: "详"
+    },
+    COORDINATION_DETAIL: {
+        en: "COORDINATION_DETAIL",
+        cn: "协调记录",
+        type: "detail",
+        simple: "协"
+    },
+    TELE_DETAIL: {
+        en: "TELE_DETAIL",
+        cn: "航班报文",
+        type: "detail",
+        simple: "报"
+    },
+    FORMER_UPDATE: {
+        en: "FORMER_UPDATE",
+        cn: "指定前序航班",
+        type: "former",
+        simple: "前"
+    },
+    CANCEL_MARK: {
+        en: "CANCEL_MARK",
+        cn: "标记航班取消",
+        type: "mark",
+        simple: "取"
+    },
+    CANCEL_UN_MARK: {
+        en: "CANCEL_UN_MARK",
+        cn: "标记取消恢复",
+        type: "huifu",
+        simple: "恢"
+    },
+    READY_MARK: {
+        en: "READY_MARK",
+        cn: "标记准备完毕",
+        type: "mark",
+        simple: "准"
+    },
+    READY_UN_MARK: {
+        en: "READY_UN_MARK",
+        cn: "标记未准备完毕",
+        type: "cancel",
+        simple: "准"
+    },
+    OUTPOOL_APPLY: {
+        en: "OUTPOOL_APPLY",
+        cn: "申请移出等待池",
+        type: "apply",
+        simple: "池"
+    },
+    OUTPOOL_APPROVE: {
+        en: "OUTPOOL_APPROVE",
+        cn: "批复移出等待池",
+        type: "approve",
+        simple: "池"
+    },
+    OUTPOOL_REFUSE: {
+        en: "OUTPOOL_REFUSE",
+        cn: "拒绝移出等待池",
+        type: "reject",
+        simple: "池"
+    },
+    INPOOL_UPDATE: {
+        en: "INPOOL_UPDATE",
+        cn: "移入等待池",
+        type: "inpool",
+        simple: "池"
+    },
+    OUTPOOL_DIRECT: {
+        en: "OUTPOOL_DIRECT",
+        cn: "移出等待池",
+        type: "outpool",
+        simple: "池"
+    },
+    CLEARANCE_UN_MARK: {
+        en: "CLEARANCE_UN_MARK",
+        cn: "标记未放行",
+        type: "cancel",
+        simple: "放"
+    },
+    CLEARANCE_MARK: {
+        en: "CLEARANCE_MARK",
+        cn: "标记已放行",
+        type: "mark",
+        simple: "放"
+    },
+    ASSIGNSLOT_MARK: {
+        en: "ASSIGNSLOT_MARK",
+        cn: "参加时隙分配",
+        type: "mark",
+        simple: "时"
+    },
+    ASSIGNSLOT_UN_MARK: {
+        en: "ASSIGNSLOT_UN_MARK",
+        cn: "退出时隙分配",
+        type: "cancel",
+        simple: "时"
+    },
+    EXEMPT_MARK: {
+        en: "EXEMPT_MARK",
+        cn: "标记豁免",
+        type: "mark",
+        simple: "豁"
+    },
+    EXEMPT_UN_MARK: {
+        en: "EXEMPT_UN_MARK",
+        cn: "取消豁免",
+        type: "cancel",
+        simple: "豁"
+    },
+
+
+
+
+};
+
+export { FlightCoordination, AlarmType, OperationType };

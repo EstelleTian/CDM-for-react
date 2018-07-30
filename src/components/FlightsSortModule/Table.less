@@ -25,10 +25,12 @@
               .ant-table-body{
                 /*减去表头高度*/
                 max-height: calc(~"100% - 2.66rem")!important;
+                overflow-x: scroll;
+                overflow-y: auto;
               }
             }
             /*处理冻结表格*/
-            .ant-table-fixed-left.overflow{
+            .ant-table-fixed-left.overflow,.ant-table-fixed-right.overflow{
               height: calc(~"100% - 1.33rem");
               .ant-table-body-outer{
                 /*调整冻结表格位置，使其对齐*/
@@ -42,9 +44,34 @@
       }
     }
   }
+  .ant-table-header{
+    margin-bottom: 0;
+    overflow-x: hidden;
+  }
+
+  .opt-canvas {
+    //float: left;
+    >span{
+      margin: 0 0.3rem;
+      color: #272a33;
+      background: #a9a3a3;
+      padding: .25rem;
+      border-radius: 0.25rem;
+      &:hover{
+        cursor: pointer;
+        background: #38b48b;
+        color: #fff;
+      }
+      i{
+        font-size: 1.15rem;
+        font-weight: bold;
+      }
+      .word{
+        font-size: 1.35rem;
+        font-weight: bold;
+      }
+    }
+
+  }
 }
 
-.ant-table-header{
-  margin-bottom: 0;
-  overflow-x: hidden;
-}

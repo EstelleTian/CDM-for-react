@@ -1,47 +1,9 @@
 import { isValidVariable, isValidObject, calculateStringTimeDiff} from './basic-verify';
-import FlightCoordination from './flightcoordination';
+import { FlightCoordination, AlarmType, OperationType } from './flightcoordination';
 import FlightCoordinationRecord from './flight-coordination-record';
 import FlowcontrolUtils from './flowcontrol-utils';
 
 const showLongFlowcontrol = true;
-//系统告警类型
-const AlarmType = {
-
-    /**
-     * 航班延误接近90分钟
-     */
-    FLIGHT_DELAY : '1',
-
-    /**
-     * 航班接近HOBT未发关舱门
-     */
-    FLIGHT_CLOSE : '2',
-
-    /**
-     * 关舱门等待
-     */
-    FLIGHT_CLOSE_WAIT : '3',
-
-    /**
-     * 流控发布/变更
-     */
-    FLOW_CONTROL : '4',
-
-    /**
-     * 申请时间  > 计划时间 + 10分钟
-     */
-    FLIGHT_PDEPTIME : '5',
-
-    /**
-     * 实关时间 > 协关时间 + 5分钟
-     */
-    FLIGHT_HOBT : '6',
-
-    /**
-     * 时隙修改
-     */
-    FLIGHT_SLOT_UPDATE : '7'
-};
 
 //根据colStyle转为displayStyle和displayStyleComment
 const convertDisplayStyle = ( colStyle = {} ) => {
@@ -106,7 +68,7 @@ const getDisplayFontSize = function( dataKey ){
     }
 }
 //转换航班计划表格数据
-const convertData = function( flight, generateTime ){
+const convertData = function( flight, flightAuthMap, generateTime ){
     // 判断数据有效性
     if (!isValidObject(flight)) {
         return {};
@@ -127,6 +89,39 @@ const convertData = function( flight, generateTime ){
         setDataValue.call(thisProxy, key, value );
         setTitleAndStyleData.call(thisProxy, key, value, flight );
     }
+
+    //增加操作列
+    setOperation( "OPERATION", flightAuthMap);
+
+    //处理操作列
+    function setOperation( key, flightAuthMap ){
+        let valueArr = [];
+        //验证权限控制显隐
+        const getValue = ( name ) => {
+            const obj = flightAuthMap[name] || {};
+            //如果status是Y，则显示，N为不显示
+            if( isValidObject(obj) && obj.status == "Y" ){
+                return true;
+            }
+            return false;
+        };
+        //遍历权限配置
+        for(let itemKey in OperationType){
+            //取key值
+            const itemVal = OperationType[itemKey] || {};
+            //航班详情、协调记录、航班报文默认开启
+            if( itemKey == "FLIGHT_DETAIL" || itemKey == "COORDINATION_DETAIL" || itemKey == "TELE_DETAIL" ){
+                valueArr.push( itemVal );
+            }else{
+                const flag = getValue( itemVal.en );
+                if( flag ){
+                    //如果显示该按钮，将其中、英名称以对象形式添加到结果集合中
+                    valueArr.push( itemVal );
+                }
+            }
+        };
+        data[key] = valueArr;
+    };
 
     //处理基本数据值和样式
     function setDataValue(key, options){
