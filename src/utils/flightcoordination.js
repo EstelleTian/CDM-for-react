@@ -1066,120 +1066,149 @@ const OperationType = {
         en: "FLIGHT_DETAIL",
         cn: "航班详情",
         type: "detail",
-        simple: "详"
+        simple: "详",
+        url: "retrieveDetailById.bo"
     },
     COORDINATION_DETAIL: {
         en: "COORDINATION_DETAIL",
         cn: "协调记录",
         type: "detail",
-        simple: "协"
+        simple: "协",
+        url: "retrieveRecordById.bo"
     },
-    TELE_DETAIL: {
-        en: "TELE_DETAIL",
-        cn: "航班报文",
-        type: "detail",
-        simple: "报"
-    },
+    // TELE_DETAIL: {
+    //     en: "TELE_DETAIL",
+    //     cn: "航班报文",
+    //     type: "detail",
+    //     simple: "报",
+    //     url: "updateReadyComplete.bo"
+    // },
     FORMER_UPDATE: {
         en: "FORMER_UPDATE",
         cn: "指定前序航班",
         type: "former",
-        simple: "前"
+        simple: "前",
+        url: "updateFormerFlight.bo"
     },
     CANCEL_MARK: {
         en: "CANCEL_MARK",
         cn: "标记航班取消",
         type: "mark",
-        simple: "取"
+        simple: "取",
+        url: "***"
     },
     CANCEL_UN_MARK: {
         en: "CANCEL_UN_MARK",
         cn: "标记取消恢复",
         type: "huifu",
-        simple: "恢"
+        simple: "恢",
+        url: "***"
     },
     READY_MARK: {
         en: "READY_MARK",
         cn: "标记准备完毕",
         type: "mark",
-        simple: "准"
+        simple: "准",
+        url: "updateReadyComplete.bo"
     },
     READY_UN_MARK: {
         en: "READY_UN_MARK",
         cn: "标记未准备完毕",
         type: "cancel",
-        simple: "准"
+        simple: "准",
+        url: "updateReadyNotComplete.bo"
     },
     OUTPOOL_APPLY: {
         en: "OUTPOOL_APPLY",
         cn: "申请移出等待池",
         type: "apply",
-        simple: "池"
+        simple: "池",
+        url: "applyFlightOutpool.bo"
     },
     OUTPOOL_APPROVE: {
         en: "OUTPOOL_APPROVE",
         cn: "批复移出等待池",
         type: "approve",
-        simple: "池"
+        simple: "池",
+        url: "approveFlightOutpool.bo"
     },
     OUTPOOL_REFUSE: {
         en: "OUTPOOL_REFUSE",
         cn: "拒绝移出等待池",
         type: "reject",
-        simple: "池"
+        simple: "池",
+        url: "refuseFlightOutpool.bo"
     },
     INPOOL_UPDATE: {
         en: "INPOOL_UPDATE",
         cn: "移入等待池",
         type: "inpool",
-        simple: "池"
+        simple: "池",
+        url: "updateFlightInpool.bo"
     },
     OUTPOOL_DIRECT: {
         en: "OUTPOOL_DIRECT",
         cn: "移出等待池",
         type: "outpool",
-        simple: "池"
+        simple: "池",
+        url: "updateFlightOutpool.bo"
     },
     CLEARANCE_UN_MARK: {
         en: "CLEARANCE_UN_MARK",
         cn: "标记未放行",
         type: "cancel",
-        simple: "放"
+        simple: "放",
+        url: "updateClearance.bo"
     },
     CLEARANCE_MARK: {
         en: "CLEARANCE_MARK",
         cn: "标记已放行",
         type: "mark",
-        simple: "放"
+        simple: "放",
+        url: "updateClearance.bo"
     },
     ASSIGNSLOT_MARK: {
         en: "ASSIGNSLOT_MARK",
         cn: "参加时隙分配",
         type: "mark",
-        simple: "时"
+        simple: "时",
+        url: "updateAssignSlotStatus.bo"
     },
     ASSIGNSLOT_UN_MARK: {
         en: "ASSIGNSLOT_UN_MARK",
         cn: "退出时隙分配",
         type: "cancel",
-        simple: "时"
+        simple: "时",
+        url: "updateAssignSlotStatus.bo"
     },
     EXEMPT_MARK: {
         en: "EXEMPT_MARK",
         cn: "标记豁免",
         type: "mark",
-        simple: "豁"
+        simple: "豁",
+        url: "updateExempt.bo"
     },
     EXEMPT_UN_MARK: {
         en: "EXEMPT_UN_MARK",
         cn: "取消豁免",
         type: "cancel",
-        simple: "豁"
+        simple: "豁",
+        url: "updateExemptCancle.bo"
     },
-
-
-
-
+    QUALIFICATIONS_MARK: {
+        en: "EXEMPT_MARK",
+        cn: "标记二类飞行资质",
+        type: "mark",
+        simple: "资",
+        url: "updateQualifications.bo"
+    },
+    QUALIFICATIONS_UN_MARK: {
+        en: "EXEMPT_UN_MARK",
+        cn: "取消二类飞行资质",
+        type: "cancel",
+        simple: "资",
+        url: "updateQualifications.bo"
+    }
 };
 
 export { FlightCoordination, AlarmType, OperationType };

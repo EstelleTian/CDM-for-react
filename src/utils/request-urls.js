@@ -19,6 +19,7 @@ const getFlowcontrolUrl = `${flowcontrolHost}/flow/retrieveFlowcontrols.action`
 
 
 export {
+    host,
     loginUrl, logoutUrl,
     getSystemConfigUrl, getUserPropertyUrl,
     getAllAirportsUrl, getSingleAirportUrl,

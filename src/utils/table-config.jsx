@@ -235,15 +235,12 @@ const handleRightClickFunc = function( thisProxy, colunmName, record, x, y ){
     if( isValidVariable(colunmName) ){
         const { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } = thisProxy.props;
         //根据列名和行对象，获取选中单元格的值
-        const value = record[colunmName] || "";
         const optValue = record["OPERATION"] || [];
-        //航班号列
-        // if( "FLIGHTID" == colunmName ){
-            //显示航班协调窗口
-            updateOperationDatasAuth(optValue, record);
-            //更新数据，需要展开的协调窗口名称和位置
-            updateOperationDatasShowNameAndPosition("flightid", x, y-36);
-        // }
+        //显示航班协调窗口
+        updateOperationDatasAuth(optValue, record);
+        //更新数据，需要展开的协调窗口名称和位置
+        updateOperationDatasShowNameAndPosition( colunmName, x, y);
+
     }
 
 };
@@ -340,7 +337,7 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
                     e.preventDefault();
                     //点击时候的位置
                     const x = e.clientX;
-                    const y = e.clientY - 32;
+                    const y = e.clientY - 68;
                     handleRightClickFunc(thisProxy, colunmName, record, x, y);
                 },
                 //左键
