@@ -12,7 +12,8 @@ const getUserPropertyUrl = `${host}/retrieveNeedBasicParam.bo`;
 const getSystemConfigUrl = `${host}/retrieveSystemConfig.bo`;
 
 //获取流控信息
-const getFlowcontrolUrl = `http://192.168.243.120:38181/flow/retrieveFlowcontrols.action`
+const getFlowcontrolUrl = `http://192.168.243.120:38181/flow/retrieveFlowcontrols.action`;
+const getNoticeUrl = `${host}/retrieveNoticeInformation.bo`;
 
 // 用户登录
 const loginUrl = `${host}/userLogon.bo`;
@@ -21,4 +22,4 @@ const logoutUrl = `${host}/userLogout.bo`;
 
 
 
-export {getSystemConfigUrl, getAllAirportsUrl, getUserPropertyUrl, loginUrl, getFlowcontrolUrl, logoutUrl };
+export {getSystemConfigUrl, getAllAirportsUrl, getUserPropertyUrl, loginUrl, getFlowcontrolUrl, logoutUrl, getNoticeUrl };

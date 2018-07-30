@@ -1,0 +1,33 @@
+@import "../../style/base";
+@import "../../style/theme-color";
+.notice-item{
+  background-color: rgba(105, 105, 105, 0.2);
+  border-radius: 0.5rem;
+  margin-bottom: 1.5rem;
+  .ant-row {
+    div {
+      overflow: hidden;
+      white-space: nowrap;
+    }
+  }
+  .operator{
+    text-align: right;
+    .iconfont{
+      display: inline-block;
+      margin: 0 0.5rem;
+      font-size: 1.5rem
+    }
+    .iconfont:hover{
+      color: #fff;
+      cursor: pointer;
+    }
+  }
+  .row {
+    margin: 0 1rem;
+    padding: 0.5rem 0;
+    //color: @c-white-50;
+  }
+}
+.notice-item:hover {
+  background-color: @bc-mazarine-100;
+}

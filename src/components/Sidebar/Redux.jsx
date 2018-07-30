@@ -17,7 +17,7 @@ const updateSidebarKey = key => ({
 });
 
 const initSidebar = {
-    show : false, // 是否显示 默认显示
+    show : true, // 是否显示 默认显示
     key : 'flowcontrol-info', // 当前显示模块的key值 默认为流控信息模块
 };
 

@@ -3,6 +3,7 @@
 import React from 'react';
 import { Col } from 'antd'
 import FlowcontrolModule from '../FlowcontrolModule/FlowcontrolModule';
+import NoticeModule from '../NoticeModule/NoticeModule';
 
 
 class Sidebar extends React.Component{
@@ -19,7 +20,7 @@ class Sidebar extends React.Component{
                     ( key == 'flowcontrol-info' ) ? <FlowcontrolModule/> : ''
                 }
                 {
-                    ( key == 'notice-info' ) ? '通告信息' : ''
+                    ( key == 'notice-info' ) ? <NoticeModule/>: ''
                 }
                 {
                     ( key == 'restriction-info' ) ? '限制信息' : ''

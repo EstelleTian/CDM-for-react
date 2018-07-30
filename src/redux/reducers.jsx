@@ -4,6 +4,7 @@ import { loginUserInfo, systemConfig, flowcontrolParams } from "../views/LoginRe
 
 import { tableDatas, tableCondition,  generateInfo, generateTime } from "components/FlightsSortModule/Redux"
 import { flowcontrolDatas, flowcontrolCondition, flowGenerateTime } from "components/FlowcontrolModule/Redux"
+import { noticeDatas, noticeGenerateTime } from "components/NoticeModule/Redux"
 import { subTableDatas } from "components/SubTable/Redux"
 import { operationDatas } from "components/OperationDialog/Redux"
 import { sidebarConfig } from "components/Sidebar/Redux"
@@ -13,6 +14,7 @@ const appReducer = combineReducers({
     filterMatches,
     subTableDatas,
     flowcontrolDatas, flowcontrolCondition, flowGenerateTime,
+    noticeDatas, noticeGenerateTime,
     sidebarConfig,
     operationDatas
 
