@@ -14,8 +14,9 @@ const getSingleAirportUrl = `${host}/retrieveDetailById.bo`;
 
 const flowcontrolHost = "http://192.168.243.120:38181";
 //获取全部流控信息
-const getFlowcontrolUrl = `${flowcontrolHost}/flow/retrieveFlowcontrols.action`
-
+const getFlowcontrolUrl = `${flowcontrolHost}/flow/retrieveFlowcontrols.action`;
+// 获取通告信息
+const getNoticeUrl = `${host}/retrieveNoticeInformation.bo`;
 
 
 export {
@@ -23,5 +24,5 @@ export {
     loginUrl, logoutUrl,
     getSystemConfigUrl, getUserPropertyUrl,
     getAllAirportsUrl, getSingleAirportUrl,
-    getFlowcontrolUrl
+    getFlowcontrolUrl, getNoticeUrl,
 };
