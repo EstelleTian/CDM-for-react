@@ -2,13 +2,14 @@
 .close-target{
   display: inline-block;
   float: right;
+  &:hover{
+    cursor: pointer;
+  }
   >i{
     font-size: 1.25rem;
   }
 }
-.close-target:hover{
-  cursor: pointer;
-}
+
 .dialog-wrapper {
   display: flex;
   background: @bc-black-90;
@@ -63,10 +64,11 @@
     color: #333333;
     background-color: #c1c1c1;
     border-color: #c1c1c1;
+    &:hover {
+      background-color: #e0e0e0;
+    }
   }
-  .ant-btn:hover {
-    background-color: #e0e0e0;
-  }
+
   .ant-btn-primary {
     color: #fff;
     background-color: #1890ff;
