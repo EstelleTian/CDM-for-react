@@ -5,6 +5,7 @@ import { Row, Col } from 'antd';
 import { getNoticeUrl } from 'utils/request-urls';
 import {  requestGet } from 'utils/request-actions';
 import NoticeItem from "./NoticeItem";
+import './NoticeList.less';
 
 class NoticeList extends React.Component{
     constructor( props ){
