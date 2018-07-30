@@ -28,6 +28,7 @@
     "js-base64": "^2.4.5",
     "less": "^3.0.4",
     "less-loader": "^4.1.0",
+    "moment": "^2.22.2",
     "open-browser-webpack-plugin": "0.0.5",
     "path": "^0.12.7",
     "postcss-loader": "^2.1.5",

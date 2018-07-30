@@ -1,0 +1,51 @@
+@import '../../style/theme-color';
+@import '../../style/button';
+.stable-div{
+  font-size: 1.25rem;
+}
+//协调窗口日历
+.ant-calendar{
+  background-color: @bc-black-100;
+  .ant-calendar-last-month-cell,.ant-calendar-next-month-btn-day {
+    .ant-calendar-date{
+      color: rgb(107, 107, 107);
+    }
+  }
+  .ant-calendar-footer-btn{
+    line-height: 3rem;
+    >a{
+      color: #fff;
+    }
+  }
+}
+
+.ant-time-picker-panel-inner{
+  background-color: @bc-black-100;
+  .ant-time-picker-panel-input{
+    background-color: @bc-black-100;
+    font-size: 1.25rem;
+  }
+  li.ant-time-picker-panel-select-option-selected{
+    background: #a9a3a3;
+  }
+  .ant-time-picker-panel-clear-btn:after{
+    color: #a9a3a3;
+  }
+}
+
+.ant-time-picker{
+  width: 100%;
+}
+.ant-calendar-picker-icon:after,
+.ant-time-picker-icon:after{
+  color: #fff;
+}
+
+//协调窗口布局调整
+.ant-form-item{
+  margin: 0.75rem 0;
+  .ant-form-item-label,.ant-form-item-control{
+    line-height: 2rem;
+  }
+}
+
