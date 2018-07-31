@@ -6,7 +6,7 @@ import { request } from 'utils/request-actions';
 import { logoutUrl } from 'utils/request-urls';
 
 
-import ModalView from "../components/ModalView/ModalView";
+import DraggableDialog from "../components/DraggableDialog/DraggableDialog";
 import './NavMenu.less';
 
 const SubMenu = Menu.SubMenu;
@@ -299,15 +299,28 @@ class NavMenu extends React.Component{
 
                 </SubMenu>
                 {
+                    // (apPublish.show) ?
+                    //     <ModalView
+                    //         titleName = "发布机场受限"
+                    //         type = "apPublish"
+                    //         x = {apPublish.x}
+                    //         y = {apPublish.y}
+                    //         width = { 1200 }
+                    //         clickCloseBtn = { this.onCloseBtn }
+                    //     /> : ''
+
                     (apPublish.show) ?
-                        <ModalView
-                            titleName = "发布机场受限"
-                            type = "apPublish"
-                            x = {apPublish.x}
-                            y = {apPublish.y}
-                            width = { 1200 }
-                            clickCloseBtn = { this.onCloseBtn }
-                        /> : ''
+                        <DraggableDialog
+                            titleName="发布机场受限"
+                            type="apPublish"
+                            width={ 1200 }
+                            clickCloseBtn={ this.onCloseBtn }
+                        >
+                            测试
+                            <p>sss</p>
+                        </DraggableDialog> : ''
+
+
                 }
             </Menu>
 
