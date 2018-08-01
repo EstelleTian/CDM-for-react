@@ -4,9 +4,9 @@ import { Menu, Checkbox, Radio, Icon, Row, Col, Badge ,message} from 'antd';
 import $ from 'jquery';
 import { request } from 'utils/request-actions';
 import { logoutUrl } from 'utils/request-urls';
-
-
 import DraggableDialog from "../components/DraggableDialog/DraggableDialog";
+import ApDialog from "../components/FlowcontrolDialog/ApDialog/ApDialog";
+
 import './NavMenu.less';
 
 const SubMenu = Menu.SubMenu;
@@ -34,8 +34,9 @@ class NavMenu extends React.Component{
         this.state = {
             apPublish: {
                 show: false,
-                x: 0,
-                y:0
+            },
+            apGSDepPublish : {
+                show: false,
             }
         }
 
@@ -85,8 +86,6 @@ class NavMenu extends React.Component{
             this.setState({
                 [key]: {
                     show: !show,
-                    x: 0,
-                    y: 0
                 }
             });
         }
@@ -146,7 +145,7 @@ class NavMenu extends React.Component{
         const { filterMatches, loginUserInfo, sidebarConfig } = this.props;
         const count = this.getFilterCount();
         const { show } = sidebarConfig;
-        const { apPublish } = this.state;
+        const { apPublish, apGSDepPublish } = this.state;
         return (
             <Menu
                 mode="horizontal"
@@ -185,7 +184,12 @@ class NavMenu extends React.Component{
                     >
                         <label>发布机场受限</label>
                     </Menu.Item>
-                    <Menu.Item key="ap-gs-dep-publish"><label>发布低能见度受限</label></Menu.Item>
+                    <Menu.Item
+                        key="apGSDepPublish"
+                        onClick= {this.onMenuTitleSelect}
+                    >
+                        <label>发布低能见度受限</label>
+                    </Menu.Item>
                     <Menu.Item key="point-publish"><label>发布航路受限</label></Menu.Item>
                     <Menu.Item key="composite-publish"><label>发布复合航路受限</label></Menu.Item>
                     <Menu.Item key="ldr-publish"><label>发布大面积延误恢复</label></Menu.Item>
@@ -299,16 +303,6 @@ class NavMenu extends React.Component{
 
                 </SubMenu>
                 {
-                    // (apPublish.show) ?
-                    //     <ModalView
-                    //         titleName = "发布机场受限"
-                    //         type = "apPublish"
-                    //         x = {apPublish.x}
-                    //         y = {apPublish.y}
-                    //         width = { 1200 }
-                    //         clickCloseBtn = { this.onCloseBtn }
-                    //     /> : ''
-
                     (apPublish.show) ?
                         <DraggableDialog
                             titleName="发布机场受限"
@@ -316,11 +310,21 @@ class NavMenu extends React.Component{
                             width={ 1200 }
                             clickCloseBtn={ this.onCloseBtn }
                         >
-                            测试
-                            <p>sss</p>
+                            <ApDialog />
+
                         </DraggableDialog> : ''
-
-
+                }
+                {
+                    (apGSDepPublish.show) ?
+                        <DraggableDialog
+                            titleName="发布低能见度受限"
+                            type="apGSDepPublish"
+                            width={ 1200 }
+                            clickCloseBtn={ this.onCloseBtn }
+                        >
+                            测试2
+                            <p>dddddd</p>
+                        </DraggableDialog> : ''
                 }
             </Menu>
 
