@@ -16,10 +16,10 @@ class OperationDialog extends React.Component{
     constructor( props ){
         super( props );
         this.handleFlightIdClick = this.handleFlightIdClick.bind(this);
+        this.closeCollaborateDialog = this.closeCollaborateDialog.bind(this);
     }
 
     componentDidUpdate(){
-        console.log("componentDidUpdate");
         const { showName } = this.props.operationDatas;
         //若协调窗口打开才监听，没打开不监听
         if( isValidVariable(showName) ){
@@ -41,6 +41,13 @@ class OperationDialog extends React.Component{
             });
         }
     };
+    //关闭协调窗口
+    closeCollaborateDialog(){
+        const { updateOperationDatasShowNameAndPosition } = this.props;
+        //更新数据，需要展开的协调窗口名称和位置
+        updateOperationDatasShowNameAndPosition( "", 0, 0 );
+    };
+
 
     //处理航班号id提交操作事件
     handleFlightIdClick( item, rowData ){
@@ -72,6 +79,7 @@ class OperationDialog extends React.Component{
     }
 
     render(){
+        const { userId } = this.props;
         const { showName, x, y, auth, rowData } = this.props.operationDatas;
 
         const dialogStyle = {
@@ -87,9 +95,7 @@ class OperationDialog extends React.Component{
                                 <span>{ rowData["FLIGHTID"] }</span>
                                 <div
                                     className="close-target"
-                                    onClick={ () => {
-                                        // clickCloseBtn(type);
-                                    } }
+                                    onClick={ this.closeCollaborateDialog }
                                 >
                                     <Icon type="close" title="关闭"/>
                                 </div>
@@ -123,9 +129,7 @@ class OperationDialog extends React.Component{
                                 <span>{showName}时间变更</span>
                                 <div
                                     className="close-target"
-                                    onClick={ () => {
-                                        // clickCloseBtn(type);
-                                    } }
+                                    onClick={ this.closeCollaborateDialog }
                                 >
                                     <Icon type="close" title="关闭"/>
                                 </div>
@@ -133,9 +137,9 @@ class OperationDialog extends React.Component{
                             <FormDialogIns
                                 rowData={rowData}
                                 showName={showName}
+                                userId={userId}
                             />
                         </div>
-
                         : ""
                 }
             </div>

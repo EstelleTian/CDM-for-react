@@ -11,10 +11,38 @@
       color: rgb(107, 107, 107);
     }
   }
+  //今天按钮样式
   .ant-calendar-footer-btn{
     line-height: 3rem;
     >a{
       color: #fff;
+    }
+  }
+  //日期控件--当日按钮字体颜色
+  .ant-calendar-last-month-cell,.ant-calendar-next-month-btn-day, .ant-calendar-today{
+    .ant-calendar-date{
+      color: #cccccc;
+    }
+  }
+  //日期按钮hover底色
+  .ant-calendar-date:hover{
+    background: #888888;
+  }
+  //不可选日期按钮底色
+  .ant-calendar-disabled-cell .ant-calendar-date{
+    background: #1d1c1c;
+    &:hover{
+      background: #1d1c1c;
+    }
+  }
+  //可选日期按钮底色
+  .ant-calendar-selected-date , .ant-calendar-selected-start-date, .ant-calendar-selected-end-date{
+    .ant-calendar-date{
+      background: #4c4c4c;
+      color: #000;
+      &:hover{
+        background: #4c4c4c;
+      }
     }
   }
 }
@@ -33,6 +61,8 @@
   }
 }
 
+
+//时间控件宽度
 .ant-time-picker{
   width: 100%;
 }
@@ -46,6 +76,17 @@
   margin: 0.75rem 0;
   .ant-form-item-label,.ant-form-item-control{
     line-height: 2rem;
+  }
+}
+
+.content{
+  .footer{
+    button{
+      margin-right: 0.5rem;
+      >span{
+        font-size: 1.25rem;
+      }
+    }
   }
 }
 

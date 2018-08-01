@@ -239,7 +239,12 @@ const handleRightClickFunc = function( thisProxy, colunmName, record, x, y ){
         //显示航班协调窗口
         updateOperationDatasAuth(optValue, record);
         //更新数据，需要展开的协调窗口名称和位置
-        updateOperationDatasShowNameAndPosition( colunmName, x, y);
+        updateOperationDatasShowNameAndPosition( "", 0, 0 );
+        //更新数据，需要展开的协调窗口名称和位置
+        setTimeout(()=>{
+            updateOperationDatasShowNameAndPosition( colunmName, x, y );
+        }, 0)
+
 
     }
 

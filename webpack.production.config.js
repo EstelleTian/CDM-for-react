@@ -17,8 +17,12 @@ module.exports = {
         filename: '[name].[hash:5].js',
         chunkFilename: "js/[name].chunk.js" //给每个分片产生一个文件
     },
-    resolve: {
-        extensions: ['.js', '.jsx']
+    resolve : {
+        extensions: [".js", ".jsx", ".less", ".css", ".json"],
+        alias:{
+            utils: path.resolve(__dirname, 'src/utils'),
+            components: path.resolve(__dirname, 'src/components'),
+        }
     },
     module: {
         rules: [
@@ -26,8 +30,9 @@ module.exports = {
                 test: /\.(js|jsx)$/,
                 use: 'babel-loader',
             },
+
             {
-                test: /\.(less|css)$/,
+                test: /\.(css|less)$/,
                 use: ExtractTextPlugin.extract({
                     fallback: 'style-loader',
                     use: [
@@ -56,6 +61,7 @@ module.exports = {
                             }
                         }
                     ]
+
                 }),
             },
             {
