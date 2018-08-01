@@ -5,11 +5,12 @@ import OperationDialog from "./OperationDialog";
 import { updateOperationDatasShowNameAndPosition } from './Redux';
 
 const mapStateToProps = ( state ) => ({
+    userId: state.loginUserInfo.userId || "",
     operationDatas: state.operationDatas
 })
 
 const mapDispatchToProps = {
-
+    updateOperationDatasShowNameAndPosition
 }
 
 const OperationDialogContainer = connect(
