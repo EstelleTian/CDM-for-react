@@ -5,7 +5,7 @@ import $ from 'jquery';
 import { request } from 'utils/request-actions';
 import { logoutUrl } from 'utils/request-urls';
 import DraggableDialog from "../components/DraggableDialog/DraggableDialog";
-import ApDialog from "../components/FlowcontrolDialog/ApDialog/ApDialog";
+import APFlowcontrolDialogContainer from "../components/APFlowcontrolDialog/APFlowcontrolDialogContainer";
 
 import './NavMenu.less';
 
@@ -142,9 +142,10 @@ class NavMenu extends React.Component{
     }
 
     render(){
-        const { filterMatches, loginUserInfo, sidebarConfig } = this.props;
+        const { filterMatches, loginUserInfo, sidebarConfig, } = this.props;
         const count = this.getFilterCount();
         const { show } = sidebarConfig;
+        const { airports } = loginUserInfo;
         const { apPublish, apGSDepPublish } = this.state;
         return (
             <Menu
@@ -309,8 +310,9 @@ class NavMenu extends React.Component{
                             type="apPublish"
                             width={ 1200 }
                             clickCloseBtn={ this.onCloseBtn }
+
                         >
-                            <ApDialog />
+                            <APFlowcontrolDialogContainer />
 
                         </DraggableDialog> : ''
                 }
