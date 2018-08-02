@@ -65,12 +65,14 @@ class Loginform extends React.Component{
         // 200 成功
         if( 200 == res.status*1 ){
             // 用户信息
-            let {username, id:userId, allAuthority, waypoints,  system, flowAssemblyAirports, systemProgram  } = res.user;
+            let {username, id:userId, allAuthority, waypoints,  system, flowAssemblyAirports, systemProgram,  airports, description } = res.user;
             let params = {
-                username,
-                loginStatus: true,
-                userId,
-                allAuthority
+                username, // 用户名
+                loginStatus: true, // 登录状态
+                userId, // 用户id
+                allAuthority, // 用户权限
+                airports, // 用户机场
+                description, // 用户中文名称
             }
             // 更新用户信息
             updateUserInfo(params);

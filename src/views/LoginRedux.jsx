@@ -23,7 +23,9 @@ const obj = {
     loginStatus: false, // 是否已登录
     userId :'', // 用户Id
     errmsg: '', // 登录失败信息
-    allAuthority : [] // 用户权限集合
+    allAuthority : [], // 用户权限集合
+    airports: '', // 用户机场
+    description: '', // 用户中文名
 }
 const loginUserInfo = ( state = obj, action ) => {
     switch( action.type ){
@@ -36,6 +38,8 @@ const loginUserInfo = ( state = obj, action ) => {
                 userId : action.userObj.userId || '',
                 errmsg: action.userObj.errmsg || '',
                 allAuthority: action.userObj.allAuthority || [],
+                airports: action.userObj.airports || '',
+                description: action.userObj.description || '',
             }
         }
 
