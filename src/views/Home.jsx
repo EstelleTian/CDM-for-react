@@ -49,6 +49,7 @@ class HomePage extends React.Component{
                     ( flightGenerateTime ) ? '' : <Loader />
                 }
 
+
             </Fragment>
 
         )

@@ -41,10 +41,12 @@ class SubTable extends React.Component{
     render(){
         const { titleName, type, tableDatas, tableColumnsObj, x, y, clickCloseBtn} = this.props;
         const { width } = tableColumnsObj;
+        console.log(x,y);
         return (
             <DraggableModule
                 x = {x}
                 y = {y}
+                bounds = ".root"
             >
             <div className="box no-cursor" style={{ width: width + 50 }}>
                 <div className="sub-table expired-table">

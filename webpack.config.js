@@ -59,6 +59,7 @@ module.exports = {
                                     "layout-header-background ": "rgba(0, 0, 0, 0)",
                                     "layout-sider-background-light": "rgba(0, 0, 0, 0)",
                                     "component-background": "rgba(0, 0, 0, 0)",
+                                    "popover-bg": "#444444",
                                     "border-color-split ": "rgba(255,255,255,.125)",
                                 }
                             }

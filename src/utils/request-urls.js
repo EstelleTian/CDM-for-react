@@ -10,7 +10,7 @@ const getUserPropertyUrl = `${host}/retrieveNeedBasicParam.bo`;
 //获取全部航班数据
 const getAllAirportsUrl = `${host}/retrieveAirportFlights.bo`;
 //根据航班id获取单条航班数据
-const getSingleAirportUrl = `${host}/retrieveDetailById.bo`;
+const getSingleAirportUrl = `${host}/retrieveFlightDetailById.bo`;
 
 const flowcontrolHost = "http://192.168.243.120:38181";
 //获取全部流控信息

@@ -4,8 +4,10 @@ import { Row, Col, Icon, Button, Card, Form, Input, Checkbox, Select, Radio, Dat
 import { getPointByAirportUrl } from 'utils/request-urls';
 import {  request } from 'utils/request-actions';
 import moment from 'moment';
-import 'moment/locale/zh-cn';
+import DraggableModule from "components/DraggableModule/DraggableModule";
+
 import './APFlowcontrolDialog.less';
+
 const CheckboxGroup = Checkbox.Group;
 const FormItem = Form.Item;
 const Search = Input.Search;
@@ -125,274 +127,313 @@ class APFlowcontrolDialog extends React.Component{
 
     render(){
         const {flowcontrolType, type, flowcontrolPointsList, controlPoints, publishUserZh, controlDepDirection, reason} = this.state;
-        const { description } = this.props;
+        const { titleName, clickCloseBtn, width, dialogName} = this.props;
         const dateFormat = 'YYYYMMDD';
         const format = 'HHmm';
         return (
-            <Col xs={{ span: 24}}  md={{ span: 24}} lg={{ span: 24}}  xl={{ span: 24}} xxl={{ span: 24}} >
-                <Card title="基本信息" className="card" >
-                    <Form className="" layout="vertical" >
-                        <Row className="" >
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
-                                <FormItem
-                                    label="流控名称"
-                                >
-                                    <Search
-                                        placeholder="请输入流控名称"
-                                        enterButton="自动命名"
-                                        onSearch={this.splicingName}
-                                    />
-                                </FormItem>
-                            </Col>
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}}  >
-
-                                <FormItem
-                                    label="长期流控"
-                                >
-                                    <Checkbox
-                                        checked={ !flowcontrolType }
-                                        onChange={this.handleChangeFlowcontrolType}
-                                    >长期流控
-                                    </Checkbox>
-                                </FormItem>
-                            </Col>
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                <FormItem
-                                    label="发布用户"
-                                >
-                                    <Input placeholder="请输入发布者" value={ publishUserZh } disabled ={true} />
-                                </FormItem>
-                            </Col>
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                <FormItem
-                                    label="原发布者"
-                                >
-                                    <Select
-                                        defaultValue="流量室"
-                                        onChange={this.handleChangeOriginalPublishUnit}
-                                    >
-                                        <Option value="流量室">流量室</Option>
-                                        <Option value="塔台">塔台</Option>
-                                        <Option value="进近" >进近</Option>
-                                        <Option value="兰州">兰州</Option>
-                                        <Option value="西安">西安</Option>
-                                        <Option value="广州">广州</Option>
-                                        <Option value="贵阳">贵阳</Option>
-                                        <Option value="昆明">昆明</Option>
-                                        <Option value="拉萨">拉萨</Option>
-                                        <Option value="重庆">重庆</Option>
-                                        <Option value="自定义">自定义</Option>
-                                    </Select>
-                                </FormItem>
-                            </Col>
-
+            <DraggableModule>
+                <div className="box center no-cursor" style={{ width: width }}>
+                    <div className="dialog">
+                        {/* 头部*/}
+                        <Row className="title drag-target cursor">
+                            <span>{ titleName }</span>
+                            <div
+                                className="close-target"
+                                onClick={ () => {
+                                    clickCloseBtn(dialogName);
+                                } }
+                            >
+                                <Icon type="close" title="关闭"/>
+                            </div>
                         </Row>
+                        {/*/!* 内容 *!/*/}
+                        <Row className="content">
+                            <Col xs={{ span: 24}}  md={{ span: 24}} lg={{ span: 24}}  xl={{ span: 24}} xxl={{ span: 24}} >
+                                <Card title="基本信息" className="card" >
+                                    <Form className="" layout="vertical" >
+                                        <Row className="" >
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
+                                                <FormItem
+                                                    label="流控名称"
+                                                >
+                                                    <Search
+                                                        placeholder="请输入流控名称"
+                                                        enterButton="自动命名"
+                                                        onSearch={this.splicingName}
+                                                    />
+                                                </FormItem>
+                                            </Col>
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}}  >
 
-                    </Form>
+                                                <FormItem
+                                                    label="长期流控"
+                                                >
+                                                    <Checkbox
+                                                        checked={ !flowcontrolType }
+                                                        onChange={this.handleChangeFlowcontrolType}
+                                                    >长期流控
+                                                    </Checkbox>
+                                                </FormItem>
+                                            </Col>
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                <FormItem
+                                                    label="发布用户"
+                                                >
+                                                    <Input placeholder="请输入发布者" value={ publishUserZh } disabled ={true} />
+                                                </FormItem>
+                                            </Col>
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                <FormItem
+                                                    label="原发布者"
+                                                >
+                                                    <Select
+                                                        defaultValue="流量室"
+                                                        onChange={this.handleChangeOriginalPublishUnit}
+                                                    >
+                                                        <Option value="流量室">流量室</Option>
+                                                        <Option value="塔台">塔台</Option>
+                                                        <Option value="进近" >进近</Option>
+                                                        <Option value="兰州">兰州</Option>
+                                                        <Option value="西安">西安</Option>
+                                                        <Option value="广州">广州</Option>
+                                                        <Option value="贵阳">贵阳</Option>
+                                                        <Option value="昆明">昆明</Option>
+                                                        <Option value="拉萨">拉萨</Option>
+                                                        <Option value="重庆">重庆</Option>
+                                                        <Option value="自定义">自定义</Option>
+                                                    </Select>
+                                                </FormItem>
+                                            </Col>
 
-                </Card>
-                <Card title="限制时间" className="card" >
-                    <Form className="" layout="vertical" >
-                        <Row className="" >
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
-                                <FormItem
-                                    label="开始日期"
-                                >
-                                    <DatePicker
-                                        defaultValue={moment('2018/07/25', dateFormat)}
-                                        format={dateFormat}
-                                    />
-                                </FormItem>
-                            </Col>
+                                        </Row>
 
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                <FormItem
-                                    label="开始时间"
-                                >
-                                    <TimePicker defaultValue={moment('12:08', format)} format={format} />
-                                </FormItem>
-                            </Col>
+                                    </Form>
 
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                <FormItem
-                                    label="结束日期"
-                                >
-                                    <Input placeholder="结束日期" />
-                                </FormItem>
-                            </Col>
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                <FormItem
-                                    label="结束时间"
-                                >
-                                    <Input placeholder="结束时间" />
-                                </FormItem>
+                                </Card>
+                                <Card title="限制时间" className="card" >
+                                    <Form className="" layout="vertical" >
+                                        <Row className="" >
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
+                                                <FormItem
+                                                    label="开始日期"
+                                                >
+                                                    <DatePicker
+                                                        defaultValue={moment('2018/07/25', dateFormat)}
+                                                        format={dateFormat}
+                                                    />
+                                                </FormItem>
+                                            </Col>
+
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                <FormItem
+                                                    label="开始时间"
+                                                >
+                                                    <TimePicker defaultValue={moment('12:08', format)} format={format} />
+                                                </FormItem>
+                                            </Col>
+
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                <FormItem
+                                                    label="结束日期"
+                                                >
+                                                    <Input placeholder="结束日期" />
+                                                </FormItem>
+                                            </Col>
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                <FormItem
+                                                    label="结束时间"
+                                                >
+                                                    <Input placeholder="结束时间" />
+                                                </FormItem>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+
+                                </Card>
+                                <Card title="限制类型" className="card" >
+                                    <Form className="" layout="vertical" >
+                                        <Row className="" >
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 12}} >
+                                                <FormItem
+                                                    label="限制类型"
+                                                >
+                                                    <RadioGroup
+                                                        value = {type}
+                                                        onChange={this.handleChangeType}
+                                                    >
+                                                        <Radio value="TIME">时间</Radio>
+                                                        <Radio value="GS">地面停止</Radio>
+                                                        <Radio value="REQ">开车申请</Radio>
+                                                        <Radio value="ASSIGN">指定时隙</Radio>
+                                                    </RadioGroup>
+                                                </FormItem>
+                                            </Col>
+
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                <FormItem
+                                                    label="限制数值"
+                                                >
+                                                    <Input placeholder="限制数值" />
+                                                </FormItem>
+                                            </Col>
+
+                                        </Row>
+                                    </Form>
+
+                                </Card>
+                                <Card title="限制方向" className="card" >
+                                    <Form className="" layout="vertical" >
+
+                                        {
+                                            flowcontrolPointsList.map((item) =>{
+                                                return (
+                                                    <Row key= {item.id}>
+                                                        <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 24}} >
+
+                                                            <FormItem
+                                                                label= { item.description}
+                                                            >
+                                                                <CheckboxGroup
+                                                                    options= { item.options}
+                                                                    value = {controlPoints}
+                                                                />
+                                                            </FormItem>
+                                                        </Col>
+                                                    </Row>
+                                                )
+                                            })
+                                        }
+
+
+                                        <Row className="" >
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
+                                                <FormItem
+                                                    label="受控起飞机场"
+                                                >
+                                                    <Input placeholder="受控起飞机场" value={controlDepDirection} disabled ={true} />
+                                                </FormItem>
+                                            </Col>
+
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                <FormItem
+                                                    label="受控降落机场"
+                                                >
+                                                    <Input placeholder="受控降落机场" />
+                                                </FormItem>
+                                            </Col>
+
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                <FormItem
+                                                    label="豁免起飞机场"
+                                                >
+                                                    <Input placeholder="" disabled ={true} />
+                                                </FormItem>
+                                            </Col>
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                <FormItem
+                                                    label="豁免降落机场"
+                                                >
+                                                    <Input placeholder="豁免降落机场" />
+                                                </FormItem>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+
+                                </Card>
+                                <Card title="限制高度" className="card" >
+                                    <Form className="" layout="vertical" >
+                                        <Row className="" >
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
+                                                <FormItem
+                                                    label="高度"
+                                                >
+                                                    <Input placeholder="限制高度" />
+                                                </FormItem>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+
+                                </Card>
+                                <Card title="限制原因" className="card" >
+                                    <Form className="" layout="vertical" >
+                                        <Row className="" >
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 24}} >
+                                                <FormItem
+                                                    label="原因"
+                                                >
+                                                    <RadioGroup
+                                                        value = {reason}
+                                                        onChange={this.handleChangeReason}
+                                                    >
+                                                        <Radio value='ACC'>空管</Radio>
+                                                        <Radio value='WEATHER'>天气</Radio>
+                                                        <Radio value='AIRPORT'>机场</Radio>
+                                                        <Radio value='CONTROL'>航班时刻</Radio>
+                                                        <Radio value='EQUIPMENT'>设备</Radio>
+                                                        <Radio value='MILITARY'>其他空域用户</Radio>
+                                                        <Radio value='OTHERS'>其他</Radio>
+                                                    </RadioGroup>
+                                                </FormItem>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+
+                                </Card>
+                                <Card title="预留时隙" className="card" >
+                                    <Form className="" layout="vertical" >
+                                        <Row className="" >
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
+                                                <FormItem
+                                                    label="时隙"
+                                                >
+                                                    <Input placeholder="时隙" />
+                                                </FormItem>
+                                            </Col>
+                                        </Row>
+                                    </Form>
+
+                                </Card>
+
+                                <Card title="备注" className="card" >
+                                    <Form className="" layout="vertical" >
+
+                                        <Row className="" >
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 12}} >
+                                                <FormItem
+                                                    label="备注"
+                                                >
+                                                        <textarea placeholder="请输入备注" rows="4" className="comments">
+
+                                                        </textarea>
+                                                </FormItem>
+                                            </Col>
+                                        </Row>
+
+                                    </Form>
+                                </Card>
                             </Col>
                         </Row>
-                    </Form>
+                        {/* 底部*/}
+                        <Row className="footer">
+                            <Col className="" xs={{ span: 24}}  md={{ span: 24}} lg={{ span: 24}}  xl={{ span: 24}} xxl={{ span: 24}} >
 
-                </Card>
-                <Card title="限制类型" className="card" >
-                    <Form className="" layout="vertical" >
-                        <Row className="" >
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 12}} >
-                                <FormItem
-                                    label="限制类型"
+                                <Button className= 'c-btn c-btn-default'
+                                        onClick={ () => {
+                                            clickCloseBtn(type);
+                                        }}
                                 >
-                                    <RadioGroup
-                                        value = {type}
-                                        onChange={this.handleChangeType}
-                                    >
-                                        <Radio value="TIME">时间</Radio>
-                                        <Radio value="GS">地面停止</Radio>
-                                        <Radio value="REQ">开车申请</Radio>
-                                        <Radio value="ASSIGN">指定时隙</Radio>
-                                    </RadioGroup>
-                                </FormItem>
-                            </Col>
-
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                <FormItem
-                                    label="限制数值"
+                                    关闭
+                                </Button>
+                                <Button className='c-btn c-btn-blue'
+                                        type="primary"
                                 >
-                                    <Input placeholder="限制数值" />
-                                </FormItem>
-                            </Col>
-
-                        </Row>
-                    </Form>
-
-                </Card>
-                <Card title="限制方向" className="card" >
-                    <Form className="" layout="vertical" >
-
-                        {
-                            flowcontrolPointsList.map((item) =>{
-                                return (
-                                    <Row key= {item.id}>
-                                        <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 24}} >
-
-                                        <FormItem
-                                            label= { item.description}
-                                        >
-                                           <CheckboxGroup
-                                               options= { item.options}
-                                               value = {controlPoints}
-                                           />
-                                        </FormItem>
-                                        </Col>
-                                    </Row>
-                                )
-                            })
-                        }
-
-
-                        <Row className="" >
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
-                                <FormItem
-                                    label="受控起飞机场"
-                                >
-                                    <Input placeholder="受控起飞机场" value={controlDepDirection} disabled ={true} />
-                                </FormItem>
-                            </Col>
-
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                <FormItem
-                                    label="受控降落机场"
-                                >
-                                    <Input placeholder="受控降落机场" />
-                                </FormItem>
-                            </Col>
-
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                <FormItem
-                                    label="豁免起飞机场"
-                                >
-                                    <Input placeholder="" disabled ={true} />
-                                </FormItem>
-                            </Col>
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                <FormItem
-                                    label="豁免降落机场"
-                                >
-                                    <Input placeholder="豁免降落机场" />
-                                </FormItem>
+                                    提交
+                                </Button>
                             </Col>
                         </Row>
-                    </Form>
-
-                </Card>
-                <Card title="限制高度" className="card" >
-                    <Form className="" layout="vertical" >
-                        <Row className="" >
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
-                                <FormItem
-                                    label="高度"
-                                >
-                                    <Input placeholder="限制高度" />
-                                </FormItem>
-                            </Col>
-                        </Row>
-                    </Form>
-
-                </Card>
-                <Card title="限制原因" className="card" >
-                    <Form className="" layout="vertical" >
-                        <Row className="" >
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 24}} >
-                                <FormItem
-                                    label="原因"
-                                >
-                                    <RadioGroup
-                                        value = {reason}
-                                        onChange={this.handleChangeReason}
-                                    >
-                                        <Radio value='ACC'>空管</Radio>
-                                        <Radio value='WEATHER'>天气</Radio>
-                                        <Radio value='AIRPORT'>机场</Radio>
-                                        <Radio value='CONTROL'>航班时刻</Radio>
-                                        <Radio value='EQUIPMENT'>设备</Radio>
-                                        <Radio value='MILITARY'>其他空域用户</Radio>
-                                        <Radio value='OTHERS'>其他</Radio>
-                                    </RadioGroup>
-                                </FormItem>
-                            </Col>
-                        </Row>
-                    </Form>
-
-                </Card>
-                <Card title="预留时隙" className="card" >
-                    <Form className="" layout="vertical" >
-                        <Row className="" >
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
-                                <FormItem
-                                    label="时隙"
-                                >
-                                    <Input placeholder="时隙" />
-                                </FormItem>
-                            </Col>
-                        </Row>
-                    </Form>
-
-                </Card>
-
-                <Card title="备注" className="card" >
-                    <Form className="" layout="vertical" >
-
-                        <Row className="" >
-                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 12}} >
-                                <FormItem
-                                    label="备注"
-                                >
-                                                    <textarea placeholder="请输入备注" rows="4" className="comments">
-
-                                                    </textarea>
-                                </FormItem>
-                            </Col>
-                        </Row>
-
-                    </Form>
-                </Card>
-            </Col>
+                    </div>
+                </div>
+            </DraggableModule>
         )
     }
 };

@@ -136,5 +136,43 @@ const addStringTime = (time, addMillis) => {
     return newStringTime;
 }
 
+/**
+ * 12为字符串时间转换格式
+ *
+ * @param str  yyyyMMddHHmm 12位字符串
+ * @param addMillis
+ * @returns {String}
+ */
+const formatTimeString = ( str ) => {
+    if(!isValidVariable(str) || str.length != 12){
+        return "";
+    }
+    // 解析各个值
+    const year = str.substring(0, 4);
+    const month = str.substring(4, 6);
+    const day = str.substring(6, 8);
+    const hour = str.substring(8, 10);
+    const mins = str.substring(10, 12);
 
-export { isValidVariable, isValidObject, calculateStringTimeDiff, addStringTime, getFullTime };
+    return year + '-' + month + '-' + day + ' ' + hour  + ':' + mins;
+};
+
+/**
+ * 12为字符串时间转换格式(转为HH:mm)
+ *
+ * @param str  yyyyMMddHHmm 12位字符串
+ * @param addMillis
+ * @returns {String}
+ */
+const getTimeFromString = ( str ) => {
+    if(!isValidVariable(str) || str.length != 12){
+        return "";
+    }
+    // 解析各个值
+    const hour = str.substring(8, 10);
+    const mins = str.substring(10, 12);
+
+    return hour  + ':' + mins;
+};
+
+export { isValidVariable, isValidObject, calculateStringTimeDiff, addStringTime, getFullTime, formatTimeString, getTimeFromString };

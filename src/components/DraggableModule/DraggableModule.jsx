@@ -22,14 +22,15 @@ class DraggableModal extends React.Component {
 
     render() {
         const dragHandlers = {onStart: this.onStart, onStop: this.onStop};
-        const { x, y } = this.props;
+        const { x = 0, y = 0, bounds = '' } = this.props;
         return (
             <Draggable
                 defaultPosition={{ x, y }}
-                bounds=".root"
+                bounds = {bounds}
                 handle=".drag-target"
                 {...dragHandlers}
             >
+
                 { this.props.children }
             </Draggable>
         );

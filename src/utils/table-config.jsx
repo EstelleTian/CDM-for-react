@@ -276,22 +276,23 @@ const handleOperationColumn = function (value, row, index) {
 
 //处理点击航班出现航班详情
 const showDetailModal = function( thisProxy, record ){
-    const { updateDetailModalDatasVisible, updateDetailModalDatasByName } = thisProxy.props;
-    const id = record["ID"];
+    const { updateDetailModalDatasVisible, updateDetailModalDatasByName, userId } = thisProxy.props;
+    const id = record["ID"] || "";
 
     //根据航班id获取单条航班数据
-    requestGet( getSingleAirportUrl, {id: id}, function(res){
-        updateFlightDetailData(res, updateDetailModalDatasByName);
+    requestGet( getSingleAirportUrl, {id, userId}, function(res){
+        updateFlightDetailData(res, updateDetailModalDatasByName, updateDetailModalDatasVisible);
     } );
 
-    //打开详情窗口
-    updateDetailModalDatasVisible("flight", true);
+
 };
 
-const updateFlightDetailData = function( res, updateDetailModalDatasByName ){
+const updateFlightDetailData = function( res, updateDetailModalDatasByName, updateDetailModalDatasVisible ){
     //TODO 发送请求获取航班详情数据
     console.log( res );
-    // updateDetailModalDatasByName("flight", record);
+    updateDetailModalDatasByName("flight", res);
+    //打开详情窗口
+    updateDetailModalDatasVisible("flight", true);
 };
 
 

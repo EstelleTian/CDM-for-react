@@ -247,13 +247,12 @@ const FlightCoordination = {
      * @param status
      * @returns
      */
-    getStatusZh: function(flight){
-        if (!isValidVariable(flight) || !isValidVariable(flight.status)) {
-            return null;
+    getStatusZh: function(status){
+        if (!isValidVariable(status)) {
+            return "";
         }
-        var zh = null;
-        //var fme = flight.fmeToday;
-        var s = parseInt(flight.status, 10);
+        var zh = "";
+        var s = parseInt(status, 10);
         switch (s) {
             case this.STATUS_FORMER_SCH:
                 zh = '前段计划';

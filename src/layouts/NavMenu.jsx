@@ -1,11 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Menu, Checkbox, Radio, Icon, Row, Col, Badge ,message} from 'antd';
-import $ from 'jquery';
+import { Menu, Checkbox, Radio, Icon, message} from 'antd';
 import { request } from 'utils/request-actions';
 import { logoutUrl } from 'utils/request-urls';
-import DraggableDialog from "../components/DraggableDialog/DraggableDialog";
-import APFlowcontrolDialogContainer from "../components/APFlowcontrolDialog/APFlowcontrolDialogContainer";
+import CreateLayer from "components/CreateLayer/CreateLayer";
+import APFlowcontrolDialogContainer from "components/APFlowcontrolDialog/APFlowcontrolDialogContainer";
 
 import './NavMenu.less';
 
@@ -148,188 +147,192 @@ class NavMenu extends React.Component{
         const { airports } = loginUserInfo;
         const { apPublish, apGSDepPublish } = this.state;
         return (
-            <Menu
-                mode="horizontal"
-                theme="dark"
-                className="menu-right"
-            >
-                <SubMenu key="toggle-siderbar"
-                         title={
-                             <span title={ show ? '关闭侧边栏' : '开启侧边栏'}>
-                                <Icon
-                                    className="trigger"
-                                    type={ show ? 'menu-unfold' : 'menu-fold'}
-                                />
-                            </span>
-                         }
-                         onTitleClick={ this.onMenuTitleSelect } />
-                <SubMenu key="navigator-flight-search"
-                         title={
-                             <span title="航班查询">
-                                <i className="iconfont icon-search2"></i>
-                            </span>
-                         }
-                         onTitleClick={ this.onMenuTitleSelect } />
-                <SubMenu
-                    key="flowcontrol-info"
-                    title={
-                        <span title="流控信息">
-                            <i className="iconfont icon-flowcontrol4"></i>
-                        </span>
-                    }
-                    onTitleClick={ this.onMenuTitleSelect }
+            <div className="opt-menu-canvas">
+                <Menu
+                    mode="horizontal"
+                    theme="dark"
+                    className="menu-right"
                 >
-                    <Menu.Item
-                        key="apPublish"
-                        onClick= {this.onMenuTitleSelect}
+                    <SubMenu key="toggle-siderbar"
+                             title={
+                                 <span title={ show ? '关闭侧边栏' : '开启侧边栏'}>
+                                    <Icon
+                                        className="trigger"
+                                        type={ show ? 'menu-unfold' : 'menu-fold'}
+                                    />
+                                </span>
+                             }
+                             onTitleClick={ this.onMenuTitleSelect } />
+                    <SubMenu key="navigator-flight-search"
+                             title={
+                                 <span title="航班查询">
+                                    <i className="iconfont icon-search2"></i>
+                                </span>
+                             }
+                             onTitleClick={ this.onMenuTitleSelect } />
+                    <SubMenu
+                        key="flowcontrol-info"
+                        title={
+                            <span title="流控信息">
+                                <i className="iconfont icon-flowcontrol4"></i>
+                            </span>
+                        }
+                        onTitleClick={ this.onMenuTitleSelect }
                     >
-                        <label>发布机场受限</label>
-                    </Menu.Item>
-                    <Menu.Item
-                        key="apGSDepPublish"
-                        onClick= {this.onMenuTitleSelect}
+                        <Menu.Item
+                            key="apPublish"
+                            onClick= {this.onMenuTitleSelect}
+                        >
+                            <label>发布机场受限</label>
+                        </Menu.Item>
+                        <Menu.Item
+                            key="apGSDepPublish"
+                            onClick= {this.onMenuTitleSelect}
+                        >
+                            <label>发布低能见度受限</label>
+                        </Menu.Item>
+                        <Menu.Item key="point-publish"><label>发布航路受限</label></Menu.Item>
+                        <Menu.Item key="composite-publish"><label>发布复合航路受限</label></Menu.Item>
+                        <Menu.Item key="ldr-publish"><label>发布大面积延误恢复</label></Menu.Item>
+                        <Menu.Item key="translation-publish"><label>发布大面积延误</label></Menu.Item>
+                        <Menu.Item key="template-manage"><label>流控信息模板管理</label></Menu.Item>
+                        <Menu.Item key="impact-flights-export"><label>流控信息导出</label></Menu.Item>
+                    </SubMenu>
+                    <SubMenu
+                        key="runway-config"
+                        title={
+                            <span title="跑道配置">
+                                <i className="iconfont icon-runway"></i>
+                            </span>
+                        }
+                        onTitleClick={ this.onMenuTitleSelect }
                     >
-                        <label>发布低能见度受限</label>
-                    </Menu.Item>
-                    <Menu.Item key="point-publish"><label>发布航路受限</label></Menu.Item>
-                    <Menu.Item key="composite-publish"><label>发布复合航路受限</label></Menu.Item>
-                    <Menu.Item key="ldr-publish"><label>发布大面积延误恢复</label></Menu.Item>
-                    <Menu.Item key="translation-publish"><label>发布大面积延误</label></Menu.Item>
-                    <Menu.Item key="template-manage"><label>流控信息模板管理</label></Menu.Item>
-                    <Menu.Item key="impact-flights-export"><label>流控信息导出</label></Menu.Item>
-                </SubMenu>
-                <SubMenu
-                    key="runway-config"
-                    title={
-                        <span title="跑道配置">
-                            <i className="iconfont icon-runway"></i>
-                        </span>
-                    }
-                    onTitleClick={ this.onMenuTitleSelect }
-                >
-                    <Menu.Item key="runway-config-edit"><label>默认跑道配置</label></Menu.Item>
-                    <Menu.Item key="runway-config-dynamic-publish"><label>动态跑道配置</label></Menu.Item>
-                    <Menu.Item key="regular-runway-config"><label>默认跑道配置</label></Menu.Item>
-                    <Menu.Item key="runway-template-manage"><label>跑道模板管理</label></Menu.Item>
-                    <Menu.Item key="snow-deicing"><label>雪情配置</label></Menu.Item>
-                </SubMenu>
-                <SubMenu
-                    title={
-                        <span title="参数配置">
-                                <i className="iconfont icon-config2"></i>
-                            </span>
-                    }
-                >
-                    <Menu.Item key="system-config"><label>系统参数配置</label></Menu.Item>
-                    <Menu.Item key="operation-config"><label>运行参数配置</label></Menu.Item>
-                    <Menu.Item key="runway-taxi-manage"><label>跑道滑行配置</label></Menu.Item>
-                    <Menu.Item key="taxi-deice-manage"><label>除冰参数管理</label></Menu.Item>
-                    <Menu.Item key="passtime-config-manage"><label>过站时间管理</label></Menu.Item>
-                    <SubMenu title="航段经验时间">
-                        <Menu.Item key="trajectory-passtime-statistics-manage"><label>静态航段时间查询</label></Menu.Item>
-                        <Menu.Item key="trajectory-passtime-statistics-count"><label>静态航段时间计算</label></Menu.Item>
-                        <Menu.Item key="trajectory-passtime-statistics-query"><label>动态航段时间查询</label></Menu.Item>
-                        <Menu.Item key="city-pair-route-manage"><label>城市对航路查询</label></Menu.Item>
+                        <Menu.Item key="runway-config-edit"><label>默认跑道配置</label></Menu.Item>
+                        <Menu.Item key="runway-config-dynamic-publish"><label>动态跑道配置</label></Menu.Item>
+                        <Menu.Item key="regular-runway-config"><label>默认跑道配置</label></Menu.Item>
+                        <Menu.Item key="runway-template-manage"><label>跑道模板管理</label></Menu.Item>
+                        <Menu.Item key="snow-deicing"><label>雪情配置</label></Menu.Item>
                     </SubMenu>
-                    <SubMenu title="显示参数配置">
-                        <Menu.Item key="icao-iata-switch"><label>ICAO/IATA</label></Menu.Item>
-                        <Menu.Item key="grid-table-font-size"><label>表格字体配置</label></Menu.Item>
-                        <Menu.Item key="grid-table-column"><label>表格列序配置</label></Menu.Item>
-                        <Menu.Item key="grid-table-style"><label>表格样式配置</label></Menu.Item>
-                        <Menu.Item key="highchart-style"><label>统计样式配置</label></Menu.Item>
+                    <SubMenu
+                        title={
+                            <span title="参数配置">
+                                    <i className="iconfont icon-config2"></i>
+                                </span>
+                        }
+                    >
+                        <Menu.Item key="system-config"><label>系统参数配置</label></Menu.Item>
+                        <Menu.Item key="operation-config"><label>运行参数配置</label></Menu.Item>
+                        <Menu.Item key="runway-taxi-manage"><label>跑道滑行配置</label></Menu.Item>
+                        <Menu.Item key="taxi-deice-manage"><label>除冰参数管理</label></Menu.Item>
+                        <Menu.Item key="passtime-config-manage"><label>过站时间管理</label></Menu.Item>
+                        <SubMenu title="航段经验时间">
+                            <Menu.Item key="trajectory-passtime-statistics-manage"><label>静态航段时间查询</label></Menu.Item>
+                            <Menu.Item key="trajectory-passtime-statistics-count"><label>静态航段时间计算</label></Menu.Item>
+                            <Menu.Item key="trajectory-passtime-statistics-query"><label>动态航段时间查询</label></Menu.Item>
+                            <Menu.Item key="city-pair-route-manage"><label>城市对航路查询</label></Menu.Item>
+                        </SubMenu>
+                        <SubMenu title="显示参数配置">
+                            <Menu.Item key="icao-iata-switch"><label>ICAO/IATA</label></Menu.Item>
+                            <Menu.Item key="grid-table-font-size"><label>表格字体配置</label></Menu.Item>
+                            <Menu.Item key="grid-table-column"><label>表格列序配置</label></Menu.Item>
+                            <Menu.Item key="grid-table-style"><label>表格样式配置</label></Menu.Item>
+                            <Menu.Item key="highchart-style"><label>统计样式配置</label></Menu.Item>
+                        </SubMenu>
                     </SubMenu>
-                </SubMenu>
-                <SubMenu
-                    title={
-                        <span title="航班计划">
-                            <i className="iconfont icon-wodejihua"></i>
-                        </span>
-                    }
-                >
-                    <Menu.Item key="cdm-flight-collaborate"><label>协调记录</label></Menu.Item>
-                    <Menu.Item key="cdm-fme-today-manage"><label>计划管理</label></Menu.Item>
-                    <Menu.Item key="slot-exchange"><label>时隙交换</label></Menu.Item>
-                    <Menu.Item key="teles-details"><label>查询航班报文</label></Menu.Item>
-                </SubMenu>
-                <SubMenu key="all-alternate-management"
-                         title={
-                             <span title="备降场管理">
-                                <i className="iconfont icon-beijiangchang"></i>
+                    <SubMenu
+                        title={
+                            <span title="航班计划">
+                                <i className="iconfont icon-wodejihua"></i>
                             </span>
-                         }
-                />
-                <SubMenu
-                    key="notice-info"
-                    title={
-                        <span title="通告信息">
-                            <i className="iconfont icon-tonggao"></i>
-                        </span>
-                    }
-                    onTitleClick={ this.onMenuTitleSelect }
-                >
-                    <Menu.Item key="notice-info-publish"><label>发布通告信息</label></Menu.Item>
-                </SubMenu>
+                        }
+                    >
+                        <Menu.Item key="cdm-flight-collaborate"><label>协调记录</label></Menu.Item>
+                        <Menu.Item key="cdm-fme-today-manage"><label>计划管理</label></Menu.Item>
+                        <Menu.Item key="slot-exchange"><label>时隙交换</label></Menu.Item>
+                        <Menu.Item key="teles-details"><label>查询航班报文</label></Menu.Item>
+                    </SubMenu>
+                    <SubMenu key="all-alternate-management"
+                             title={
+                                 <span title="备降场管理">
+                                    <i className="iconfont icon-beijiangchang"></i>
+                                </span>
+                             }
+                    />
+                    <SubMenu
+                        key="notice-info"
+                        title={
+                            <span title="通告信息">
+                                <i className="iconfont icon-tonggao"></i>
+                            </span>
+                        }
+                        onTitleClick={ this.onMenuTitleSelect }
+                    >
+                        <Menu.Item key="notice-info-publish"><label>发布通告信息</label></Menu.Item>
+                    </SubMenu>
 
-                <SubMenu
-                    key="restriction-info"
-                    title={
-                        <span title="限制信息">
-                            <i className="iconfont icon-guanli"></i>
-                        </span>
-                    }
-                    onTitleClick={ this.onMenuTitleSelect }
-                >
-                    <Menu.Item key="restriction-deice-publish">发布除冰限制</Menu.Item>
-                </SubMenu>
-                <SubMenu
-                    key="setting"
-                    title={
-                        <span>
-                            <Icon type="user" /> {loginUserInfo.username || "未登录" }
-                        </span>
-                    }
-                >
-                    <Menu.Item key="help">
-                        <label><Icon type="book" />帮助手册</label>
-                    </Menu.Item>
-                    <Menu.Item key="history">
-                        <label><Icon type="api" />历史查询</label>
-                    </Menu.Item>
-                    <Menu.Item key="resetPwd">
-                        <label><Icon type="key" />修改密码</label>
-                    </Menu.Item>
-                    <Menu.Item key="logout" onClick={this.handleLogout} >
-                        <label ><Icon type="logout" />登出</label>
-                    </Menu.Item>
+                    <SubMenu
+                        key="restriction-info"
+                        title={
+                            <span title="限制信息">
+                                <i className="iconfont icon-guanli"></i>
+                            </span>
+                        }
+                        onTitleClick={ this.onMenuTitleSelect }
+                    >
+                        <Menu.Item key="restriction-deice-publish">发布除冰限制</Menu.Item>
+                    </SubMenu>
+                    <SubMenu
+                        key="setting"
+                        title={
+                            <span>
+                                <Icon type="user" /> {loginUserInfo.username || "未登录" }
+                            </span>
+                        }
+                    >
+                        <Menu.Item key="help">
+                            <label><Icon type="book" />帮助手册</label>
+                        </Menu.Item>
+                        <Menu.Item key="history">
+                            <label><Icon type="api" />历史查询</label>
+                        </Menu.Item>
+                        <Menu.Item key="resetPwd">
+                            <label><Icon type="key" />修改密码</label>
+                        </Menu.Item>
+                        <Menu.Item key="logout" onClick={this.handleLogout} >
+                            <label ><Icon type="logout" />登出</label>
+                        </Menu.Item>
 
-                </SubMenu>
+                    </SubMenu>
+
+                </Menu>
                 {
                     (apPublish.show) ?
-                        <DraggableDialog
-                            titleName="发布机场受限"
-                            type="apPublish"
-                            width={ 1200 }
-                            clickCloseBtn={ this.onCloseBtn }
-
+                        <CreateLayer
+                            className="flowcontol-layer"
                         >
-                            <APFlowcontrolDialogContainer />
+                            <APFlowcontrolDialogContainer
+                                titleName="发布机场受限"
+                                type="apPublish"
+                                width={ 1200 }
+                                clickCloseBtn={ this.onCloseBtn }
+                            />
+                        </CreateLayer>
 
-                        </DraggableDialog> : ''
+                        : ''
                 }
-                {
-                    (apGSDepPublish.show) ?
-                        <DraggableDialog
-                            titleName="发布低能见度受限"
-                            type="apGSDepPublish"
-                            width={ 1200 }
-                            clickCloseBtn={ this.onCloseBtn }
-                        >
-                            测试2
-                            <p>dddddd</p>
-                        </DraggableDialog> : ''
-                }
-            </Menu>
-
+                {/*{*/}
+                    {/*(apGSDepPublish.show) ?*/}
+                        {/*<DraggableDialog*/}
+                            {/*titleName="发布低能见度受限"*/}
+                            {/*type="apGSDepPublish"*/}
+                            {/*width={ 1200 }*/}
+                            {/*clickCloseBtn={ this.onCloseBtn }*/}
+                        {/*>*/}
+                            {/*测试2*/}
+                            {/*<p>dddddd</p>*/}
+                        {/*</DraggableDialog> : ''*/}
+                {/*}*/}
+            </div>
 
         )
     }

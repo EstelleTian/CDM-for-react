@@ -1,8 +1,6 @@
 import React from 'react';
 import moment from 'moment';
 import { Checkbox, Input, Form, DatePicker, TimePicker, Button } from 'antd';
-import {isValidVariable} from "utils/basic-verify";
-import shallowequal from 'shallowequal';
 import './Form.less'
 
 const FormItem = Form.Item;

@@ -1,4 +1,4 @@
-//用于创建在root之外的DOM 层
+//用于创建在root之外的DOM 层，和body同级
 
 /**
  *  <CreateLayer
@@ -14,7 +14,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import PropTypes from 'prop-types'
-import './Layer.less';
+import './CreateLayer.less';
 
 function CreateLayer() {
     class Layer extends React.Component{

@@ -2,9 +2,9 @@
 import React from 'react';
 import $ from 'jquery';
 import { Col, Menu, Badge } from 'antd';
-import { TableColumns } from "../../utils/table-config";
-import { convertData, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "../../utils/flight-grid-table-data-util";
-
+import { TableColumns } from "utils/table-config";
+import { convertData, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "utils/flight-grid-table-data-util";
+import  CreateLayer from 'components/CreateLayer/CreateLayer'
 import SubTable from '../SubTable/SubTable';
 import './TableHeader.less';
 
@@ -56,8 +56,8 @@ class TableHeader extends React.Component{
         this.setState({
             [key]: {
                 show: !show,
-                x: clientX - domLeft - 260,
-                y: height
+                x: clientX - 150,
+                y: height + 18
             }
         });
 
@@ -167,68 +167,78 @@ class TableHeader extends React.Component{
                 </div>
                 {
                     ( expired.show ) ?
-                        <SubTable
-                            titleName = "失效航班"
-                            key = "expired"
-                            type = "expired"
-                            tableDatas = { Object.values( expiredData.datas || {} ) }
-                            tableColumnsObj = { TableColumns( "expired", expiredData.colDisplay, expiredData.colNames, expiredData.colTitle ) }
-                            x = {expired.x}
-                            y = {expired.y}
-                            clickCloseBtn = { this.onCloseBtn }
-                        /> : ""
+                        <CreateLayer>
+                            <SubTable
+                                titleName = "失效航班"
+                                key = "expired"
+                                type = "expired"
+                                tableDatas = { Object.values( expiredData.datas || {} ) }
+                                tableColumnsObj = { TableColumns( "expired", expiredData.colDisplay, expiredData.colNames, expiredData.colTitle ) }
+                                x = {expired.x}
+                                y = {expired.y}
+                                clickCloseBtn = { this.onCloseBtn }
+                            />
+                        </CreateLayer>: ""
                 }
                 {
                     ( pool.show ) ?
-                        <SubTable
-                            titleName = "等待池航班"
-                            key = "pool"
-                            type = "pool"
-                            tableDatas = { Object.values( poolData.datas || {} ) }
-                            tableColumnsObj = { TableColumns( "pool", poolData.colDisplay, poolData.colNames, poolData.colTitle ) }
-                            x = {pool.x}
-                            y = {pool.y}
-                            clickCloseBtn = { this.onCloseBtn }
-                        /> : ""
+                        <CreateLayer>
+                            <SubTable
+                                titleName = "等待池航班"
+                                key = "pool"
+                                type = "pool"
+                                tableDatas = { Object.values( poolData.datas || {} ) }
+                                tableColumnsObj = { TableColumns( "pool", poolData.colDisplay, poolData.colNames, poolData.colTitle ) }
+                                x = {pool.x}
+                                y = {pool.y}
+                                clickCloseBtn = { this.onCloseBtn }
+                            />
+                        </CreateLayer> : ""
                 }
                 {
                     ( alarm.show ) ?
-                        <SubTable
-                            titleName = "告警航班"
-                            key = "alarm"
-                            type = "alarm"
-                            tableDatas = { Object.values( alarmData.datas || {} ) }
-                            tableColumnsObj = { TableColumns( "alarm", alarmData.colDisplay, alarmData.colNames, alarmData.colTitle ) }
-                            x = {alarm.x}
-                            y = {alarm.y}
-                            clickCloseBtn = { this.onCloseBtn }
-                        /> : ""
+                        <CreateLayer>
+                            <SubTable
+                                titleName = "告警航班"
+                                key = "alarm"
+                                type = "alarm"
+                                tableDatas = { Object.values( alarmData.datas || {} ) }
+                                tableColumnsObj = { TableColumns( "alarm", alarmData.colDisplay, alarmData.colNames, alarmData.colTitle ) }
+                                x = {alarm.x}
+                                y = {alarm.y}
+                                clickCloseBtn = { this.onCloseBtn }
+                            />
+                        </CreateLayer>: ""
                 }
                 {
                     ( special.show ) ?
-                        <SubTable
-                            titleName = "特殊航班"
-                            key = "special"
-                            type = "special"
-                            tableDatas = { Object.values( specialData.datas || {} ) }
-                            tableColumnsObj = { TableColumns( "special", specialData.colDisplay, specialData.colNames, specialData.colTitle ) }
-                            x = {special.x}
-                            y = {special.y}
-                            clickCloseBtn = { this.onCloseBtn }
-                        /> : ""
+                        <CreateLayer>
+                            <SubTable
+                                titleName = "特殊航班"
+                                key = "special"
+                                type = "special"
+                                tableDatas = { Object.values( specialData.datas || {} ) }
+                                tableColumnsObj = { TableColumns( "special", specialData.colDisplay, specialData.colNames, specialData.colTitle ) }
+                                x = {special.x}
+                                y = {special.y}
+                                clickCloseBtn = { this.onCloseBtn }
+                            />
+                        </CreateLayer>: ""
                 }
                 {
                     ( todo.show ) ?
-                        <SubTable
-                            titleName = "待办事项"
-                            key = "todo"
-                            type = "todo"
-                            tableDatas = { Object.values( todoData.datas || {} ) }
-                            tableColumnsObj = { TableColumns( "todo", todoData.colDisplay, todoData.colNames, todoData.colTitle ) }
-                            x = {todo.x}
-                            y = {todo.y}
-                            clickCloseBtn = { this.onCloseBtn }
-                        /> : ""
+                        <CreateLayer>
+                            <SubTable
+                                titleName = "待办事项"
+                                key = "todo"
+                                type = "todo"
+                                tableDatas = { Object.values( todoData.datas || {} ) }
+                                tableColumnsObj = { TableColumns( "todo", todoData.colDisplay, todoData.colNames, todoData.colTitle ) }
+                                x = {todo.x}
+                                y = {todo.y}
+                                clickCloseBtn = { this.onCloseBtn }
+                            />
+                        </CreateLayer>: ""
                 }
             </div>
         )
