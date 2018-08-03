@@ -19,26 +19,36 @@ class TableHeader extends React.Component{
         this.getDisplayFontSize = getDisplayFontSize.bind(this);
         this.state = {
             expired: {
+                cn: "失效航班",
+                iconType: "icon-expired",
                 show: false,
                 x: 0,
                 y:0
             },
             special: {
+                cn: "特殊航班",
+                iconType: "icon-special",
                 show: false,
                 x: 0,
                 y:0
             },
             pool: {
+                cn: "等待池航班",
+                iconType: "icon-pool",
                 show: false,
                 x: 0,
                 y:0
             },
             alarm: {
+                cn: "告警航班",
+                iconType: "icon-alarm",
                 show: false,
                 x: 0,
                 y:0
             },
             todo: {
+                cn: "待办事项",
+                iconType: "icon-todo",
                 show: false,
                 x: 0,
                 y:0
@@ -55,6 +65,7 @@ class TableHeader extends React.Component{
         const domTop = dom[0].offsetTop || 0;
         this.setState({
             [key]: {
+                ...this.state[key],
                 show: !show,
                 x: clientX - 150,
                 y: height + 18
@@ -71,6 +82,7 @@ class TableHeader extends React.Component{
     onCloseBtn( type ){
         this.setState({
             [type]: {
+                ...this.state[type],
                 show: false
             }
         });
@@ -79,167 +91,63 @@ class TableHeader extends React.Component{
     }
 
     render(){
-        const { generateTime = {}, subTableDatas = {}} = this.props;
+        const { subTableDatas = {}} = this.props;
         const poolData = subTableDatas.pool;
         const alarmData = subTableDatas.alarm;
         const expiredData = subTableDatas.expired;
         const specialData = subTableDatas.special;
         const todoData = subTableDatas.todo;
-        const { time = '' } = generateTime;
         const { expired, special, pool, alarm, todo } = this.state;
+        const subTableKeys = Object.keys(this.state);
 
         return (
             <div className="header">
-                {/*<div className="title">*/}
-                    {/*<span>航班起飞排序</span>*/}
-                    {/*{*/}
-                        {/*( time ) ? <span>{time}</span> : ''*/}
-                    {/*}*/}
-                {/*</div>*/}
                 <div className="flight-menu">
-                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('expired', e)} }>
-                        <Badge count={ Object.keys( expiredData.datas || {} ).length } className="badge-icon">
-                            <span title="失效航班">
-                                <i className="iconfont icon-expired"></i>
-                            </span>
-                        </Badge>
-                    </div>
-                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('special', e)} }>
-                        <Badge count={ Object.keys( specialData.datas || {} ).length } className="badge-icon">
-                            <span title="特殊航班">
-                                <i className="iconfont icon-special"></i>
-                            </span>
-                        </Badge>
-                    </div>
-                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('pool', e)} }>
-                        <Badge count={ Object.keys( poolData.datas || {} ).length } className="badge-icon">
-                            <span title="等待池">
-                                <i className="iconfont icon-pool"></i>
-                            </span>
-                        </Badge>
-                    </div>
-                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('alarm', e)} }>
-                        <Badge count={ Object.keys( alarmData.datas || {} ).length } className="badge-icon">
-                            <span title="告警信息">
-                                <i className="iconfont icon-alarm"></i>
-                            </span>
-                        </Badge>
-                    </div>
-                    <div className="item" onClick={(e)=>{ this.onMenuTitleSelect('todo', e)} }>
-                        <Badge count={ Object.keys( todoData.datas || {} ).length } className="badge-icon">
-                            <span title="待办事项">
-                                <i className="iconfont icon-todo"></i>
-                            </span>
-                        </Badge>
-                    </div>
-                {/*<Menu*/}
-                    {/*mode="horizontal"*/}
-                    {/*theme="dark"*/}
-                    {/*multiple={ true }*/}
-                    {/*onClick={ this.onMenuTitleSelect }*/}
-                    {/*>*/}
-                    {/*<Menu.Item key="expired" title="失效航班" className="expired">*/}
-                        {/*<Badge count={ Object.keys( expiredData.datas || {} ).length } className="badge-icon">*/}
-                            {/*<span>失效航班</span>*/}
-                        {/*</Badge>*/}
-                    {/*</Menu.Item>*/}
-                    {/*<Menu.Item key="special" title="特殊航班" className="special">*/}
-                        {/*<Badge count={ Object.keys( specialData.datas || {} ).length } className="badge-icon">*/}
-                            {/*<span>特殊航班</span>*/}
-                        {/*</Badge>*/}
-                    {/*</Menu.Item>*/}
-                    {/*<Menu.Item key="pool" title="等待池" className="pool">*/}
-                        {/*<Badge count={ Object.keys( poolData.datas || {} ).length } className="badge-icon">*/}
-                            {/*<span>等待池</span>*/}
-                        {/*</Badge>*/}
-                    {/*</Menu.Item>*/}
-                    {/*<Menu.Item key="alarm" title="告警信息" className="alarm">*/}
-                        {/*<Badge count={ Object.keys( alarmData.datas || {} ).length } className="badge-icon">*/}
-                            {/*<span>告警信息</span>*/}
-                        {/*</Badge>*/}
-                    {/*</Menu.Item>*/}
-                    {/*<Menu.Item key="todo" title="待办事项" className="todo">*/}
-                        {/*<Badge count={ Object.keys( todoData.datas || {} ).length } className="badge-icon">*/}
-                            {/*<span>待办事项</span>*/}
-                        {/*</Badge>*/}
-                    {/*</Menu.Item>*/}
-                {/*</Menu>*/}
+                    {
+                        subTableKeys.map(( name )=>{
+                            const obj = this.state[name];
+                            return (
+                                <div key={name} className="item" onClick={(e)=>{ this.onMenuTitleSelect(name, e)} }>
+                                    <Badge count={ Object.keys( subTableDatas[name].datas || {} ).length } className="badge-icon">
+                                        <span title={ obj.cn }>
+                                            <i className={`iconfont  ${ obj.iconType }`}></i>
+                                        </span>
+                                    </Badge>
+                                </div>
+                            )
+                        })
+                    }
                 </div>
                 {
-                    ( expired.show ) ?
-                        <CreateLayer>
-                            <SubTable
-                                titleName = "失效航班"
-                                key = "expired"
-                                type = "expired"
-                                tableDatas = { Object.values( expiredData.datas || {} ) }
-                                tableColumnsObj = { TableColumns( "expired", expiredData.colDisplay, expiredData.colNames, expiredData.colTitle ) }
-                                x = {expired.x}
-                                y = {expired.y}
-                                clickCloseBtn = { this.onCloseBtn }
-                            />
-                        </CreateLayer>: ""
+                    subTableKeys.map(( name )=>{
+                        const obj = this.state[name];
+                        if( obj.show ){
+                            const dataMap = subTableDatas[name];
+                            return (
+                                <CreateLayer
+                                    key={name}
+                                >
+                                    <SubTable
+                                        titleName = { obj.cn }
+                                        key = { name }
+                                        type = { name }
+                                        tableDatas = { Object.values( dataMap.datas || {} ) }
+                                        tableColumnsObj = { TableColumns( name, dataMap.colDisplay, dataMap.colNames, dataMap.colTitle ) }
+                                        x = { obj.x }
+                                        y = { obj.y }
+                                        clickCloseBtn = { this.onCloseBtn }
+                                    />
+                                </CreateLayer>
+                            )
+                        }else{
+                            return "";
+                        }
+
+
+                    })
                 }
-                {
-                    ( pool.show ) ?
-                        <CreateLayer>
-                            <SubTable
-                                titleName = "等待池航班"
-                                key = "pool"
-                                type = "pool"
-                                tableDatas = { Object.values( poolData.datas || {} ) }
-                                tableColumnsObj = { TableColumns( "pool", poolData.colDisplay, poolData.colNames, poolData.colTitle ) }
-                                x = {pool.x}
-                                y = {pool.y}
-                                clickCloseBtn = { this.onCloseBtn }
-                            />
-                        </CreateLayer> : ""
-                }
-                {
-                    ( alarm.show ) ?
-                        <CreateLayer>
-                            <SubTable
-                                titleName = "告警航班"
-                                key = "alarm"
-                                type = "alarm"
-                                tableDatas = { Object.values( alarmData.datas || {} ) }
-                                tableColumnsObj = { TableColumns( "alarm", alarmData.colDisplay, alarmData.colNames, alarmData.colTitle ) }
-                                x = {alarm.x}
-                                y = {alarm.y}
-                                clickCloseBtn = { this.onCloseBtn }
-                            />
-                        </CreateLayer>: ""
-                }
-                {
-                    ( special.show ) ?
-                        <CreateLayer>
-                            <SubTable
-                                titleName = "特殊航班"
-                                key = "special"
-                                type = "special"
-                                tableDatas = { Object.values( specialData.datas || {} ) }
-                                tableColumnsObj = { TableColumns( "special", specialData.colDisplay, specialData.colNames, specialData.colTitle ) }
-                                x = {special.x}
-                                y = {special.y}
-                                clickCloseBtn = { this.onCloseBtn }
-                            />
-                        </CreateLayer>: ""
-                }
-                {
-                    ( todo.show ) ?
-                        <CreateLayer>
-                            <SubTable
-                                titleName = "待办事项"
-                                key = "todo"
-                                type = "todo"
-                                tableDatas = { Object.values( todoData.datas || {} ) }
-                                tableColumnsObj = { TableColumns( "todo", todoData.colDisplay, todoData.colNames, todoData.colTitle ) }
-                                x = {todo.x}
-                                y = {todo.y}
-                                clickCloseBtn = { this.onCloseBtn }
-                            />
-                        </CreateLayer>: ""
-                }
+
+
             </div>
         )
     }
