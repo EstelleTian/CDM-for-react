@@ -46,20 +46,19 @@ class APFlowcontrolDialog extends React.Component{
         const { loginUserInfo } = this.props;
         // 用户关注机场即开始点
         const { airports } = loginUserInfo;
-        console.log(airports)
-
+        // 参数
         let para = {
             startWaypoints : airports
         }
-
+        // 发送请求
         request(getPointByAirportUrl,'POST',para,this.updatePoins);
     }
     // 更新流控点
     updatePoins(res) {
         let  { flowcontrolPointsList = [] } = res;
-        // 过滤空点
+        // 过滤流控点
         flowcontrolPointsList = flowcontrolPointsList.filter((item) => {
-            if('AP' == item.type){                
+            if('AP' == item.type){ // 类型为AP(机场)的
                 // 解析JSON字符串
                 item.points = JSON.parse(item.points);
                 return true
@@ -131,7 +130,9 @@ class APFlowcontrolDialog extends React.Component{
         const dateFormat = 'YYYYMMDD';
         const format = 'HHmm';
         return (
-            <DraggableModule>
+            <DraggableModule
+                bounds = ".root"
+            >
                 <div className="box center no-cursor" style={{ width: width }}>
                     <div className="dialog">
                         {/* 头部*/}
@@ -419,8 +420,8 @@ class APFlowcontrolDialog extends React.Component{
 
                                 <Button className= 'c-btn c-btn-default'
                                         onClick={ () => {
-                                            clickCloseBtn(type);
-                                        }}
+                                            clickCloseBtn(dialogName);
+                                        } }
                                 >
                                     关闭
                                 </Button>

@@ -2,8 +2,8 @@
 
 import React from 'react';
 import { Col } from 'antd'
-import FlowcontrolModule from '../FlowcontrolModule/FlowcontrolModule';
-import NoticeModule from '../NoticeModule/NoticeModule';
+import FlowcontrolModule from '../FlowcontrolModule/List/FlowcontrolModule';
+import NoticeModule from '../NoticeModule/List/NoticeModule';
 
 
 class Sidebar extends React.Component{

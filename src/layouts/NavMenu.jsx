@@ -4,7 +4,7 @@ import { Menu, Checkbox, Radio, Icon, message} from 'antd';
 import { request } from 'utils/request-actions';
 import { logoutUrl } from 'utils/request-urls';
 import CreateLayer from "components/CreateLayer/CreateLayer";
-import APFlowcontrolDialogContainer from "components/APFlowcontrolDialog/APFlowcontrolDialogContainer";
+import APFlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/APFlowcontrolDialog/APFlowcontrolDialogContainer";
 
 import './NavMenu.less';
 

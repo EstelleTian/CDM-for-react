@@ -12,10 +12,6 @@ const RadioGroup = Radio.Group;
 const CheckboxGroup = Checkbox.Group;
 const Search = Input.Search;
 
-const options = [
-    { label: '屏蔽长期', value: 'shield' },
-];
-
 class FlowcontrolHeader extends React.Component{
     constructor( props ){
         super(props);
