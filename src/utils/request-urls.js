@@ -19,6 +19,8 @@ const getFlowcontrolUrl = `${flowcontrolHost}/flow/retrieveFlowcontrols.action`;
 const getPointByAirportUrl = `${flowcontrolHost}/flowcontrolPoints/retrievePointsByAirport.action`
 // 获取通告信息
 const getNoticeUrl = `${host}/retrieveNoticeInformation.bo`;
+// 获取除冰限制信息
+const getRestrictionUrl = `${host}/retrieveRestriction.bo`;
 
 
 export {
@@ -27,5 +29,5 @@ export {
     getSystemConfigUrl, getUserPropertyUrl,
     getAllAirportsUrl, getSingleAirportUrl,
     getFlowcontrolUrl, getNoticeUrl,
-    getPointByAirportUrl,
+    getPointByAirportUrl, getRestrictionUrl
 };

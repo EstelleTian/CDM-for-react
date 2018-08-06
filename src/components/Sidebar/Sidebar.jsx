@@ -1,9 +1,10 @@
-//流控信息---菜单操作功能
+//侧边栏组件
 
 import React from 'react';
 import { Col } from 'antd'
 import FlowcontrolModule from '../FlowcontrolModule/List/FlowcontrolModule';
 import NoticeModule from '../NoticeModule/List/NoticeModule';
+import RestrictionModule from '../RestrictionModule/List/RestrictionModule';
 
 
 class Sidebar extends React.Component{
@@ -23,7 +24,7 @@ class Sidebar extends React.Component{
                     ( key == 'notice-info' ) ? <NoticeModule/>: ''
                 }
                 {
-                    ( key == 'restriction-info' ) ? '限制信息' : ''
+                    ( key == 'restriction-info' ) ? <RestrictionModule /> : ''
                 }
 
 
