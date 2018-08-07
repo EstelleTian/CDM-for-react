@@ -1,8 +1,9 @@
 //航班表格上右键协调对话框
 import React from 'react';
-import { Drawer, Row } from 'antd';
-import BasicDetail from './BasicDetail';
+import { Drawer, Row, Col, Icon } from 'antd';
 import {formatTimeString} from "utils/basic-verify";
+import BasicDetail from './BasicDetail';
+import AdditionalDetail from './AdditionalDetail';
 import './DetailModule.less';
 
 class DetailModule extends React.Component{
@@ -18,13 +19,20 @@ class DetailModule extends React.Component{
         const { flightBasicMap = {} } = FlightDetailView;
         const FLIGHTID = flightBasicMap.FLIGHTID || {};
 
-
         return (
             <Drawer
                 title={(
                     <div className="title">
                         <span className="flightid">{FLIGHTID.value || "" } 航班详情</span>
                         <span className="time">(数据获取时间: {formatTimeString(generateTime)})</span>
+                        <div
+                            className="close-target"
+                            onClick={ () => {
+                                updateDetailModalDatasVisible("flight", false);
+                            } }
+                        >
+                            <Icon type="close" title="关闭"/>
+                        </div>
                     </div>
                 )}
                 placement="bottom"
@@ -34,11 +42,11 @@ class DetailModule extends React.Component{
                     updateDetailModalDatasVisible(name, false);
                 }}
             >
-                <Row className="content">
-                    <BasicDetail
-                        basicMap = { flightBasicMap }
+                <Col span={24} className="content flight-content">
+                    <AdditionalDetail
+                        flightDetailView = { FlightDetailView }
                     />
-                </Row>
+                </Col>
             </Drawer>
         )
     }

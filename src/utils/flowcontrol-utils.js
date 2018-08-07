@@ -1,4 +1,4 @@
-import { isValidletiable, addStringTime } from './basic-verify';
+import { addStringTime, isValidVariable } from './basic-verify';
 /**
  * Flowcontrol对象常量及工具方法
  */
@@ -33,14 +33,15 @@ const FlowcontrolUtils = {
     TYPE_RESERVE: 'RESERVE',//预留时隙
     TYPE_LDR: 'LDR', // 大规模延误
     TYPE_TRANSLATION: 'TRANSLATION', // 成都版大规模延误
+    TYPE_GS_DEP: 'GS_DEP', // 低能见度
 
   //==========================================================
-    REASON_ACC:'ACC',//空管</label>&nbsp;&nbsp;&nbsp;&nbsp;
-    REASON_WEATHER:'WEATHER',//天气</label>&nbsp;&nbsp;&nbsp;&nbsp;
-    REASON_AIRPORT:'AIRPORT',//机场</label>&nbsp;&nbsp;&nbsp;&nbsp;
-    REASON_CONTROL:'CONTROL',//航班时刻</label>&nbsp;&nbsp;&nbsp;&nbsp;
-    REASON_EQUIPMENT:'EQUIPMENT',//设备</label>&nbsp;&nbsp;&nbsp;&nbsp;
-    REASON_MILITARY:'MILITARY',//其他空域用户</label>&nbsp;&nbsp;&nbsp;&nbsp;
+    REASON_ACC:'ACC',//空管
+    REASON_WEATHER:'WEATHER',//天气
+    REASON_AIRPORT:'AIRPORT',//机场
+    REASON_CONTROL:'CONTROL',//航班时刻
+    REASON_EQUIPMENT:'EQUIPMENT',//设备
+    REASON_MILITARY:'MILITARY',//其他空域用户
     REASON_OTHERS:'OTHERS',//其他
 
 //=============================================================================
@@ -54,12 +55,11 @@ const FlowcontrolUtils = {
     COMPRESS_TYPE_OFF: 'OFF',
 
     /**
-     * 获取类型中文
+     * 获取类型中文---用于流控列表
      * @param type
      */
     getTypeZh: function(type){
-        let zh = null;
-
+        let zh = "";
         switch (type) {
             case this.TYPE_MIT:
                 zh = '限制距离';
@@ -88,7 +88,37 @@ const FlowcontrolUtils = {
             default:
                 break;
         }
+        return zh;
+    },
 
+    /**
+     * 获取类型中文---用于航班详情---命中流控
+     * @param type
+     */
+    getDetailTypeZh: function(type){
+        let zh = "";
+        switch (type) {
+            case this.TYPE_LDR:
+                zh = 'LDR';
+                break;
+            case this.TYPE_GS:
+                zh = '地面停止';
+                break;
+            case this.TYPE_GS_DEP:
+                zh = '低能见度';
+                break;
+            case this.TYPE_TIME:
+                zh = '时间';
+                break;
+            case this.TYPE_REQ:
+                zh = '开车申请';
+                break;
+            case this.TYPE_ASSIGN:
+                zh = '指定时隙';
+                break;
+            default:
+                break;
+        }
         return zh;
     },
 
@@ -128,15 +158,15 @@ const FlowcontrolUtils = {
     },
 
     /**
-     * 获取流控中文状态
+     * 获取流控中文状态---流控列表
      *
      * @param flowcontrol
      * @param now
      * @returns
      */
     getStatusZh: function(flowcontrol, now){
-        let zh = null;
-        if (!isValidletiable(flowcontrol)) {
+        let zh = "";
+        if (!isValidVariable(flowcontrol)) {
             return zh;
         }
         let type = flowcontrol.type;
@@ -170,6 +200,12 @@ const FlowcontrolUtils = {
         return zh;
     },
 
+    /**
+     * 获取流控中文状态---航班详细下---命中流控
+     *
+     * @param status
+     * @returns
+     */
     getStatusZh2: function(status){
         let zh = "";
         if (status == this.FLOWCONTROL_STATUS_PRE_PUBLISH) {
@@ -200,7 +236,7 @@ const FlowcontrolUtils = {
      */
     getControlElement: (flowcontrol) => {
         if (flowcontrol == undefined || flowcontrol == null) {
-            return null;
+            return "";
         }
         // 流控类型
         let flowType = flowcontrol.flowType;
@@ -212,7 +248,7 @@ const FlowcontrolUtils = {
         let controlDirection = flowcontrol.controlDirection;
         // 判断流控限制类型
         // 受控航路点为空时 使用受控机场
-        if (isValidletiable(controlPoints)) {
+        if (isValidVariable(controlPoints)) {
             return controlPoints;
         } else {
             if (flowType == FlowcontrolUtils.FLOW_TYPE_ARR) {
@@ -230,7 +266,7 @@ const FlowcontrolUtils = {
      * @param flowcontrol
      */
     isFutureOrRunning: (flowcontrol) => {
-        if (!isValidletiable(flowcontrol.status)
+        if (!isValidVariable(flowcontrol.status)
             || flowcontrol.status == FlowcontrolUtils.FLOWCONTROL_STATUS_STOP
             || flowcontrol.status == FlowcontrolUtils.FLOWCONTROL_STATUS_TERMINATED
             || flowcontrol.status == FlowcontrolUtils.FLOWCONTROL_STATUS_FINISHED
@@ -242,7 +278,7 @@ const FlowcontrolUtils = {
     },
 
     isCalculated: (flowcontrol) => {
-        return isValidletiable(flowcontrol.startFlowCasaTime);
+        return isValidVariable(flowcontrol.startFlowCasaTime);
     },
 
     /**
@@ -254,12 +290,12 @@ const FlowcontrolUtils = {
      */
     checkFlowcontrolDirection: (flowcontrol, direction) => {
     	let flowDirectionArray = null;
-    	if(isValidletiable(flowcontrol.flowcontrolDirection)){
+    	if(isValidVariable(flowcontrol.flowcontrolDirection)){
     		flowDirectionArray = flowcontrol.flowcontrolDirection.split(',');
     	}
         if (direction == 'ALL') {
             return true;
-        } else if (isValidletiable(flowDirectionArray)
+        } else if (isValidVariable(flowDirectionArray)
         		&& $.inArray(direction, flowDirectionArray) > -1) {
             return true;
         } else {

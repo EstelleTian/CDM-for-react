@@ -185,6 +185,13 @@ const FlightCoordination = {
     STATUS_DEICE_OFF: 0,  // 默认不除冰
     STATUS_DEICE_ON_MANUAL: 100, // 人工指定除冰
     STATUS_DEICE_OFF_MANUAL: 200, // 人工指定不除冰
+
+    //时隙状态
+    SLOT_STATUS_AUTO: 1, //自动
+    SLOT_STATUS_LOCKED: 2, //锁定
+    SLOT_STATUS_PRELOCK: 3, //预锁
+    SLOT_STATUS_MANUAL: 4, //人工
+    SLOT_STATUS_NOSLOT: 5, //不参加
     
     
     /**
@@ -195,10 +202,10 @@ const FlightCoordination = {
      */
     getPriorityZh: function(priority, arrap){
         if (!isValidVariable(priority)) {
-            return null;
+            return "";
         }
-        var p = parseInt(priority, 10);
-        var zh = null;
+        const p = parseInt(priority, 10);
+        let zh = "";
         switch (p) {
             case this.PRIORITY_NORMAL:
                 // 飞往香港（VHHH）、澳门（VMMC）、台湾（RC开头）的航班，在优先级列显示为“地区”航班
@@ -251,8 +258,8 @@ const FlightCoordination = {
         if (!isValidVariable(status)) {
             return "";
         }
-        var zh = "";
-        var s = parseInt(status, 10);
+        let zh = "";
+        let s = parseInt(status, 10);
         switch (s) {
             case this.STATUS_FORMER_SCH:
                 zh = '前段计划';
@@ -342,7 +349,7 @@ const FlightCoordination = {
      * @returns
      */
 //    getEfpsStatusZh: function(status) {
-//        var zh = null;
+//        let zh = null;
 //        switch (status) {
 //            case this.EFPS_STATUS_PRE:
 //                zh = '预激活';
@@ -420,7 +427,7 @@ const FlightCoordination = {
      * @returns
      */
     getEfpsStatusZh: function(status){
-        var zh = null;
+        let zh = null;
         switch (status) {
             case this.EFPS_STATUS_PRE:
                 zh = '预激活';
@@ -492,8 +499,8 @@ const FlightCoordination = {
      * @returns
      */
     getClearanceStatusZh: function(status){
-        var s = parseInt(status, 10);
-        var zh = null;
+        let s = parseInt(status, 10);
+        let zh = null;
         switch (s) {
             case this.CLEARANCE_UNAPPLY:
                 zh = '';
@@ -526,8 +533,8 @@ const FlightCoordination = {
      * @returns
      */
     getClearanceStatusZhFull: function(status){
-        var s = parseInt(status, 10);
-        var zh = null;
+        let s = parseInt(status, 10);
+        let zh = null;
         switch (s) {
             case this.CLEARANCE_UNAPPLY:
                 zh = '未申请';
@@ -561,8 +568,8 @@ const FlightCoordination = {
      * @returns
      */
     getMarkClearanceStatusZhFull: (status) => {
-        var s = parseInt(status, 10);
-        var zh = null;
+        let s = parseInt(status, 10);
+        let zh = null;
         switch (s) {
             case 0:
                 zh = '未放行';
@@ -584,7 +591,7 @@ const FlightCoordination = {
      * @returns
      */
     getDelayReasonZh: function(delayReason){
-        var zh = '';
+        let zh = '';
         switch (delayReason) {
             case this.DELAY_REASON_MILITARY:
                 zh = '军方';
@@ -618,7 +625,7 @@ const FlightCoordination = {
      * @returns
      */
     getPoolStatusZh: (status) => {
-        var zh = '';
+        let zh = '';
         if (status == '0') {
             zh = '出池';
         } else if (status == '1') {
@@ -628,17 +635,64 @@ const FlightCoordination = {
         }
         return zh;
     },
+    /**
+     * 获取时隙状态中文
+     *
+     * @param status
+     * @returns
+     */
+    getSlotStatusZh: ( status ) => {
+        let zh = '';
+        if (status == '1') {
+            zh = '自动';
+        } else if (status == '2') {
+            zh = '锁定';
+        } else if (status == '3') {
+            zh = '预锁';
+        } else if (status == '4') {
+            zh = '人工';
+        } else if (status == '5') {
+            zh = '不参加';
+        }
+        return zh;
+    },
+    /**
+     * 获取放行状态中文
+     *
+     * @param status
+     * @returns
+     */
+    getClearanceZh: ( status ) => {
+        let zh = '';
+        if (status == '1') {
+            zh = '已放行';
+        }
+        return zh;
+    },
+    /**
+     * 获取放行状态中文
+     *
+     * @param status
+     * @returns
+     */
+    getQualificationsZh: ( status ) => {
+        let zh = '';
+        if (status == '2') {
+            zh = '二类飞行';
+        }
+        return zh;
+    },
 
     /**
      * 获取除冰状态中文
      * @param {} value
      */
     getDeiceZh: function(deice){
-        var zh = '';
-        var status = '';
-        var position = '';
-        var group = '';
-        var deiceData = new Array();
+        let zh = '';
+        let status = '';
+        let position = '';
+        let group = '';
+        let deiceData = new Array();
         if (isValidVariable(deice)) {
             deiceData = deice.split(',');
         }
@@ -685,7 +739,7 @@ const FlightCoordination = {
      * @returns
      */
     getMarkNeedSlotZh: (status) => {
-        var zh = '';
+        let zh = '';
         if (status == '0') {
             zh = '参加';
         } else if (status == '3') {
@@ -697,7 +751,7 @@ const FlightCoordination = {
      * 获取资质对应名称
      */
     getMarkQualFlightZh:( status ) => {
-        var zh = '';
+        let zh = '';
         if (status == '2') {
             zh = '二类飞行';
         }
@@ -711,7 +765,7 @@ const FlightCoordination = {
      * @returns
      */
     getRPSDepap: (flight) => {
-        var depap = null;
+        let depap = null;
         if (isValidVariable(flight.fmeToday.RDepap)) {
             depap = flight.fmeToday.RDepap;
         } else if (isValidVariable(flight.fmeToday.PDepap)) {
@@ -729,7 +783,7 @@ const FlightCoordination = {
      * @returns
      */
     getRPSArrap: (flight) => {
-        var arrap = null;
+        let arrap = null;
         if (isValidVariable(flight.fmeToday.RArrap)) {
             arrap = flight.fmeToday.RArrap;
         } else if (isValidVariable(flight.fmeToday.PArrap)) {
@@ -748,7 +802,7 @@ const FlightCoordination = {
      * @param flight
      */
     getValidTobt: (flight) => {
-        var tobt = null;
+        let tobt = null;
         if (isValidVariable(flight.tobt)) {
             // 人工填写
             tobt = flight.tobt;
@@ -770,8 +824,8 @@ const FlightCoordination = {
      * 获取TOBT时间及来源
      */
     getTOBT: function(flight){
-        var tobt = null;
-        var tobtSource = null;
+        let tobt = null;
+        let tobtSource = null;
         if (isValidVariable(flight.tobt)) {
             tobt = flight.tobt;
             tobtSource = this.TOBT_MANUAL;
@@ -790,7 +844,7 @@ const FlightCoordination = {
      * @param flightid
      */
     isBelongToCarrier: (flight, carriers) => {
-        for (var i in carriers) {
+        for (let i in carriers) {
             if (flight.fmeToday.flightid.indexOf(carriers[i]) > -1) {
                 return true;
             }
@@ -821,9 +875,9 @@ const FlightCoordination = {
      * @returns {String}
      */
     getConvergenceWaypointName: (flight) => {
-        var cw = null;
-        var cwa = env_custom['ENV_DEP_MONITORFIX_WAYPOINTS'].value.split(',');
-        for (var index in cwa) {
+        let cw = null;
+        let cwa = env_custom['ENV_DEP_MONITORFIX_WAYPOINTS'].value.split(',');
+        for (let index in cwa) {
             cw = cwa[index];
             if (isValidVariable(flight.monitorPointInfo)) {
                 if (flight.monitorPointInfo.indexOf(cw) >= 0) {
@@ -841,9 +895,9 @@ const FlightCoordination = {
      * @returns {String}
      */
     getArrivalConvergenceWaypointName: (flight) => {
-        var convergenceWaypoints = new Array();
-        var cwa = env_custom['ENV_ARR_MONITORFIX_WAYPOINTS'].value.split(',');
-        for (var index in cwa) {
+        let convergenceWaypoints = new Array();
+        let cwa = env_custom['ENV_ARR_MONITORFIX_WAYPOINTS'].value.split(',');
+        for (let index in cwa) {
             cw = cwa[index];
             if (isValidVariable(flight.monitorPointInfo)) {
                 if (flight.monitorPointInfo.indexOf(cw) >= 0) {
@@ -861,12 +915,12 @@ const FlightCoordination = {
      * @returns {String}
      */
     getArrivalControlInnerWaypointName: (flight) => {
-        var innerWaypoints = new Array();
+        let innerWaypoints = new Array();
         if (env_arrival_innerWaypoints == '') {
             return null;
         }
-        var cwa = env_arrival_innerWaypoints.split(',');
-        for (var index in cwa) {
+        let cwa = env_arrival_innerWaypoints.split(',');
+        for (let index in cwa) {
             cw = cwa[index];
             if (isValidVariable(flight.monitorPointInfo)) {
                 if (flight.monitorPointInfo.indexOf(cw) >= 0) {
@@ -884,27 +938,27 @@ const FlightCoordination = {
      * @param flight
      */
     parseMonitorPointInfo: (flight) => {
-        var result = new Object();
+        let result = new Object();
         if (!isValidVariable(flight)
             || !isValidVariable(flight.monitorPointInfo)) {
             return result;
         }
 
         // 所经航路点信息
-        var rarr = new Array();
-        var mpis = flight.monitorPointInfo.split('?'); // 问号?转义
-        for (var index in mpis) {
-            var mpiO = {};
-            var mpi = mpis[index]; // 单个点的所有信息
+        let rarr = new Array();
+        let mpis = flight.monitorPointInfo.split('?'); // 问号?转义
+        for (let index in mpis) {
+            let mpiO = {};
+            let mpi = mpis[index]; // 单个点的所有信息
             if (!isValidVariable(mpi)) {
                 continue;
             }
-            var pis = mpi.split('/');
-            for (var i in pis) {
-                var pi = pis[i]; // 单个点的单项信息
-                var is = pi.split(':');
-                var key = is[0];
-                var value = is[1];
+            let pis = mpi.split('/');
+            for (let i in pis) {
+                let pi = pis[i]; // 单个点的单项信息
+                let is = pi.split(':');
+                let key = is[0];
+                let value = is[1];
                 mpiO[key] = value;
             }
             rarr.push(mpiO);
@@ -924,8 +978,8 @@ const FlightCoordination = {
         });
 
         // 创建返回结果
-        for (var index in rarr) {
-            var r = rarr[index];
+        for (let index in rarr) {
+            let r = rarr[index];
             result[r.ID] = r;
         }
 
@@ -938,27 +992,27 @@ const FlightCoordination = {
      * @param slot
      */
     parseAutoSlotMonitorPointInfo: (slot) => {
-        var result = new Object();
+        let result = new Object();
         if (!isValidVariable(slot)
             || !isValidVariable(slot.mpCto)) {
             return result;
         }
 
         // 所经航路点信息
-        var rarr = new Array();
-        var mpis = slot.mpCto.split('?'); // 问号?转义
-        for (var index in mpis) {
-            var mpiO = {};
-            var mpi = mpis[index]; // 单个点的所有信息
+        let rarr = new Array();
+        let mpis = slot.mpCto.split('?'); // 问号?转义
+        for (let index in mpis) {
+            let mpiO = {};
+            let mpi = mpis[index]; // 单个点的所有信息
             if (!isValidVariable(mpi)) {
                 continue;
             }
-            var pis = mpi.split('/');
-            for (var i in pis) {
-                var pi = pis[i]; // 单个点的单项信息
-                var is = pi.split(':');
-                var key = is[0];
-                var value = is[1];
+            let pis = mpi.split('/');
+            for (let i in pis) {
+                let pi = pis[i]; // 单个点的单项信息
+                let is = pi.split(':');
+                let key = is[0];
+                let value = is[1];
                 mpiO[key] = value;
             }
             rarr.push(mpiO);
@@ -977,8 +1031,8 @@ const FlightCoordination = {
             }
         });
 
-        for (var index in rarr) {
-            var r = rarr[index];
+        for (let index in rarr) {
+            let r = rarr[index];
             result[r.ID] = r;
         }
 
