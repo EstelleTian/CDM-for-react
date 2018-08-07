@@ -54,8 +54,7 @@ class RestrictionList extends React.Component{
         // 更新除冰限制数据生成时间
         updateRestrictionGenerateTime(generateTime);
         // 取除冰限制数据
-        const {airportDeiceResult = {}} = res;
-        const {result = {}} = airportDeiceResult;
+        const {result = {}} = res;
 
         // 更新除冰限制数据
         updateRestrictionDatas(result);
