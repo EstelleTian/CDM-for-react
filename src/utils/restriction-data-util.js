@@ -1,8 +1,8 @@
 /**
- * 除冰限制数据转换工具
+ * 限制信息数据转换工具
  */
 
-import { isValidVariable, isValidObject, addStringTime } from './basic-verify';
+import { isValidVariable, isValidObject } from './basic-verify';
 /**
  * Restriction对象常量
  */
@@ -16,23 +16,20 @@ const RestrictionConstant = {
     RESTRICTION_TYPE_DEICE : "DEICE"
 };
 
-// 除冰限制数据转换
+// 限制数据转换
 const convertRestrictionData =(data, generateTime) => {
     // 校验数据
     if(!isValidObject(data)){
         return {};
     }
 
-
-
     /**
-     * 除冰限制开始时间
+     * 数据创建时间
      * @param data 数据对象
-     * @param generateTime 数据生成时间
      *
      * */
     const setGenerateTime= (data) => {
-        // 除冰限制
+        // 取限制信息数据创建时间 (generateTime字段值)
         let { generateTime = '', } = data;
         // 转换后的结果
         let res = '';
@@ -43,14 +40,13 @@ const convertRestrictionData =(data, generateTime) => {
     };
 
     /**
-     * 除冰限制开始时间
+     * 限制开始时间
      * @param data 数据对象
-     * @param generateTime 数据生成时间
      *
      * */
-    const setDataTime= (data, generateTime) => {
-        // 除冰限制
-        let { status,  startTime = "", endTime = "",  placeType, relativeStartTime, relativeStatus } = data;
+    const setDataTime= (data) => {
+        // 取限制信息数据开始时间和结束时间
+        let { startTime = "", endTime = "",} = data;
 
 
         // 转换后的结果
@@ -78,7 +74,7 @@ const convertRestrictionData =(data, generateTime) => {
     // 时间格式化 hh:mm
     const formatTime4 = (time) => {
         let result = '';
-        if(time && 12 == time.length){
+        if(time && 12 <= time.length){
             const hh = time.substring(8,10);
             const mm = time.substring(10,12);
             result = `${hh}:${mm}`;
@@ -88,7 +84,7 @@ const convertRestrictionData =(data, generateTime) => {
     // 日期格式化 yy-mm-dd
     const formatDate = (datetime) => {
         let result = '';
-        if(datetime && 12 == datetime.length){
+        if(datetime && 12 <= datetime.length){
             const yy = datetime.substring(0,4);
             const mm = datetime.substring(4,6);
             const dd = datetime.substring(6,8);
@@ -99,12 +95,12 @@ const convertRestrictionData =(data, generateTime) => {
 
 
     /**
-     * 除冰限制状态
+     * 限制状态
      * @param data 数据对象
      *
      * */
     const setStatus= (data) => {
-        // 除冰限制
+        // 取数据状态值
         let { status} = data;
 
         // 转换后的结果
@@ -126,12 +122,12 @@ const convertRestrictionData =(data, generateTime) => {
     };
 
     /**
-     * 除冰限制状态对应的class名称
+     * 限制状态对应的class名称
      * @param data 数据对象
      *
      * */
     const setstatusClassName= (data) => {
-        // 除冰限制
+        // 取数据状态值
         let { status} = data;
 
         // 转换后的结果
@@ -154,13 +150,13 @@ const convertRestrictionData =(data, generateTime) => {
 
 
     /**
-     * 除冰限制限制数值
+     * 限制限制数值
      * @param data 数据对象
      * @
      *
      * */
     const setValue= (data) => {
-        // 除冰限制
+        // 取数据的类型值和限制数值
         let { type, value } = data;
 
         // 转换后的结果
@@ -175,26 +171,24 @@ const convertRestrictionData =(data, generateTime) => {
 
     // 转换后的结果对象
     let result = {};
-    // 除冰限制名称
+    // 限制名称
     result.name = data.name || '';
-    // 除冰限制id
+    // 限制id
     result.id = data.id || '';
-    // 发布者
+    // 发布者(中文)
     result.publishUserZh = data.publishUserZh || '';
-
     // 航空公司
     result.deiceFlights = data.deiceFlights || '';
-
     // 创建时间
     result.createdTime = setGenerateTime(data);
 
-    // 除冰限制时间
+    // 限制时间
     result.dataTime = setDataTime(data);
-    // 除冰限制生效时间
+    // 限制生效时间
     result.effectiveTime = `${result.dataTime.startTime}-${result.dataTime.endTime}`;
-    // 除冰限制生效日期
+    // 限制生效日期
     result.effectiveDate = `${result.dataTime.startDate}/${result.dataTime.endDate}`;
-    // 除冰限制状态
+    // 限制状态
     result.status = setStatus(data);
     // 状态对应的样式名称
     result.statusClassName = setstatusClassName(data, generateTime);
@@ -204,7 +198,7 @@ const convertRestrictionData =(data, generateTime) => {
     return result
 };
 
-// 校验除冰限制是否为正在生效状态
+// 校验限制是否为正在生效状态
 const isEffective = (data) => {
     // 标记 默认为true, 即是正在生效状态
     let flag = true;
