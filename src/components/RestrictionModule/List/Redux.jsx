@@ -106,7 +106,6 @@ const restrictionGenerateTime = (state = initRestrictionGenerateTime, action) =>
     switch ( action.type ){
         case UPDATE_RESTRICTION_GENERATE_TIME: {
             const { time } = action;
-            debugger
             return{
                 ...state,
                 time: time
