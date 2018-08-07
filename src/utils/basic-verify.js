@@ -144,17 +144,17 @@ const addStringTime = (time, addMillis) => {
  * @returns {String}
  */
 const formatTimeString = ( str ) => {
-    if(!isValidVariable(str) || str.length != 12){
-        return "";
-    }
-    // 解析各个值
-    const year = str.substring(0, 4);
-    const month = str.substring(4, 6);
-    const day = str.substring(6, 8);
-    const hour = str.substring(8, 10);
-    const mins = str.substring(10, 12);
+    if( isValidVariable(str) && ( str.length == 12 || str.length == 14 ) ){
+        // 解析各个值
+        const year = str.substring(0, 4);
+        const month = str.substring(4, 6);
+        const day = str.substring(6, 8);
+        const hour = str.substring(8, 10);
+        const mins = str.substring(10, 12);
 
-    return year + '-' + month + '-' + day + ' ' + hour  + ':' + mins;
+        return year + '-' + month + '-' + day + ' ' + hour  + ':' + mins;
+    }
+    return "";
 };
 
 /**
@@ -165,14 +165,34 @@ const formatTimeString = ( str ) => {
  * @returns {String}
  */
 const getTimeFromString = ( str ) => {
-    if(!isValidVariable(str) || str.length != 12){
-        return "";
-    }
-    // 解析各个值
-    const hour = str.substring(8, 10);
-    const mins = str.substring(10, 12);
+    if( isValidVariable(str) && ( str.length == 12 || str.length == 14 ) ){
+        // 解析各个值
+        const hour = str.substring(8, 10);
+        const mins = str.substring(10, 12);
 
-    return hour  + ':' + mins;
+        return hour  + ':' + mins;
+    }
+    return "";
 };
 
-export { isValidVariable, isValidObject, calculateStringTimeDiff, addStringTime, getFullTime, formatTimeString, getTimeFromString };
+/**
+ * 12为字符串时间转换格式(转为DD/HHmm)
+ *
+ * @param str  yyyyMMddHHmm 12位字符串
+ * @param addMillis
+ * @returns {String}
+ */
+const getDayTimeFromString = ( str ) => {
+    if( isValidVariable(str) && ( str.length == 12 || str.length == 14 ) ){
+        // 解析各个值
+        const day = str.substring(6, 8);
+        const hour = str.substring(8, 10);
+        const mins = str.substring(10, 12);
+
+        return day + "/" + hour  +  mins;
+    }
+    return "";
+};
+
+export { isValidVariable, isValidObject, calculateStringTimeDiff, addStringTime, getFullTime, formatTimeString,
+    getTimeFromString, getDayTimeFromString };

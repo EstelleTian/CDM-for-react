@@ -288,8 +288,7 @@ const showDetailModal = function( thisProxy, record ){
 };
 
 const updateFlightDetailData = function( res, updateDetailModalDatasByName, updateDetailModalDatasVisible ){
-    //TODO 发送请求获取航班详情数据
-    console.log( res );
+    // console.log( res );
     updateDetailModalDatasByName("flight", res);
     //打开详情窗口
     updateDetailModalDatasVisible("flight", true);
@@ -348,7 +347,6 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
                 },
                 //左键
                 onClick: ( e )=>{
-                    console.log("选中行" + record["FLIGHTID"]);
                     showDetailModal(thisProxy, record);
                 }
             }

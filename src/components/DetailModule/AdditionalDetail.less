@@ -1,0 +1,111 @@
+@import '../../style/base';
+.accordion{
+  height: 100%;
+  ul{
+    padding-left: 0!important;
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    >li{
+      float: left;
+      list-style: none;
+      margin-left: 0.25rem;
+      display: block;
+      height: 100%;
+      .title{
+        float: left;
+        width: 2.25rem;
+        background: #7d7e7f;
+        padding: 0.5rem;
+        color: #000;
+        height: 15rem;
+        font-size: 1.25rem;
+        border-bottom-left-radius: 0.75rem;
+        border-top-left-radius: 0.75rem;
+        margin-top: 1rem;
+        &:hover{
+          cursor: pointer;
+          background: #6cafae;
+        }
+      }
+      .container{
+        float: left;
+        width: 0;
+        -webkit-transition: width .3s linear;
+        .content{
+          display: none;
+          .info{
+            margin-top: 1rem;
+            .cell{
+              .cell-title{
+                color: #7b7a7a;
+                font-size: 1.15rem;
+                padding-bottom: 0.5rem;
+              }
+              >span{
+                font-size: 1.5rem;
+              }
+              >span.route{
+                font-size: 1rem;
+                text-align: left!important;
+              }
+            }
+          }
+        }
+      }
+
+      .ant-table-thead > tr > th > span, .ant-table-tbody > tr > td{
+        font-size: 1.15rem;
+      }
+    }
+    >li.active{
+      .title{
+        background: #6cafae;
+      }
+      .container{
+        min-width: 15rem;
+        -webkit-transition: width .3s linear;
+        .content{
+          display: block;
+          margin: 0 0.5rem 0 1rem;;
+        }
+      }
+      //运行分析xinxi
+      .operation{
+        width: 20rem;
+      }
+      //协调信息
+      .coordination{
+        width: 40rem;
+      }
+      //报文
+      .flightEFPS{
+        width: 20rem;
+      }
+      //航迹
+      .traInfo{
+        width: 35rem;
+      }
+      //流控
+      .flowcontrol{
+        width: 45rem;
+      }
+      //协调记录
+      .record{
+        width: 65rem;
+      }
+      //航班信息
+      .basicDetail{
+        width: 45rem;
+      }
+      //前段航班信息
+      .formercDetail{
+        width: 40rem;
+      }
+    }
+  }
+  //解决表高度足够时，y轴不出滚动条
+  .ant-table-body{
+    overflow-y: auto!important;
+  }
+}

@@ -52,30 +52,30 @@
                 color: #0e0e0e;
               }
             }
-            .tele{
-              position: relative;
-              left: 4rem;
-              top: -.5rem;
-              i{
-                padding-left: 0.5rem;
-              }
-            }
           }
           .info{
             margin-top: 1rem;
-
+            .cell{
+              .cell-title{
+                color: #7b7a7a;
+                font-size: 1.15rem;
+                padding-bottom: 0.5rem;
+              }
+              >span{
+                font-size: 1.5rem;
+              }
+              >span.route{
+                font-size: 1rem;
+                text-align: left!important;
+              }
+            }
           }
-          .cell{
-            .cell-title{
-              color: #7b7a7a;
-              font-size: 1.15rem;
-              padding-bottom: 0.5rem;
-            }
-            >span{
-              font-size: 1.5rem;
-            }
-            >span.route{
-              font-size: 1rem;
+          .cell.tele{
+            i{
+              padding-left: 0.5rem;
+              &:hover{
+                cursor: pointer;
+              }
             }
           }
         }
