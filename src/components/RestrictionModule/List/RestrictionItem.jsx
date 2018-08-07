@@ -13,11 +13,11 @@ class RestrictionItem extends React.Component{
     render(){
         const { data, generateTime, indexNumber } = this.props;
         const formatData = convertRestrictionData(data,generateTime);
-        const { name, id, publishUserZh, value, deiceFlights, createdTime,
+        const { name, id, publishUserZh, value, deiceFlights, createdDate, createdTime,
             status, statusClassName, effectiveTime, effectiveDate,
         } = formatData;
         return (
-            <Col span={24} className="flow-item">
+            <Col span={24} className="restriction-item">
                 <Row className="title">
                     <Col span={17} className={ statusClassName ? `${statusClassName} status` : 'status'}
                          title={ `名称:${name}  ${status}`}
@@ -41,10 +41,10 @@ class RestrictionItem extends React.Component{
                     <Col span={12} >航空公司</Col>
                 </Row>
                 <Row className="row value">
-                    <Col span={4} className="type" title={publishUserZh ? `发布者:${publishUserZh}` : ''}>{publishUserZh}</Col>
-                    <Col span={4} className="value" title={ createdTime ? `创建时间:${createdTime}` : '' }> { createdTime } </Col>
-                    <Col span={4} className="points" title={value ? `限制数值:${value}` : ''}>{value}</Col>
-                    <Col span={12} className="points" title={deiceFlights ? `航空公司:${deiceFlights}` : ''}>{deiceFlights}</Col>
+                    <Col span={4} className="publish-user" title={publishUserZh ? `发布者:${publishUserZh}` : ''}>{publishUserZh}</Col>
+                    <Col span={4} className="created-time" title={ createdDate ? `创建时间:${createdDate} ${createdTime}` : '' }> { createdTime } </Col>
+                    <Col span={4} className="value" title={value ? `限制数值:${value}` : ''}>{value}</Col>
+                    <Col span={12} className="deice-flights" title={deiceFlights ? `航空公司:${deiceFlights}` : ''}>{deiceFlights}</Col>
                 </Row>
                 <Row className="row">
                     <Col className="operator" span={24}>
@@ -55,10 +55,6 @@ class RestrictionItem extends React.Component{
                     </Col>
                 </Row>
             </Col>
-
-
-
-
         )
     }
 };

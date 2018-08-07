@@ -28,14 +28,19 @@ const convertRestrictionData =(data, generateTime) => {
      * @param data 数据对象
      *
      * */
-    const setGenerateTime= (data) => {
+    const setCreatedDateTime= (data) => {
         // 取限制信息数据创建时间 (generateTime字段值)
         let { generateTime = '', } = data;
         // 转换后的结果
-        let res = '';
-        if(isValidVariable(generateTime)){
-            res = formatTime4(generateTime)
+        let res = {};
+        let date ='';
+        let time = ''
+        if(isValidVariable(generateTime) && 12 <= generateTime){
+            time = formatTime4(generateTime);
+            date = formatDate(generateTime);
         }
+        res.date = date;
+        res.time = time;
         return res;
     };
 
@@ -179,8 +184,12 @@ const convertRestrictionData =(data, generateTime) => {
     result.publishUserZh = data.publishUserZh || '';
     // 航空公司
     result.deiceFlights = data.deiceFlights || '';
+    // 创建日期时间
+    result.createdDateTime = setCreatedDateTime(data);
+    // 创建日期
+    result.createdDate = result.createdDateTime.date;
     // 创建时间
-    result.createdTime = setGenerateTime(data);
+    result.createdTime = result.createdDateTime.time;
 
     // 限制时间
     result.dataTime = setDataTime(data);
