@@ -25,7 +25,15 @@ class APFlowcontrolDialog extends React.Component{
         this.handleChangeFlowcontrolType = this.handleChangeFlowcontrolType.bind(this);
         this.handleChangeType = this.handleChangeType.bind(this);
         this.handleChangeReason = this.handleChangeReason.bind(this);
+        this.handleChangeLevel = this.handleChangeLevel.bind(this);
         this.state = {
+            // 高度选项
+            levelValues: [600,900,1200,1500,1800,2100,2400,2700,3000,3300,3600,3900,4200,4500,4800,5100,5400,5700,6000,
+                6300,6600,6900,7200,7500,7800,8100,8400,8900,9200,9500,9800,10100,10400,10700,11000,11300,11600,11900,12200,12500,13100,13700,14300,14900],
+            // 高度选项
+            levelOptions: [],
+            // 勾选的高度值
+            controlLevel:[],
             flowcontrolPointsList : [], // 流控点集合
             flowcontrolType : 1, // 长期流控  (1:非长期  0:长期)
             publishUserZh : this.props.loginUserInfo.description || '', // 发布用户
@@ -36,6 +44,19 @@ class APFlowcontrolDialog extends React.Component{
             reason : '', // 限制原因
         }
     }
+    // 转换高度选项
+    connetLevel(){
+        let arr = this.state.levelValues;
+        let result = [];
+         arr.map((item)=>{
+             result.push(<Option key={item.toString(10)}>{item.toString(10)}</Option>)
+        })
+
+        this.setState({
+            levelOptions : result
+        })
+    }
+
     // 拼接流控名称
     splicingName () {
         console.log('hello');
@@ -117,15 +138,25 @@ class APFlowcontrolDialog extends React.Component{
         console.log(val);
     }
 
+    // 变更高度
+    handleChangeLevel(value){
+
+        this.setState({
+            controlLevel : value
+        })
+        console.log(value);
+    }
+
     //
     componentDidMount(){
 
-        this.getPointByAirport()
+        this.getPointByAirport();
+        this.connetLevel();
     }
 
 
     render(){
-        const {flowcontrolType, type, flowcontrolPointsList, controlPoints, publishUserZh, controlDepDirection, reason} = this.state;
+        const {flowcontrolType, type, flowcontrolPointsList, controlPoints, publishUserZh, controlDepDirection, reason, levelOptions} = this.state;
         const { titleName, clickCloseBtn, width, dialogName} = this.props;
         const dateFormat = 'YYYYMMDD';
         const format = 'HHmm';
@@ -148,7 +179,7 @@ class APFlowcontrolDialog extends React.Component{
                             </div>
                         </Row>
                         {/*/!* 内容 *!/*/}
-                        <Row className="content">
+                        <Row className="content ap-flowcontrol-dialog">
                             <Col xs={{ span: 24}}  md={{ span: 24}} lg={{ span: 24}}  xl={{ span: 24}} xxl={{ span: 24}} >
                                 <Card title="基本信息" className="card" >
                                     <Form className="" layout="vertical" >
@@ -160,6 +191,7 @@ class APFlowcontrolDialog extends React.Component{
                                                     <Search
                                                         placeholder="请输入流控名称"
                                                         enterButton="自动命名"
+                                                        value= "123"
                                                         onSearch={this.splicingName}
                                                     />
                                                 </FormItem>
@@ -269,14 +301,26 @@ class APFlowcontrolDialog extends React.Component{
                                                     </RadioGroup>
                                                 </FormItem>
                                             </Col>
+                                            {
+                                                (type == 'TIME') ? <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                    <FormItem
+                                                        label="限制数值"
+                                                    >
+                                                        <Input placeholder="限制数值" className="value" />
+                                                        <span className="unit">分钟</span>
+                                                    </FormItem>
+                                                </Col> : ''
+                                            }
 
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                                <FormItem
-                                                    label="限制数值"
-                                                >
-                                                    <Input placeholder="限制数值" />
-                                                </FormItem>
-                                            </Col>
+                                            {
+                                                (type == 'ASSIGN') ? <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                    <FormItem
+                                                        label="指定分钟"
+                                                    >
+                                                        <Input placeholder="指定分钟" />
+                                                    </FormItem>
+                                                </Col> : ''
+                                            }
 
                                         </Row>
                                     </Form>
@@ -344,11 +388,17 @@ class APFlowcontrolDialog extends React.Component{
                                 <Card title="限制高度" className="card" >
                                     <Form className="" layout="vertical" >
                                         <Row className="" >
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
+                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 12}} >
                                                 <FormItem
                                                     label="高度"
                                                 >
-                                                    <Input placeholder="限制高度" />
+                                                    <Select
+                                                        mode="multiple"
+                                                        placeholder="请选择限制高度"
+                                                        onChange={this.handleChangeLevel}
+                                                    >
+                                                        { levelOptions }
+                                                    </Select>
                                                 </FormItem>
                                             </Col>
                                         </Row>
@@ -403,7 +453,7 @@ class APFlowcontrolDialog extends React.Component{
                                                 <FormItem
                                                     label="备注"
                                                 >
-                                                        <textarea placeholder="请输入备注" rows="4" className="comments">
+                                                        <textarea placeholder="请输入备注" rows="4"  className="comments">
 
                                                         </textarea>
                                                 </FormItem>
