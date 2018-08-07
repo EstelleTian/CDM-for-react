@@ -19,15 +19,22 @@ class NoticeItem extends React.Component{
             }
         };
 
+        const  formatDate = (dateTime) => {
+            if(dateTime && dateTime.length >=12 ){
+                return dateTime.substring(0,4)+ '-' + dateTime.substring(4,6) + '-' + dateTime.substring(6,8) ;
+            }
+        };
+
         let result = JSON.parse(JSON.stringify(data));
         result.lastModifyTime = formatDateTime(data.lastModifyTime);
+        result.lastModifyDate = formatDate(data.lastModifyTime);
         return result;
     }
 
     render(){
         const { data, generateTime, indexNumber } = this.props;
         const formatData =  this.convertNoticeData(data,generateTime);
-        const { id, title, text, publishUser, lastModifyTime, } = formatData;
+        const { id, title, text, publishUser, lastModifyTime, lastModifyDate} = formatData;
 
         return (
             <Col span={24} className="notice-item">
@@ -39,7 +46,7 @@ class NoticeItem extends React.Component{
                     <Col  span={8} className="publish-user" title={publishUser ? `${publishUser}`: ''} >
                         <span>{publishUser}</span>
                     </Col>
-                    <Col  span={6} className="last-modify-time" title={lastModifyTime ? `${lastModifyTime}`: ''} >
+                    <Col  span={6} className="last-modify-time" title={lastModifyDate ? `${lastModifyDate}`: ''} >
                         <i className="iconfont icon-time" title="修改时间" />
                         <span>{lastModifyTime}</span>
                     </Col>
