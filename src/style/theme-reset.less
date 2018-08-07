@@ -1,0 +1,55 @@
+
+
+/*
+ *  项目组件样式
+ */
+//----------------覆盖antd样式------start-------------------------------
+
+@import "./theme-color";
+
+//Select 下拉列表组件样式
+.ant-select-selection--single {
+  .ant-select-selection-selected-value {
+    line-height: inherit;
+    font-size: 14px;
+  }
+  .ant-select-arrow {
+    color: #fff;
+  }
+}
+// 多选
+.ant-select-selection--multiple .ant-select-selection__choice {
+  background: @bc-black-80;
+  color: #aaa;
+}
+
+//Select 下拉列表组件列表样式
+.ant-select-selection:hover {
+  border-color: #d9d9d9;
+}
+
+.ant-select-dropdown-menu {
+  background-color: @bc-black-100;
+  border: 1px solid @c-white-100;
+  border-radius: 4px;
+  .ant-select-dropdown-menu-item-selected,
+  .ant-select-dropdown-menu-item-selected:hover {
+    background-color: #a9a3a3;
+  }
+  .ant-select-dropdown-menu-item {
+    font-size: 14px;
+  }
+
+  .ant-select-dropdown-menu {
+    background: @bc-black-100;
+  }
+}
+
+.ant-select-dropdown-menu-item-disabled {
+  color: #FFFFFF;
+}
+
+
+
+//----------------覆盖antd样式---------end----------------------------
+
