@@ -19,6 +19,9 @@ class APFlowcontrolDialog extends React.Component{
     constructor( props ){
         super(props);
         this.splicingName = this.splicingName.bind(this);
+        this.splicingGSTypeName = this.splicingGSTypeName.bind(this);
+        this.splicingREQTypeName = this.splicingREQTypeName.bind(this);
+
         this.getPointByAirport = this.getPointByAirport.bind(this);
         this.updatePoins = this.updatePoins.bind(this);
         this.handleChangeOriginalPublishUnit = this.handleChangeOriginalPublishUnit.bind(this);
@@ -26,7 +29,13 @@ class APFlowcontrolDialog extends React.Component{
         this.handleChangeType = this.handleChangeType.bind(this);
         this.handleChangeReason = this.handleChangeReason.bind(this);
         this.handleChangeLevel = this.handleChangeLevel.bind(this);
+
         this.onChangeFlowcontrolPoint = this.onChangeFlowcontrolPoint.bind(this);
+
+        this.handleChangeLimitValueValue = this.handleChangeLimitValueValue.bind(this);
+        this.handleChangeFlowcontrolName = this.handleChangeFlowcontrolName.bind(this);
+
+        this.handleSubmit = this.handleSubmit.bind(this);
         this.state = {
             // 高度选项
             levelValues: [600,900,1200,1500,1800,2100,2400,2700,3000,3300,3600,3900,4200,4500,4800,5100,5400,5700,6000,
@@ -36,13 +45,18 @@ class APFlowcontrolDialog extends React.Component{
             // 勾选的高度值
             controlLevel:[],
             flowcontrolPointsList : [], // 流控点集合
+            checkedControlPoints : [], // 勾选的限制流控点(含所属组,不用作最终表单提交)
+            controlPoints : [], // 勾选的限制流控点(不含所属组,用于最终表单提交)
+
             flowcontrolType : 1, // 长期流控  (1:非长期  0:长期)
             publishUserZh : this.props.loginUserInfo.description || '', // 发布用户
             originalPublishUnit : '', // 原发布单位
-            type : 'TIME', // 限制类型
-            checkedControlPoints : [], // 勾选的限制流控点
+            type : '', // 限制类型
+
             controlDepDirection : this.props.loginUserInfo.airports, // 受控起飞机场
             reason : '', // 限制原因
+            limitValue: '', // 限制数值
+            name : ''
         }
     }
     // 转换高度选项
@@ -58,10 +72,6 @@ class APFlowcontrolDialog extends React.Component{
         })
     }
 
-    // 拼接流控名称
-    splicingName () {
-        console.log('hello');
-    }
     // 依据机场获取流控点(受控点)数据
     getPointByAirport(){
 
@@ -97,6 +107,66 @@ class APFlowcontrolDialog extends React.Component{
         this.setState({
             flowcontrolPointsList
         })
+    }
+    // 变更流控名称
+    handleChangeFlowcontrolName(e){
+        let val = e.target.value;
+        this.setState({
+            name : val
+        })
+        console.log(val);
+    }
+
+    // 拼接流控名称
+    splicingName () {
+        const { type } = this.state;
+
+        let res = '';
+        // 若选中限制类型为地面停止
+        if(type == 'GS'){
+            res = this.splicingGSTypeName();
+        }else if(type == 'REQ'){
+            res = this.splicingREQTypeName();
+        }else if(type == 'TIME'){
+
+        }else if(type == 'ASSIGN'){
+
+        }
+
+
+        this.setState({
+            name : res
+        })
+    }
+    // 拼接地面停止限制类型流控名称
+    splicingGSTypeName () {
+        // 结果
+        let res = '';
+
+        const { controlDepDirection, controlPoints } = this.state;
+        // 若未勾选限制流控点,则以受控起飞机场命名
+        if(controlPoints.length < 1) {
+            res = controlDepDirection + ' 地面停止'
+        }else {
+            // 若勾选限制流控点,则以勾选的限制流控点命名
+            res = controlPoints.join(',') + ' 地面停止'
+        }
+        return res;
+    };
+    // 拼接开车申请限制类型流控名称
+    splicingREQTypeName() {
+        // 结果
+        let res = '';
+
+        const { controlDepDirection, controlPoints } = this.state;
+        // 若未勾选限制流控点,则以受控起飞机场命名
+        if(controlPoints.length < 1) {
+            res = controlDepDirection + ' 开车申请'
+        }else {
+            // 若勾选限制流控点,则以勾选的限制流控点命名
+            res = controlPoints.join(',') + ' 开车申请'
+        }
+        return res;
     }
 
     // 变更流控类型(长期/非长期)
@@ -171,13 +241,70 @@ class APFlowcontrolDialog extends React.Component{
             // 删除选中的值
             checkedValue.splice(checkedValue.indexOf(val),1);
         }
-        console.log(checkedValue);
+
+        let points = [];
+        checkedValue.map((item) => {
+            // 截取流控点名称
+            let val =  item.substring(0, item.indexOf('_'));
+            points.push(val);
+        });
+
+        // 更新checkedControlPoints
         this.setState({
             checkedControlPoints : checkedValue
+        });
+
+        // 更新controlPoints
+        this.setState({
+            controlPoints: points
+        });
+    }
+
+    // 更新勾选的限制流控点(不含所属组)
+    handleChangeControlPoints() {
+        // 取勾选的限制流控点(含所属组)
+        const { checkedControlPoints } = this.state;
+        let points = [];
+        checkedControlPoints.map((item) => {
+            // 截取流控点名称
+            let val =  item.substring(0, item.indexOf('_'));
+            points.push(val);
+        });
+        console.log(points)
+        // 更新controlPoints
+        this.setState({
+            controlPoints: points
         })
     }
 
+    // 变更限制数值
+    handleChangeLimitValueValue(e){
+        let val = e.target.value;
+        this.setState({
+            limitValue : val
+        })
+    }
 
+    handleSubmit(e){
+        e.preventDefault();
+        const _form = this.props.form;
+        _form.validateFieldsAndScroll((err, values) => {
+            //success
+            if (!err) {
+
+            }
+        });
+    }
+    //
+    positiveInteger = (rule, value, callback) => {
+        let regexp = /^[1-9]\d*$/;
+        let valid = regexp.test(value);
+        if(!valid){
+            callback('请输入正整数')
+        }else {
+            callback();
+        }
+    }
 
     //
     componentDidMount(){
@@ -188,157 +315,197 @@ class APFlowcontrolDialog extends React.Component{
 
 
     render(){
-        const {flowcontrolType, type, flowcontrolPointsList, checkedControlPoints, publishUserZh, controlDepDirection, reason, levelOptions} = this.state;
+        const {flowcontrolType, type, flowcontrolPointsList, checkedControlPoints,
+            publishUserZh, controlDepDirection, reason, levelOptions, limitValue,
+            name,
+        } = this.state;
         const { titleName, clickCloseBtn, width, dialogName} = this.props;
         const dateFormat = 'YYYYMMDD';
         const format = 'HHmm';
+        const { getFieldDecorator } = this.props.form;
+        // 校验规则
+        const rulesGenerate = {
+            // 限制类型
+            type: getFieldDecorator("type", {
+                rules: [
+                    {required: true, message: "请选择限制类型"},// 必选
+                ]
+            }),
+            // 限制数值
+            limitValue: getFieldDecorator("limitValue", {
+                rules: [
+                    {validator : this.positiveInteger} // 正整数
+                ]
+            }),
+            // 限制原因
+            reason: getFieldDecorator("reason", {
+                rules: [
+                    {required: true, message: "请选择限制原因"},// 必选
+                ]
+            }),
+        };
         return (
             <DraggableModule
                 bounds = ".root"
             >
                 <div className="box center no-cursor" style={{ width: width }}>
                     <div className="dialog">
-                        {/* 头部*/}
-                        <Row className="title drag-target cursor">
-                            <span>{ titleName }</span>
-                            <div
-                                className="close-target"
-                                onClick={ () => {
-                                    clickCloseBtn(dialogName);
-                                } }
-                            >
-                                <Icon type="close" title="关闭"/>
-                            </div>
-                        </Row>
-                        {/*/!* 内容 *!/*/}
-                        <Row className="content ap-flowcontrol-dialog">
-                            <Col xs={{ span: 24}}  md={{ span: 24}} lg={{ span: 24}}  xl={{ span: 24}} xxl={{ span: 24}} >
-                                <Card title="基本信息" className="card" >
-                                    <Form className="" layout="vertical" >
-                                        <Row className="" >
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
-                                                <FormItem
-                                                    label="流控名称"
-                                                >
-                                                    <Search
-                                                        placeholder="请输入流控名称"
-                                                        enterButton="自动命名"
-                                                        value= "123"
-                                                        onSearch={this.splicingName}
-                                                    />
-                                                </FormItem>
-                                            </Col>
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}}  >
-
-                                                <FormItem
-                                                    label="长期流控"
-                                                >
-                                                    <Checkbox
-                                                        checked={ !flowcontrolType }
-                                                        onChange={this.handleChangeFlowcontrolType}
-                                                    >长期流控
-                                                    </Checkbox>
-                                                </FormItem>
-                                            </Col>
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                                <FormItem
-                                                    label="发布用户"
-                                                >
-                                                    <Input placeholder="请输入发布者" value={ publishUserZh } disabled ={true} />
-                                                </FormItem>
-                                            </Col>
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                                <FormItem
-                                                    label="原发布者"
-                                                >
-                                                    <Select
-                                                        defaultValue="流量室"
-                                                        onChange={this.handleChangeOriginalPublishUnit}
+                        <Form className="" layout="vertical" onSubmit={this.handleSubmit} >
+                            {/* 头部*/}
+                            <Row className="title drag-target cursor">
+                                <span>{ titleName }</span>
+                                <div
+                                    className="close-target"
+                                    onClick={ () => {
+                                        clickCloseBtn(dialogName);
+                                    } }
+                                >
+                                    <Icon type="close" title="关闭"/>
+                                </div>
+                            </Row>
+                            {/*/!* 内容 *!/*/}
+                            <Row className="content ap-flowcontrol-dialog">
+                                <Col xs={{ span: 24}}  md={{ span: 24}} lg={{ span: 24}}  xl={{ span: 24}} xxl={{ span: 24}} >
+                                    <Card title="基本信息" className="card" >
+                                            <Row className="" >
+                                                <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
+                                                    <FormItem
+                                                        label="流控名称"
                                                     >
-                                                        <Option value="流量室">流量室</Option>
-                                                        <Option value="塔台">塔台</Option>
-                                                        <Option value="进近" >进近</Option>
-                                                        <Option value="兰州">兰州</Option>
-                                                        <Option value="西安">西安</Option>
-                                                        <Option value="广州">广州</Option>
-                                                        <Option value="贵阳">贵阳</Option>
-                                                        <Option value="昆明">昆明</Option>
-                                                        <Option value="拉萨">拉萨</Option>
-                                                        <Option value="重庆">重庆</Option>
-                                                        <Option value="自定义">自定义</Option>
-                                                    </Select>
-                                                </FormItem>
-                                            </Col>
+                                                        <Search
+                                                            placeholder="请输入流控名称"
+                                                            enterButton="自动命名"
+                                                            value={name}
+                                                            title = {name}
+                                                            onChange={this.handleChangeFlowcontrolName}
+                                                            onSearch={this.splicingName}
+                                                        />
+                                                    </FormItem>
+                                                </Col>
+                                                <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}}  >
 
-                                        </Row>
+                                                    <FormItem
+                                                        label="长期流控"
+                                                    >
+                                                        <Checkbox
+                                                            checked={ !flowcontrolType }
+                                                            onChange={this.handleChangeFlowcontrolType}
+                                                        >长期流控
+                                                        </Checkbox>
+                                                    </FormItem>
+                                                </Col>
+                                                <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                    <FormItem
+                                                        label="发布用户"
+                                                    >
+                                                        <Input placeholder="请输入发布者" value={ publishUserZh } disabled ={true} />
+                                                    </FormItem>
+                                                </Col>
+                                                <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                    <FormItem
+                                                        label="原发布者"
+                                                    >
+                                                        <Select
+                                                            defaultValue="流量室"
+                                                            onChange={this.handleChangeOriginalPublishUnit}
+                                                        >
+                                                            <Option value="流量室">流量室</Option>
+                                                            <Option value="塔台">塔台</Option>
+                                                            <Option value="进近" >进近</Option>
+                                                            <Option value="兰州">兰州</Option>
+                                                            <Option value="西安">西安</Option>
+                                                            <Option value="广州">广州</Option>
+                                                            <Option value="贵阳">贵阳</Option>
+                                                            <Option value="昆明">昆明</Option>
+                                                            <Option value="拉萨">拉萨</Option>
+                                                            <Option value="重庆">重庆</Option>
+                                                            <Option value="自定义">自定义</Option>
+                                                        </Select>
+                                                    </FormItem>
+                                                </Col>
 
-                                    </Form>
+                                            </Row>
 
-                                </Card>
-                                <Card title="限制时间" className="card" >
-                                    <Form className="" layout="vertical" >
-                                        <Row className="" >
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
-                                                <FormItem
-                                                    label="开始日期"
-                                                >
-                                                    <DatePicker
-                                                        defaultValue={moment('2018/07/25', dateFormat)}
-                                                        format={dateFormat}
-                                                    />
-                                                </FormItem>
-                                            </Col>
 
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                                <FormItem
-                                                    label="开始时间"
-                                                >
-                                                    <TimePicker defaultValue={moment('12:08', format)} format={format} />
-                                                </FormItem>
-                                            </Col>
+                                    </Card>
+                                    <Card title="限制时间" className="card" >
+                                            <Row className="" >
+                                                <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
+                                                    <FormItem
+                                                        label="开始日期"
+                                                    >
+                                                        <DatePicker
+                                                            defaultValue={moment('2018/07/25', dateFormat)}
+                                                            format={dateFormat}
+                                                        />
+                                                    </FormItem>
+                                                </Col>
 
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                                <FormItem
-                                                    label="结束日期"
-                                                >
-                                                    <Input placeholder="结束日期" />
-                                                </FormItem>
-                                            </Col>
-                                            <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
-                                                <FormItem
-                                                    label="结束时间"
-                                                >
-                                                    <Input placeholder="结束时间" />
-                                                </FormItem>
-                                            </Col>
-                                        </Row>
-                                    </Form>
+                                                <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                    <FormItem
+                                                        label="开始时间"
+                                                    >
+                                                        <TimePicker defaultValue={moment('12:08', format)} format={format} />
+                                                    </FormItem>
+                                                </Col>
 
-                                </Card>
-                                <Card title="限制类型" className="card" >
-                                    <Form className="" layout="vertical" >
+                                                <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                    <FormItem
+                                                        label="结束日期"
+                                                    >
+                                                        <Input placeholder="结束日期" />
+                                                    </FormItem>
+                                                </Col>
+                                                <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
+                                                    <FormItem
+                                                        label="结束时间"
+                                                    >
+                                                        <Input placeholder="结束时间" />
+                                                    </FormItem>
+                                                </Col>
+                                            </Row>
+
+                                    </Card>
+                                    <Card title="限制类型" className="card" >
                                         <Row className="" >
                                             <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 12}} >
                                                 <FormItem
                                                     label="限制类型"
                                                 >
-                                                    <RadioGroup
-                                                        value = {type}
-                                                        onChange={this.handleChangeType}
-                                                    >
-                                                        <Radio value="TIME">时间</Radio>
-                                                        <Radio value="GS">地面停止</Radio>
-                                                        <Radio value="REQ">开车申请</Radio>
-                                                        <Radio value="ASSIGN">指定时隙</Radio>
-                                                    </RadioGroup>
+                                                    {
+                                                        rulesGenerate.type(
+                                                            <RadioGroup
+                                                                // value={type}
+                                                                onChange={this.handleChangeType}
+                                                            >
+                                                                <Radio value="TIME">时间</Radio>
+                                                                <Radio value="GS">地面停止</Radio>
+                                                                <Radio value="REQ">开车申请</Radio>
+                                                                <Radio value="ASSIGN">指定时隙</Radio>
+                                                            </RadioGroup>
+                                                        )
+                                                    }
+
+
+
                                                 </FormItem>
                                             </Col>
                                             {
                                                 (type == 'TIME') ? <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
                                                     <FormItem
                                                         label="限制数值"
+                                                        // value = {limitValue}
                                                     >
-                                                        <Input placeholder="限制数值" className="value" />
+                                                        {
+                                                            rulesGenerate.limitValue(
+                                                                <Input
+                                                                    placeholder="限制数值"
+                                                                    className="value"
+                                                                    // onChange= {this.handleChangeLimitValueValue}
+                                                                />
+                                                            )
+                                                        }
+
                                                         <span className="unit">分钟</span>
                                                     </FormItem>
                                                 </Col> : ''
@@ -355,11 +522,9 @@ class APFlowcontrolDialog extends React.Component{
                                             }
 
                                         </Row>
-                                    </Form>
 
-                                </Card>
-                                <Card title="限制方向" className="card" >
-                                    <Form className="" layout="vertical" >
+                                    </Card>
+                                    <Card title="限制方向" className="card" >
 
                                         {
                                             flowcontrolPointsList.map((item) =>{
@@ -426,11 +591,9 @@ class APFlowcontrolDialog extends React.Component{
                                                 </FormItem>
                                             </Col>
                                         </Row>
-                                    </Form>
 
-                                </Card>
-                                <Card title="限制高度" className="card" >
-                                    <Form className="" layout="vertical" >
+                                    </Card>
+                                    <Card title="限制高度" className="card" >
                                         <Row className="" >
                                             <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 12}} >
                                                 <FormItem
@@ -446,52 +609,50 @@ class APFlowcontrolDialog extends React.Component{
                                                 </FormItem>
                                             </Col>
                                         </Row>
-                                    </Form>
 
-                                </Card>
-                                <Card title="限制原因" className="card" >
-                                    <Form className="" layout="vertical" >
+                                    </Card>
+                                    <Card title="限制原因" className="card" >
                                         <Row className="" >
                                             <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 24}} >
                                                 <FormItem
                                                     label="原因"
                                                 >
-                                                    <RadioGroup
-                                                        value = {reason}
-                                                        onChange={this.handleChangeReason}
-                                                    >
-                                                        <Radio value='ACC'>空管</Radio>
-                                                        <Radio value='WEATHER'>天气</Radio>
-                                                        <Radio value='AIRPORT'>机场</Radio>
-                                                        <Radio value='CONTROL'>航班时刻</Radio>
-                                                        <Radio value='EQUIPMENT'>设备</Radio>
-                                                        <Radio value='MILITARY'>其他空域用户</Radio>
-                                                        <Radio value='OTHERS'>其他</Radio>
-                                                    </RadioGroup>
+                                                    {
+                                                        rulesGenerate.reason(
+                                                            <RadioGroup
+                                                                // value = {reason}
+                                                                // onChange={this.handleChangeReason}
+                                                            >
+                                                                <Radio value='ACC'>空管</Radio>
+                                                                <Radio value='WEATHER'>天气</Radio>
+                                                                <Radio value='AIRPORT'>机场</Radio>
+                                                                <Radio value='CONTROL'>航班时刻</Radio>
+                                                                <Radio value='EQUIPMENT'>设备</Radio>
+                                                                <Radio value='MILITARY'>其他空域用户</Radio>
+                                                                <Radio value='OTHERS'>其他</Radio>
+                                                            </RadioGroup>
+                                                        )
+                                                    }
+
                                                 </FormItem>
                                             </Col>
                                         </Row>
-                                    </Form>
 
-                                </Card>
-                                <Card title="预留时隙" className="card" >
-                                    <Form className="" layout="vertical" >
+                                    </Card>
+                                    <Card title="预留时隙" className="card" >
                                         <Row className="" >
                                             <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 6}} >
                                                 <FormItem
                                                     label="时隙"
                                                 >
-                                                    <Input placeholder="时隙" />
+                                                    <Input placeholder="时隙" defaultValue= 'xxxx' />
                                                 </FormItem>
                                             </Col>
                                         </Row>
-                                    </Form>
 
-                                </Card>
+                                    </Card>
 
-                                <Card title="备注" className="card" >
-                                    <Form className="" layout="vertical" >
-
+                                    <Card title="备注" className="card" >
                                         <Row className="" >
                                             <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12}} xxl={{ span: 12}} >
                                                 <FormItem
@@ -503,29 +664,29 @@ class APFlowcontrolDialog extends React.Component{
                                                 </FormItem>
                                             </Col>
                                         </Row>
+                                    </Card>
+                                </Col>
+                            </Row>
+                            {/* 底部*/}
+                            <Row className="footer">
+                                <Col className="" xs={{ span: 24}}  md={{ span: 24}} lg={{ span: 24}}  xl={{ span: 24}} xxl={{ span: 24}} >
 
-                                    </Form>
-                                </Card>
-                            </Col>
-                        </Row>
-                        {/* 底部*/}
-                        <Row className="footer">
-                            <Col className="" xs={{ span: 24}}  md={{ span: 24}} lg={{ span: 24}}  xl={{ span: 24}} xxl={{ span: 24}} >
-
-                                <Button className= 'c-btn c-btn-default'
-                                        onClick={ () => {
-                                            clickCloseBtn(dialogName);
-                                        } }
-                                >
-                                    关闭
-                                </Button>
-                                <Button className='c-btn c-btn-blue'
-                                        type="primary"
-                                >
-                                    提交
-                                </Button>
-                            </Col>
-                        </Row>
+                                    <Button className= 'c-btn c-btn-default'
+                                            onClick={ () => {
+                                                clickCloseBtn(dialogName);
+                                            } }
+                                    >
+                                        关闭
+                                    </Button>
+                                    <Button className='c-btn c-btn-blue'
+                                            type="primary"
+                                            htmlType="submit"
+                                    >
+                                        提交
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Form>
                     </div>
                 </div>
             </DraggableModule>
@@ -533,4 +694,4 @@ class APFlowcontrolDialog extends React.Component{
     }
 };
 
-export default APFlowcontrolDialog;
+export default Form.create()(APFlowcontrolDialog) ;
