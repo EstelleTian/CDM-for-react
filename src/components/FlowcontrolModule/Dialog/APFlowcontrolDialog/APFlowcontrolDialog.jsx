@@ -26,6 +26,7 @@ class APFlowcontrolDialog extends React.Component{
         this.handleChangeType = this.handleChangeType.bind(this);
         this.handleChangeReason = this.handleChangeReason.bind(this);
         this.handleChangeLevel = this.handleChangeLevel.bind(this);
+        this.onChangeFlowcontrolPoint = this.onChangeFlowcontrolPoint.bind(this);
         this.state = {
             // 高度选项
             levelValues: [600,900,1200,1500,1800,2100,2400,2700,3000,3300,3600,3900,4200,4500,4800,5100,5400,5700,6000,
@@ -39,7 +40,7 @@ class APFlowcontrolDialog extends React.Component{
             publishUserZh : this.props.loginUserInfo.description || '', // 发布用户
             originalPublishUnit : '', // 原发布单位
             type : 'TIME', // 限制类型
-            controlPoints : [], // 限制流控点(勾选的)
+            checkedControlPoints : [], // 勾选的限制流控点
             controlDepDirection : this.props.loginUserInfo.airports, // 受控起飞机场
             reason : '', // 限制原因
         }
@@ -87,19 +88,12 @@ class APFlowcontrolDialog extends React.Component{
         });
         // 处理数据
         flowcontrolPointsList.map((item) =>{
-            // 增加options属性，用于生成 Checkbox 组
-            item.options  = [];
+            // 增加value属性，用于记录其所属组值
             item.points.map((i,ind) =>{
-                const opt = {
-                    label : i.name,
-                    value : i.name,
-                    group : i.group,
-                };
-                item.options.push(opt);
+                let value = i.name+'_' + i.group; // 以下划线分隔值与所属组值
+                i.value= value;
             })
         });
-
-
         this.setState({
             flowcontrolPointsList
         })
@@ -146,6 +140,44 @@ class APFlowcontrolDialog extends React.Component{
         })
         console.log(value);
     }
+    // 变更限制流控点
+    onChangeFlowcontrolPoint(e){
+        // 删除与指定项组不同的其他项
+        const  removeOtherGroupItem = ( val, checkedValue ) =>{
+            // 取选中的checkbox值所属group值, _之后的字符串 如: 'ZYG_APPFIX' 取'APPFIX'
+            let group = val.substring(val.indexOf('_')+1);
+           checkedValue = checkedValue.filter((item,index) =>{
+               // 取到所属组值
+                let _group = item.substring(item.indexOf('_')+1);
+                // 若所属组值相同则返回该项
+                if(_group === group){
+                    return true;
+                }else {
+                    return false;
+                }
+            });
+           return checkedValue;
+        };
+
+        let val = e.target.value;
+        let checked = e.target.checked;
+        let checkedValue = this.state.checkedControlPoints;
+        if(checked){
+            // 先删除与选中的值所属组不同的数据
+            checkedValue = removeOtherGroupItem(val, checkedValue);
+            // 添加选中的值
+            checkedValue.push(val);
+        }else {
+            // 删除选中的值
+            checkedValue.splice(checkedValue.indexOf(val),1);
+        }
+        console.log(checkedValue);
+        this.setState({
+            checkedControlPoints : checkedValue
+        })
+    }
+
+
 
     //
     componentDidMount(){
@@ -156,7 +188,7 @@ class APFlowcontrolDialog extends React.Component{
 
 
     render(){
-        const {flowcontrolType, type, flowcontrolPointsList, controlPoints, publishUserZh, controlDepDirection, reason, levelOptions} = this.state;
+        const {flowcontrolType, type, flowcontrolPointsList, checkedControlPoints, publishUserZh, controlDepDirection, reason, levelOptions} = this.state;
         const { titleName, clickCloseBtn, width, dialogName} = this.props;
         const dateFormat = 'YYYYMMDD';
         const format = 'HHmm';
@@ -338,10 +370,22 @@ class APFlowcontrolDialog extends React.Component{
                                                             <FormItem
                                                                 label= { item.description}
                                                             >
-                                                                <CheckboxGroup
-                                                                    options= { item.options}
-                                                                    value = {controlPoints}
-                                                                />
+                                                                {
+                                                                    item.points.map((it,ind) =>{
+                                                                        return (
+                                                                            <Checkbox
+                                                                                key={it.name + ind}
+                                                                                value={it.value}
+                                                                                onChange={this.onChangeFlowcontrolPoint}
+                                                                                checked={ (checkedControlPoints.indexOf(it.value) == -1 ) ? false : true }
+                                                                            >
+                                                                                { it.name }
+                                                                            </Checkbox>
+                                                                        )
+                                                                    })
+                                                                }
+
+
                                                             </FormItem>
                                                         </Col>
                                                     </Row>
