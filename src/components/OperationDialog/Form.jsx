@@ -2,6 +2,10 @@ import React from 'react';
 import moment from 'moment';
 import { Checkbox, Input, Form, DatePicker, TimePicker, Button } from 'antd';
 import './Form.less'
+import {isValidObject, isValidVariable} from "utils/basic-verify";
+import {request} from "utils/request-actions";
+import { host } from "utils/request-urls";
+import {updateMultiTableDatas} from "components/FlightsSortModule/Redux";
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
@@ -10,6 +14,7 @@ class FormDialog extends React.Component{
     constructor( props ){
         super( props );
         this.submitForm = this.submitForm.bind(this);
+        this.submitCancelForm = this.submitCancelForm.bind(this);
         this.onDateChange = this.onDateChange.bind(this);
         this.onTimeChange = this.onTimeChange.bind(this);
         this.compareWithEOBT = this.compareWithEOBT.bind(this);
@@ -119,43 +124,93 @@ class FormDialog extends React.Component{
             this.compareWithEOBT("time", val);
         }
 
-    }
+    };
 
     //表单提交
     submitForm(){
         const { date, time, locked } = this.state;
+        const { timeAuth = {} } = this.props;
+        const url = timeAuth.updateBtn.url || "";
         //验证date和time的validateStatus为""，则允许提交
         if( date.validateStatus == "" && time.validateStatus == "" ){
             const { showName, rowData, userId } = this.props;
-            const id = rowData["ID"]; //id
+            const id = rowData["ID"]*1 || null; //id
             const str = date.value + time.value; //拼接时间
             const comment = this.refs.comment.textAreaRef.value || ""; //获取备注内容
-            const lockedValue = locked ? 1 : 0; //是否禁止系统自动调整，1 禁止  0 允许
-            //根据showName，判断cobt和ctd提交值
-            let ctd = "";
-            let cobt = "";
-            if( showName == "COBT" ){
-                cobt = str;
-                ctd = rowData["CTOT"];
-            }else if( showName == "CTOT" ){
-                cobt = rowData["COBT"];
-                ctd = str;
+            let params = {};
+            if( showName == "COBT" || showName == "CTOT" ){
+                const lockedValue = locked ? 1 : 0; //是否禁止系统自动调整，1 禁止  0 允许
+                //根据showName，判断cobt和ctd提交值
+                let ctd = "";
+                let cobt = "";
+                if( showName == "COBT" ){
+                    cobt = str;
+                    ctd = rowData["CTOT"];
+                }else if( showName == "CTOT" ){
+                    cobt = rowData["COBT"];
+                    ctd = str;
+                }
+                //拼接为接口提交数据集合
+                params = {
+                    userId,
+                    id,
+                    cobt,
+                    ctd,
+                    comment,
+                    lockedValue
+                }
+            }else if( showName == "ASBT" ){//上客时间
+                params = {
+                    userId,
+                    id,
+                    boardingTime: str,
+                    comment
+                }
+            }else if( showName == "AGCT" ){//关舱门时间
+                params = {
+                    userId,
+                    id,
+                    close: str,
+                    comment
+                }
+            }else if( showName == "AOBT" ){//关舱门时间
+                params = {
+                    userId,
+                    id,
+                    aobt: str,
+                    comment
+                }
             }
-            //拼接为接口提交数据集合
-            const params = {
-                userId,
-                id,
-                cobt,
-                ctd,
-                comment,
-                lockedValue
-            }
-            console.log(params);
+            console.log(params, url);
+
+            //发送请求
+            request( `${host}/${url}`, "post", params, (res) => {
+                console.log(res);
+                this.props.requestCallback(res);
+            } );
+
+
         }
     };
 
+    //表单撤销提交
+    submitCancelForm(){
+        const { showName, rowData, userId, timeAuth = {} } = this.props;
+        const url = timeAuth.cancelBtn.url || "";
+        const id = rowData["ID"]*1 || null; //id
+        const comment = this.refs.comment.textAreaRef.value || ""; //获取备注内容
+        const params = {
+            userId,
+            id,
+            comment
+        }
+        console.log(params, url);
+
+    };
+
     render(){
-        const { rowData, showName } = this.props;
+        const { rowData, showName, timeAuth } = this.props;
+        //时间列显示权限
         const formItemLayout = {
             labelCol: {
                 xs: { span: 22 },
@@ -170,6 +225,7 @@ class FormDialog extends React.Component{
         const DEPAP = rowData["DEPAP"]; //起飞机场
         const ARRAP = rowData["ARRAP"]; //降落机场
         const { date, time, locked } = this.state;
+        const curValue = rowData[showName] || ""; //获取当前点击单元格的数据
 
         return(
             <div className={`content ${showName}`}>
@@ -251,14 +307,104 @@ class FormDialog extends React.Component{
                                 label=""
                                 className="footer"
                             >
-                                <Button className="c-btn c-btn-blue"
-                                        onClick = { this.submitForm }
-                                >
-                                    指定
-                                </Button>
-                                <Button className="c-btn c-btn-red">
-                                    撤销
-                                </Button>
+                                {
+                                    (isValidObject( timeAuth.updateBtn ) &&  timeAuth.updateBtn.show) ?
+                                        <Button className="c-btn c-btn-blue"
+                                                onClick = { this.submitForm }
+                                        >
+                                            指定
+                                        </Button> : ""
+                                }
+                                {
+                                    (isValidObject( timeAuth.cancelBtn ) &&  timeAuth.cancelBtn.show) ?
+                                        <Button className="c-btn c-btn-red"
+                                                onClick = { this.submitCancelForm }
+                                        >
+                                            撤销
+                                        </Button> : ""
+                                }
+                            </FormItem>
+                        </Form>
+                        : ""
+                }
+                {
+                    (showName == "ASBT" || showName == "AGCT" || showName == "AOBT") ?
+                        <Form>
+                            <FormItem
+                                label="航班"
+                                {...formItemLayout}
+                            >
+                        <span className="stable-div">
+                            { flightid }
+                        </span>
+                            </FormItem>
+                            <FormItem
+                                label="机场"
+                                {...formItemLayout}
+                            >
+                        <span className="stable-div">
+                            { DEPAP + "-" + ARRAP }
+                        </span>
+                            </FormItem>
+                            <FormItem
+                                label="日期"
+                                {...formItemLayout}
+                                validateStatus={ date.validateStatus }
+                                help={ date.help }
+                            >
+                                <DatePicker
+                                    disabledDate={ (current) => {
+                                        //不能选早于今天的 false显示 true不显示
+                                        //明天
+                                        const tomorrow = moment(moment().add(1, 'day')).endOf('day');
+                                        //今天
+                                        const today = moment().startOf('day');
+                                        //只能选今明两天
+                                        return current < today || current > tomorrow;
+                                    } }
+                                    value = {  date.value == "" ? moment() : moment( date.value ) }
+                                    onChange={ this.onDateChange }
+                                />
+                            </FormItem>
+                            <FormItem
+                                label="时间"
+                                {...formItemLayout}
+                                validateStatus={ time.validateStatus }
+                                help={ time.help }
+                            >
+                                <TimePicker
+                                    format = 'HHmm'
+                                    value = { time.value == "" ? moment() : moment( time.value, 'HHmm') }
+                                    onChange={ this.onTimeChange }
+                                />
+                            </FormItem>
+                            <FormItem
+                                {...formItemLayout}
+                                label="备注"
+                            >
+                                <TextArea ref="comment" placeholder="备注(最多100个字符)"/>
+                            </FormItem>
+                            <FormItem
+                                wrapperCol = {{ sm: {offset: 2, span: 22}, xs: {span: 24} }}
+                                label=""
+                                className="footer"
+                            >
+                                {
+                                    (isValidObject( timeAuth.updateBtn ) &&  timeAuth.updateBtn.show) ?
+                                        <Button className="c-btn c-btn-blue"
+                                                onClick = { this.submitForm }
+                                        >
+                                            指定
+                                        </Button> : ""
+                                }
+                                {
+                                    (isValidObject( timeAuth.cancelBtn ) &&  timeAuth.cancelBtn.show) ?
+                                        <Button className="c-btn c-btn-red"
+                                                onClick = { this.submitCancelForm }
+                                        >
+                                            撤销
+                                        </Button> : ""
+                                }
                             </FormItem>
                         </Form>
                         : ""

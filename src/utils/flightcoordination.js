@@ -1113,8 +1113,8 @@ const AlarmType = {
     FLIGHT_SLOT_UPDATE : '7'
 };
 
-//航班协调操作常量
-const OperationType = {
+//协调操作常量---航班号
+const OperationTypeForFlightId = {
     FLIGHT_DETAIL: {
         en: "FLIGHT_DETAIL",
         cn: "航班详情",
@@ -1249,19 +1249,65 @@ const OperationType = {
         url: "updateExemptCancle.bo"
     },
     QUALIFICATIONS_MARK: {
-        en: "EXEMPT_MARK",
+        en: "QUALIFICATIONS_MARK",
         cn: "标记二类飞行资质",
         type: "mark",
         simple: "资",
         url: "updateQualifications.bo"
     },
     QUALIFICATIONS_UN_MARK: {
-        en: "EXEMPT_UN_MARK",
+        en: "QUALIFICATIONS_UN_MARK",
         cn: "取消二类飞行资质",
         type: "cancel",
         simple: "资",
         url: "updateQualifications.bo"
     }
 };
+//协调操作常量---时间列 COBT CTOT AGCT ASBT
+const OperationTypeForTimeColumn = {
+    COBT_UPDATE: {
+        en: "COBT",
+        cn: "预撤时间",
+        url: "updateFlightCobt.bo"
+    },
+    COBT_CLEAR: {
+        en: "COBT",
+        cn: "预撤时间",
+        url: "cleanFlightCobt.bo"
+    },
+    CTOT_UPDATE: {
+        en: "CTOT",
+        cn: "预起时间",
+        url: "updateFlightCtd.bo"
+    },
+    CTOT_CLEAR: {
+        en: "CTOT",
+        cn: "预起时间",
+        url: "cleanFlightCtd.bo"
+    },
+    ASBT_UPDATE: {
+        en: "ASBT",
+        cn: "上客时间",
+        url: "updateFlightAsbt.bo"
+    },
+    ASBT_CLEAR: {
+        en: "ASBT",
+        cn: "上客时间",
+        url: ""
+    },
+    AGCT_UPDATE: {
+        en: "AGCT",
+        cn: "关门时间",
+        url: "updateFlightAgct.bo"
+    },
+    AGCT_CLEAR: {
+        en: "AGCT",
+        cn: "关门时间",
+        url: ""
+    },
 
-export { FlightCoordination, AlarmType, OperationType };
+
+};
+
+
+export { FlightCoordination, AlarmType, OperationTypeForFlightId, OperationTypeForTimeColumn };

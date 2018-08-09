@@ -1,9 +1,7 @@
-import { isValidVariable, isValidObject, calculateStringTimeDiff} from './basic-verify';
-import { FlightCoordination, AlarmType, OperationType } from './flightcoordination';
+import { isValidVariable, isValidObject } from './basic-verify';
+import { FlightCoordination, AlarmType, OperationTypeForFlightId, OperationTypeForTimeColumn } from './flightcoordination';
 import FlightCoordinationRecord from './flight-coordination-record';
 import FlowcontrolUtils from './flowcontrol-utils';
-
-const showLongFlowcontrol = true;
 
 //根据colStyle转为displayStyle和displayStyleComment
 const convertDisplayStyle = ( colStyle = {} ) => {
@@ -42,7 +40,6 @@ const getDisplayStyle = function( dataKey ){
     if(tempStr.indexOf('transparent') != -1) {
         tempStr = tempStr.replace('transparent', '');
     }
-
     return tempStr;
 };
 
@@ -90,11 +87,11 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         setTitleAndStyleData.call(thisProxy, key, value, flight );
     }
 
-    //增加操作列
-    setOperation( "OPERATION", flightAuthMap);
+    //增加操作列---航班号列
+    setOperationForFlightid( "FLIGHTIDOPERATION", flightAuthMap);
 
-    //处理操作列
-    function setOperation( key, flightAuthMap ){
+    //处理操作列---航班号列
+    function setOperationForFlightid( key, flightAuthMap ){
         let valueArr = [];
         //验证权限控制显隐
         const getValue = ( name ) => {
@@ -105,10 +102,10 @@ const convertData = function( flight, flightAuthMap, generateTime ){
             }
             return false;
         };
-        //遍历权限配置
-        for(let itemKey in OperationType){
+        //遍历航班号列权限配置
+        for(let itemKey in OperationTypeForFlightId){
             //取key值
-            const itemVal = OperationType[itemKey] || {};
+            const itemVal = OperationTypeForFlightId[itemKey] || {};
             //航班详情、协调记录、航班报文默认开启
             if( itemKey == "FLIGHT_DETAIL" || itemKey == "COORDINATION_DETAIL" || itemKey == "TELE_DETAIL" ){
                 valueArr.push( itemVal );
