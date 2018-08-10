@@ -9,7 +9,8 @@ const mapStateToProps = ( state, nextPorps ) =>({
     titleName: nextPorps.titleName,
     dialogName: nextPorps.type,
     clickCloseBtn: nextPorps.clickCloseBtn,
-    width: nextPorps.width
+    width: nextPorps.width,
+    x: nextPorps.x
 
 });
 

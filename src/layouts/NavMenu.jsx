@@ -314,6 +314,7 @@ class NavMenu extends React.Component{
                                 titleName="发布机场受限"
                                 type="apPublish"
                                 width={ 1200 }
+                                x={300}
                                 clickCloseBtn={ this.onCloseBtn }
                             />
                         </CreateLayer>

@@ -1305,8 +1305,21 @@ const OperationTypeForTimeColumn = {
         cn: "关门时间",
         url: ""
     },
-
-
+    HOBT_APPLY: {
+        en: "HOBT",
+        cn: "HOBT申请",
+        url: "applyFlightHobt.bo"
+    },
+    HOBT_APPROVE: {
+        en: "HOBT",
+        cn: "HOBT批复",
+        url: "approveFlightHobt.bo"
+    },
+    HOBT_REFUSE: {
+        en: "HOBT",
+        cn: "HOBT批复",
+        url: "refuseFlightHobt.bo"
+    },
 };
 
 

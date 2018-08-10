@@ -149,6 +149,52 @@ class OperationDialog extends React.Component{
                     res.show = true;
                     res.cancelBtn.show = true;
                 }
+            }else if(showName == "HOBT"){
+                const authMap = rowData.originalData.flightAuthMap;
+                const applyKey = showName+"_APPLY";  //申请
+                const applyAuth = authMap[applyKey] || {};
+                const applyObj = OperationTypeForTimeColumn[applyKey] || {};
+                const approveKey = showName+"_APPROVE";  //批复
+                const approveAuth = authMap[approveKey] || {};
+                const approveObj = OperationTypeForTimeColumn[approveKey] || {};
+                const refuseKey = showName+"_REFUSE";  //拒绝
+                const refuseAuth = authMap[refuseKey] || {};
+                const refuseObj = OperationTypeForTimeColumn[refuseKey] || {};
+                res = {
+                    show: false,
+                    reason: "",
+                    cn: "",
+                    type: "",
+                    applyBtn: {
+                        show: false,
+                        url: applyObj.url
+                    },
+                    approveBtn: {
+                        show: false,
+                        url: approveObj.url
+                    },
+                    refuseBtn: {
+                        show: false,
+                        url: refuseObj.url
+                    }
+                };
+
+                if( isValidVariable(applyAuth.status) && applyAuth.status == "Y" ){
+                    res.show = true;
+                    res.type = "apply";
+                    res.cn = applyObj.cn;
+                    res["applyBtn"].show = true;
+                }else if( isValidVariable(approveAuth.status) && approveAuth.status == "Y" ){
+                    res.show = true;
+                    res.type = "approve";
+                    res.cn = approveObj.cn;
+                    res["approveBtn"].show = true;
+                    if( isValidVariable(refuseAuth.status) && refuseAuth.status == "Y" ){
+                        res["refuseBtn"].show = true; //拒绝按钮
+                    }
+                }else{
+                    res.reason = applyAuth.reason;
+                }
             }
         }
         return res;
@@ -207,7 +253,7 @@ class OperationDialog extends React.Component{
                                 (isValidVariable(timeAuth) && timeAuth.show)
                                     ? <div className="collaborate-dialog">
                                         <div  className="title">
-                                            <span>{timeAuth.cn}修改</span>
+                                            <span>{timeAuth.cn}变更</span>
                                             <div
                                                 className="close-target"
                                                 onClick={ this.closeCollaborateDialog }
@@ -227,9 +273,34 @@ class OperationDialog extends React.Component{
                                          <div>{timeAuth.reason}</div>
                                       </div>
                             ): ""
-
                     )
-
+                }
+                {
+                    (showName == "HOBT") ?
+                        (
+                            (isValidVariable(timeAuth) && timeAuth.show)
+                                ? <div className="collaborate-dialog">
+                                    <div  className="title">
+                                        <span>{timeAuth.cn}变更</span>
+                                        <div
+                                            className="close-target"
+                                            onClick={ this.closeCollaborateDialog }
+                                        >
+                                            <Icon type="close" title="关闭"/>
+                                        </div>
+                                    </div>
+                                    <FormDialogIns
+                                        rowData={rowData}
+                                        showName={showName}
+                                        userId={userId}
+                                        timeAuth={timeAuth}
+                                        requestCallback = { this.requestCallback }
+                                    />
+                                </div>
+                                : <div className="collaborate-dialog">
+                                    <div>{timeAuth.reason}</div>
+                                </div>
+                        ): ""
                 }
             </div>
         )
