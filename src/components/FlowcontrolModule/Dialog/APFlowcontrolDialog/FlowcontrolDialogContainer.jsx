@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import APFlowcontrolDialog from "./APFlowcontrolDialog";
+import FlowcontrolDialog from "./FlowcontrolDialog";
 
 const mapStateToProps = ( state, nextPorps ) =>({
     loginUserInfo: state.loginUserInfo || {},
@@ -18,9 +18,9 @@ const mapDispatchToProps = {
 
 }
 
-const APFlowcontrolDialogContainer = connect(
+const FlowcontrolDialogContainer = connect(
     mapStateToProps,
     mapDispatchToProps
-)(APFlowcontrolDialog);
+)(FlowcontrolDialog);
 
-export default withRouter(APFlowcontrolDialogContainer);
+export default withRouter(FlowcontrolDialogContainer);

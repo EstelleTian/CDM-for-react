@@ -413,7 +413,7 @@ class APFlowcontrolDialog extends React.Component{
             publishUserZh, controlDepDirection, reason, levelOptions, limitValue,
             name, startDate, startTime, endDate, endTime,
         } = this.state;
-        const { titleName, clickCloseBtn, width, dialogName} = this.props;
+        const { titleName, clickCloseBtn, width, dialogName, x} = this.props;
         const dateFormat = 'YYYYMMDD';
         const format = 'HHmm';
         const { getFieldDecorator } = this.props.form;
@@ -450,6 +450,7 @@ class APFlowcontrolDialog extends React.Component{
         return (
             <DraggableModule
                 bounds = ".root"
+                x = {x}
             >
                 <div className="box center no-cursor" style={{ width: width }}>
                     <div className="dialog">

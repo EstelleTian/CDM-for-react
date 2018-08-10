@@ -130,10 +130,10 @@ class FormDialog extends React.Component{
     submitForm(){
         const { date, time, locked } = this.state;
         const { timeAuth = {} } = this.props;
-        const url = timeAuth.updateBtn.url || "";
         //验证date和time的validateStatus为""，则允许提交
         if( date.validateStatus == "" && time.validateStatus == "" ){
             const { showName, rowData, userId } = this.props;
+            const url = timeAuth.updateBtn.url || "";
             const id = rowData["ID"]*1 || null; //id
             const str = date.value + time.value; //拼接时间
             const comment = this.refs.comment.textAreaRef.value || ""; //获取备注内容
@@ -181,6 +181,9 @@ class FormDialog extends React.Component{
                     comment
                 }
             }
+
+
+
             console.log(params, url);
 
             //发送请求
@@ -225,7 +228,13 @@ class FormDialog extends React.Component{
         const DEPAP = rowData["DEPAP"]; //起飞机场
         const ARRAP = rowData["ARRAP"]; //降落机场
         const { date, time, locked } = this.state;
-        const curValue = rowData[showName] || ""; //获取当前点击单元格的数据
+
+        let originalVal = "";
+        let applyVal = "";
+        if( showName == "HOBT" && timeAuth.type == "approve"){
+            originalVal = rowData[showName];
+            applyVal = rowData.originalData.flightCoordinationRecordsMap[showName].value || "";
+        }
 
         return(
             <div className={`content ${showName}`}>
@@ -266,6 +275,7 @@ class FormDialog extends React.Component{
                                     } }
                                     value = {  date.value == "" ? moment() : moment( date.value ) }
                                     onChange={ this.onDateChange }
+                                    format = "YYYYMMDD"
                                 />
                             </FormItem>
                             <FormItem
@@ -407,6 +417,176 @@ class FormDialog extends React.Component{
                                 }
                             </FormItem>
                         </Form>
+                        : ""
+                }
+                {
+                    (showName == "HOBT") ?
+                        (timeAuth.type == "apply") ?
+                            <Form>
+                                <FormItem
+                                    label="航班"
+                                    {...formItemLayout}
+                                >
+                                    <span className="stable-div">
+                                        { flightid }
+                                    </span>
+                                        </FormItem>
+                                <FormItem
+                                    label="机场"
+                                    {...formItemLayout}
+                                >
+                            <span className="stable-div">
+                                { DEPAP + "-" + ARRAP }
+                            </span>
+                        </FormItem>
+                                <FormItem
+                                    label="日期"
+                                    {...formItemLayout}
+                                    validateStatus={ date.validateStatus }
+                                    help={ date.help }
+                                >
+                                    <DatePicker
+                                        disabledDate={ (current) => {
+                                            //不能选早于今天的 false显示 true不显示
+                                            //明天
+                                            const tomorrow = moment(moment().add(1, 'day')).endOf('day');
+                                            //今天
+                                            const today = moment().startOf('day');
+                                            //只能选今明两天
+                                            return current < today || current > tomorrow;
+                                        } }
+                                        value = {  date.value == "" ? moment() : moment( date.value ) }
+                                        onChange={ this.onDateChange }
+                                    />
+                                </FormItem>
+                                <FormItem
+                                    label="时间"
+                                    {...formItemLayout}
+                                    validateStatus={ time.validateStatus }
+                                    help={ time.help }
+                                >
+                                    <TimePicker
+                                        format = 'HHmm'
+                                        value = { time.value == "" ? moment() : moment( time.value, 'HHmm') }
+                                        onChange={ this.onTimeChange }
+                                    />
+                                </FormItem>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="备注"
+                                >
+                                    <TextArea ref="comment" placeholder="备注(最多100个字符)"/>
+                                </FormItem>
+                                <FormItem
+                                    wrapperCol = {{ sm: {offset: 2, span: 22}, xs: {span: 24} }}
+                                    label=""
+                                    className="footer"
+                                >
+                                    {
+                                        (isValidObject( timeAuth.applyBtn ) &&  timeAuth.applyBtn.show) ?
+                                            <Button className="c-btn c-btn-blue"
+                                                    onClick = { this.submitForm }
+                                            >
+                                                指定
+                                            </Button> : ""
+                                    }
+                                </FormItem>
+                            </Form>
+                            :
+                            <Form>
+                                <FormItem
+                                    label="航班"
+                                    {...formItemLayout}
+                                >
+                                    <span className="stable-div">
+                                        { flightid }
+                                    </span>
+                                </FormItem>
+                                <FormItem
+                                    label="机场"
+                                    {...formItemLayout}
+                                >
+                                    <span className="stable-div">
+                                        { DEPAP + "-" + ARRAP }
+                                    </span>
+                                </FormItem>
+                                <FormItem
+                                    label="原始值"
+                                    {...formItemLayout}
+                                >
+                                    <span className="stable-div">
+                                        { originalVal }
+                                    </span>
+                                </FormItem>
+                                <FormItem
+                                    label="申请值"
+                                    {...formItemLayout}
+                                >
+                                    <span className="stable-div">
+                                        { applyVal }
+                                    </span>
+                                </FormItem>
+                                <FormItem
+                                    label="日期"
+                                    {...formItemLayout}
+                                    validateStatus={ date.validateStatus }
+                                    help={ date.help }
+                                >
+                                    <DatePicker
+                                        disabledDate={ (current) => {
+                                            //不能选早于今天的 false显示 true不显示
+                                            //明天
+                                            const tomorrow = moment(moment().add(1, 'day')).endOf('day');
+                                            //今天
+                                            const today = moment().startOf('day');
+                                            //只能选今明两天
+                                            return current < today || current > tomorrow;
+                                        } }
+                                        value = {  date.value == "" ? moment() : moment( date.value ) }
+                                        onChange={ this.onDateChange }
+                                    />
+                                </FormItem>
+                                <FormItem
+                                    label="时间"
+                                    {...formItemLayout}
+                                    validateStatus={ time.validateStatus }
+                                    help={ time.help }
+                                >
+                                    <TimePicker
+                                        format = 'HHmm'
+                                        value = { time.value == "" ? moment() : moment( time.value, 'HHmm') }
+                                        onChange={ this.onTimeChange }
+                                    />
+                                </FormItem>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="备注"
+                                >
+                                    <TextArea ref="comment" placeholder="备注(最多100个字符)"/>
+                                </FormItem>
+                                <FormItem
+                                    wrapperCol = {{ sm: {offset: 2, span: 22}, xs: {span: 24} }}
+                                    label=""
+                                    className="footer"
+                                >
+                                    {
+                                        (isValidObject( timeAuth.approveBtn ) &&  timeAuth.approveBtn.show) ?
+                                            <Button className="c-btn c-btn-blue"
+                                                    onClick = { this.submitForm }
+                                            >
+                                                批复
+                                            </Button> : ""
+                                    }
+                                    {
+                                        (isValidObject( timeAuth.refuseBtn ) &&  timeAuth.refuseBtn.show) ?
+                                            <Button className="c-btn c-btn-red"
+                                                    onClick = { this.submitCancelForm }
+                                            >
+                                                拒绝
+                                            </Button> : ""
+                                    }
+                                </FormItem>
+                            </Form>
                         : ""
                 }
             </div>
