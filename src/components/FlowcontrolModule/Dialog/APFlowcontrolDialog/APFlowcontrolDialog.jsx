@@ -22,6 +22,8 @@ class APFlowcontrolDialog extends React.Component{
         this.splicingGSTypeName = this.splicingGSTypeName.bind(this);
         this.splicingREQTypeName = this.splicingREQTypeName.bind(this);
 
+        this.handleValidateFlowcontrolType = this.handleValidateFlowcontrolType.bind(this);
+
         this.getPointByAirport = this.getPointByAirport.bind(this);
         this.updatePoins = this.updatePoins.bind(this);
         this.handleChangeOriginalPublishUnit = this.handleChangeOriginalPublishUnit.bind(this);
@@ -35,7 +37,18 @@ class APFlowcontrolDialog extends React.Component{
         this.handleChangeLimitValueValue = this.handleChangeLimitValueValue.bind(this);
         this.handleChangeFlowcontrolName = this.handleChangeFlowcontrolName.bind(this);
 
+        this.onStartDateChange = this.onStartDateChange.bind(this);
+        this.onStartTimeChange = this.onStartTimeChange.bind(this);
+        this.onEndDateChange = this.onEndDateChange.bind(this);
+        this.onEndTimeChange = this.onEndTimeChange.bind(this);
+
+
+        //
+        this.validateFlowcontorlName = this.validateFlowcontorlName.bind(this);
+
         this.handleSubmit = this.handleSubmit.bind(this);
+        const { time } = this.props.generateTime;
+
         this.state = {
             // 高度选项
             levelValues: [600,900,1200,1500,1800,2100,2400,2700,3000,3300,3600,3900,4200,4500,4800,5100,5400,5700,6000,
@@ -44,6 +57,7 @@ class APFlowcontrolDialog extends React.Component{
             levelOptions: [],
             // 勾选的高度值
             controlLevel:[],
+
             flowcontrolPointsList : [], // 流控点集合
             checkedControlPoints : [], // 勾选的限制流控点(含所属组,不用作最终表单提交)
             controlPoints : [], // 勾选的限制流控点(不含所属组,用于最终表单提交)
@@ -56,7 +70,14 @@ class APFlowcontrolDialog extends React.Component{
             controlDepDirection : this.props.loginUserInfo.airports, // 受控起飞机场
             reason : '', // 限制原因
             limitValue: '', // 限制数值
-            name : ''
+            name : '',
+            startDate : time.substring(0,8) || moment().format('YYYYMMDD'),
+            startTime : time.substring(8,12) || moment().format('HHmm'),
+            // endDate : time.substring(0,8) || moment().format('YYYYMMDD'),
+            // endTime : time.substring(8,12) || moment().format('HHmm'),
+            endDate : '',
+            endTime : '',
+
         }
     }
     // 转换高度选项
@@ -111,39 +132,63 @@ class APFlowcontrolDialog extends React.Component{
     // 变更流控名称
     handleChangeFlowcontrolName(e){
         let val = e.target.value;
-        this.setState({
+        let _form = this.props.form;
+        _form.setFieldsValue({
             name : val
         })
-        console.log(val);
+        console.log(this.state.name);
     }
 
     // 拼接流控名称
     splicingName () {
-        const { type } = this.state;
-
+        let _form = this.props.form;
+        // 先校验限制类型
+        _form.validateFields(['type'],{
+            force : true,
+        }, this.handleValidateFlowcontrolType);
+    }
+    // 处理限制类型校验
+    handleValidateFlowcontrolType(errors,values){
+        let _form = this.props.form;
         let res = '';
-        // 若选中限制类型为地面停止
-        if(type == 'GS'){
-            res = this.splicingGSTypeName();
-        }else if(type == 'REQ'){
-            res = this.splicingREQTypeName();
-        }else if(type == 'TIME'){
+        const { type } = this.state;
+        // 校验不通过
+        if (errors) {
+            // 设置流控名称输入框校验
+            _form.setFields({
+                name: {
+                    value: '',
+                    errors: [new Error('请先选择限制类型')],
+                },
+            })
+        }else { // 校验通过
+            // 重置流控名称输入框校验
+            // _form.resetFields('name');
 
-        }else if(type == 'ASSIGN'){
+            if(type == 'GS'){ // 限制类型为地面停止
+                res = this.splicingGSTypeName();
+            }else if(type == 'REQ'){ // 限制类型为开车申请
+                res = this.splicingREQTypeName();
+            }else if(type == 'TIME'){ // 限制类型为时间
 
+            }else if(type == 'ASSIGN'){ // 限制类型为指定时隙
+
+            }
+
+            // 设置
+            _form.setFieldsValue({
+                name : res
+            })
+            console.log(this.state.name);
         }
 
-
-        this.setState({
-            name : res
-        })
     }
     // 拼接地面停止限制类型流控名称
     splicingGSTypeName () {
         // 结果
         let res = '';
-
         const { controlDepDirection, controlPoints } = this.state;
+
         // 若未勾选限制流控点,则以受控起飞机场命名
         if(controlPoints.length < 1) {
             res = controlDepDirection + ' 地面停止'
@@ -305,6 +350,55 @@ class APFlowcontrolDialog extends React.Component{
             callback();
         }
     }
+    //
+    validateFlowcontorlName = (rule, value, callback) => {
+        callback();
+    }
+
+    // 开始日期改变
+    onStartDateChange( datemoment, dateString ){
+        const { startDate } = this.state;
+        if(dateString != ""){
+            //更新选中的日期
+            this.setState({
+                startDate: dateString
+            });
+        }
+
+
+    };
+
+    //开始时间改变
+    onStartTimeChange( timemoment, timeString ){
+        const { startTime } = this.state;
+        if( timeString != "" ){
+            //更新选中的时间
+            this.setState({
+                startTime: timeString
+            });
+        }
+    }
+    // 结束日期改变
+    onEndDateChange( datemoment, dateString ){
+        const { endDate } = this.state;
+        debugger
+        //更新选中的日期 可以为空
+        this.setState({
+            endDate: dateString
+        });
+
+
+    };
+
+    //结束时间改变
+    onEndTimeChange( timemoment, timeString ){
+        const { endTime } = this.state;
+
+        //更新选中的时间 可以为空
+        this.setState({
+            endTime: timeString
+        });
+    }
 
     //
     componentDidMount(){
@@ -317,7 +411,7 @@ class APFlowcontrolDialog extends React.Component{
     render(){
         const {flowcontrolType, type, flowcontrolPointsList, checkedControlPoints,
             publishUserZh, controlDepDirection, reason, levelOptions, limitValue,
-            name,
+            name, startDate, startTime, endDate, endTime,
         } = this.state;
         const { titleName, clickCloseBtn, width, dialogName} = this.props;
         const dateFormat = 'YYYYMMDD';
@@ -325,6 +419,14 @@ class APFlowcontrolDialog extends React.Component{
         const { getFieldDecorator } = this.props.form;
         // 校验规则
         const rulesGenerate = {
+            // 限制类型
+            name: getFieldDecorator("name", {
+                rules: [
+                    {required: true, message: "请输入或自动命名流控名称"},// 必填
+                    {validator : this.validateFlowcontorlName} // 正整数
+                ]
+            }),
+
             // 限制类型
             type: getFieldDecorator("type", {
                 rules: [
@@ -334,6 +436,7 @@ class APFlowcontrolDialog extends React.Component{
             // 限制数值
             limitValue: getFieldDecorator("limitValue", {
                 rules: [
+                    {required: true, message: ""},
                     {validator : this.positiveInteger} // 正整数
                 ]
             }),
@@ -372,14 +475,18 @@ class APFlowcontrolDialog extends React.Component{
                                                     <FormItem
                                                         label="流控名称"
                                                     >
-                                                        <Search
-                                                            placeholder="请输入流控名称"
-                                                            enterButton="自动命名"
-                                                            value={name}
-                                                            title = {name}
-                                                            onChange={this.handleChangeFlowcontrolName}
-                                                            onSearch={this.splicingName}
-                                                        />
+                                                        {
+                                                            rulesGenerate.name(
+                                                                <Search
+                                                                    placeholder="请输入流控名称"
+                                                                    enterButton="自动命名"
+                                                                    title = {name}
+                                                                    onChange={this.handleChangeFlowcontrolName}
+                                                                    onSearch={this.splicingName}
+                                                                />
+                                                            )
+                                                        }
+
                                                     </FormItem>
                                                 </Col>
                                                 <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}}  >
@@ -435,8 +542,18 @@ class APFlowcontrolDialog extends React.Component{
                                                         label="开始日期"
                                                     >
                                                         <DatePicker
-                                                            defaultValue={moment('2018/07/25', dateFormat)}
+                                                            disabledDate={ (current) => {
+                                                                //不能选早于今天的 false显示 true不显示
+                                                                //明天
+                                                                const tomorrow = moment(moment().add(1, 'day')).endOf('day');
+                                                                //今天
+                                                                const today = moment().startOf('day');
+                                                                //只能选今明两天
+                                                                return current < today || current > tomorrow;
+                                                            } }
+                                                            value = {  startDate == "" ? moment() : moment( startDate, dateFormat ) }
                                                             format={dateFormat}
+                                                            onChange={ this.onStartDateChange }
                                                         />
                                                     </FormItem>
                                                 </Col>
@@ -445,7 +562,11 @@ class APFlowcontrolDialog extends React.Component{
                                                     <FormItem
                                                         label="开始时间"
                                                     >
-                                                        <TimePicker defaultValue={moment('12:08', format)} format={format} />
+                                                        <TimePicker
+                                                            value = { startTime == "" ? moment() : moment( startTime, 'HHmm') }
+                                                            format={format}
+                                                            onChange={ this.onStartTimeChange }
+                                                        />
                                                     </FormItem>
                                                 </Col>
 
@@ -453,14 +574,32 @@ class APFlowcontrolDialog extends React.Component{
                                                     <FormItem
                                                         label="结束日期"
                                                     >
-                                                        <Input placeholder="结束日期" />
+                                                        <DatePicker
+                                                            allowClear = {true} // 显示清除按钮
+                                                            disabledDate={ (current) => {
+                                                                //不能选早于今天的 false显示 true不显示
+                                                                //明天
+                                                                const tomorrow = moment(moment().add(1, 'day')).endOf('day');
+                                                                //今天
+                                                                const today = moment().startOf('day');
+                                                                //只能选今明两天
+                                                                return current < today || current > tomorrow;
+                                                            } }
+                                                            // value = {  endDate }
+                                                            format={dateFormat}
+                                                            onChange={ this.onEndDateChange }
+                                                        />
                                                     </FormItem>
                                                 </Col>
                                                 <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
                                                     <FormItem
                                                         label="结束时间"
                                                     >
-                                                        <Input placeholder="结束时间" />
+                                                        <TimePicker
+                                                            // value = { endTime }
+                                                            format={format}
+                                                            onChange={ this.onEndTimeChange }
+                                                        />
                                                     </FormItem>
                                                 </Col>
                                             </Row>
@@ -494,17 +633,13 @@ class APFlowcontrolDialog extends React.Component{
                                                 (type == 'TIME') ? <Col xs={{ span: 12}}  md={{ span: 12}} lg={{ span: 12}}  xl={{ span: 12, offset: 1}} xxl={{ span: 5, offset: 1}} >
                                                     <FormItem
                                                         label="限制数值"
-                                                        // value = {limitValue}
+                                                        value = {limitValue}
                                                     >
-                                                        {
-                                                            rulesGenerate.limitValue(
-                                                                <Input
-                                                                    placeholder="限制数值"
-                                                                    className="value"
-                                                                    // onChange= {this.handleChangeLimitValueValue}
-                                                                />
-                                                            )
-                                                        }
+                                                        <Input
+                                                            placeholder="限制数值"
+                                                            className="value"
+                                                            onChange= {this.handleChangeLimitValueValue}
+                                                        />
 
                                                         <span className="unit">分钟</span>
                                                     </FormItem>
@@ -600,6 +735,7 @@ class APFlowcontrolDialog extends React.Component{
                                                     label="高度"
                                                 >
                                                     <Select
+                                                        allowClear = {true}
                                                         mode="multiple"
                                                         placeholder="请选择限制高度"
                                                         onChange={this.handleChangeLevel}
