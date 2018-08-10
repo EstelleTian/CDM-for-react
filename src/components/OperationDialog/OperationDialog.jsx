@@ -2,11 +2,14 @@
 import React from 'react';
 import { Icon, Input, Form } from 'antd';
 import $ from 'jquery';
-import './OperationDialog.less';
-import { isValidVariable } from "utils/basic-verify";
-import { requestGet } from "utils/request-actions";
+import {isValidObject, isValidVariable} from "utils/basic-verify";
+import { request } from "utils/request-actions";
 import { host } from "utils/request-urls";
 import FormDialog from './Form';
+import { convertData, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "utils/flight-grid-table-data-util";
+
+import './OperationDialog.less';
+import {OperationTypeForTimeColumn} from "utils/flightcoordination";
 
 const { TextArea } = Input;
 
@@ -17,6 +20,12 @@ class OperationDialog extends React.Component{
         super( props );
         this.handleFlightIdClick = this.handleFlightIdClick.bind(this);
         this.closeCollaborateDialog = this.closeCollaborateDialog.bind(this);
+        this.convertData = convertData.bind(this);
+        this.getDisplayStyle = getDisplayStyle.bind(this);
+        this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
+        this.getDisplayFontSize = getDisplayFontSize.bind(this);
+        this.getTimeColumnsAuth = this.getTimeColumnsAuth.bind(this);
+        this.requestCallback = this.requestCallback.bind(this);
     }
 
     componentDidUpdate(){
@@ -47,40 +56,109 @@ class OperationDialog extends React.Component{
         //更新数据，需要展开的协调窗口名称和位置
         updateOperationDatasShowNameAndPosition( "", 0, 0 );
     };
+    //表单提交后--单条数据更新方法
+    requestCallback( res ){
+        this.closeCollaborateDialog();
+        const { updateMultiTableDatas } = this.props;
+        const { flightView = {}, generateTime } = res;
+        const { flightFieldViewMap = {}, flightAuthMap = {} } = flightView;
+        const { ID = {} } =flightFieldViewMap;
+        const id = ID.value;
+
+        const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
+        //将航班原数据补充到航班对象中
+        data.originalData = flightView;
+        const map = {
+            [id]: data
+        }
+        updateMultiTableDatas( map );
+    };
 
 
     //处理航班号id提交操作事件
     handleFlightIdClick( item, rowData ){
+        const { userId = "", updateMultiTableDatas } = this.props;
         //选中的操作名称
         const { en = "", url = "" } = item;
         //航班ID
-        const id = rowData["ID"] || "";
+        const id = rowData["ID"]*1 || null;
         //备注输入的值
         const comment = this.refs.comment.textAreaRef.value || "";
-
-        console.log( host, url, en, id, comment );
-        let params = {};
         // 标记准备完毕 标记未准备完毕 标记豁免 取消豁免
-        if( en == "READY_MARK" || en == "READY_UN_MARK" || en == "EXEMPT_MARK" || en == "EXEMPT_UN_MARK" ){
-            params = {
-                id,
-                comment
-            };
-        }else if( en == "" ){
+        let params = {
+            id,
+            userId,
+            comment
+        };
 
+        if( en == "ASSIGNSLOT_MARK"  ){ //退出时隙分配
+            params["assignSlotStatus"] = 3;
+        }else if( en == "ASSIGNSLOT_UN_MARK" ){ //参加时隙分配
+            params["assignSlotStatus"] = 0;
+        }else if( en == "CLEARANCE_MARK"  ){ //标记已放行 1 标记已放行
+            params["status"] = 1;
+        }else if( en == "CLEARANCE_UN_MARK" ){ //标记未放行 0 标记未放行
+            params["status"] = 0;
+        }else if( en == "QUALIFICATIONS_MARK"  ){ //标记二类飞行资质 2 标记二类飞行
+            params["type"] = 2;
+        }else if( en == "QUALIFICATIONS_UN_MARK" ){ //取消二类飞行资质 0 标记没有二类飞行资质
+            params["type"] = 0;
+        }else if( en == "INPOOL_UPDATE" ){ //移入等待池 0
+            params["status"] = 0;
         }
         //发送请求
-        requestGet( `${host}/${url}`, params, (res) => {
+        request( `${host}/${url}`, "post", params, (res) => {
             console.log(res);
+            this.requestCallback(res);
         });
+    };
 
-
-
-    }
+    getTimeColumnsAuth( rowData, showName ){
+        let res = "";
+        if( isValidObject(rowData) && isValidVariable(showName) ){
+            if( showName == "FLIGHTID" ){
+                res =  "";
+            }else if(showName == "COBT" || showName == "CTOT" || showName == "ASBT" || showName == "AGCT" || showName == "AOBT"){
+                const authMap = rowData.originalData.flightAuthMap;
+                const updateKey = showName+"_UPDATE";
+                const cancelKey = showName+"_CLEAR";
+                const updateAuth = authMap[updateKey] || {};
+                const cancelAuth = authMap[cancelKey] || {};
+                const updateObj = OperationTypeForTimeColumn[updateKey] || {};
+                const cancelObj = OperationTypeForTimeColumn[cancelKey] || {};
+                res = {
+                    show: false,
+                    reason: "",
+                    cn: updateObj.cn || "",
+                    updateBtn: {
+                        show: false,
+                        url: updateObj.url
+                    },
+                    cancelBtn: {
+                        show: true,
+                        url: cancelObj.url
+                    }
+                };
+                if( isValidVariable(updateAuth.status) && updateAuth.status == "Y" ){
+                    res.show = true;
+                    res.updateBtn.show = true;
+                }else{
+                    res.reason = updateAuth.reason;
+                }
+                if( isValidVariable(cancelAuth.status) && cancelAuth.status == "Y" ){
+                    res.show = true;
+                    res.cancelBtn.show = true;
+                }
+            }
+        }
+        return res;
+    };
 
     render(){
         const { userId } = this.props;
-        const { showName, x, y, auth, rowData } = this.props.operationDatas;
+        const { showName = "", x, y, auth, rowData = {} } = this.props.operationDatas;
+        //时间列显示权限
+        let timeAuth = this.getTimeColumnsAuth( rowData, showName );
 
         const dialogStyle = {
           left: x,
@@ -123,24 +201,35 @@ class OperationDialog extends React.Component{
                         : ""
                 }
                 {
-                    (showName == "COBT" || showName == "CTOT") ?
-                        <div className="collaborate-dialog">
-                            <div  className="title">
-                                <span>{showName}时间变更</span>
-                                <div
-                                    className="close-target"
-                                    onClick={ this.closeCollaborateDialog }
-                                >
-                                    <Icon type="close" title="关闭"/>
-                                </div>
-                            </div>
-                            <FormDialogIns
-                                rowData={rowData}
-                                showName={showName}
-                                userId={userId}
-                            />
-                        </div>
-                        : ""
+                    (
+                        (showName == "COBT" || showName == "CTOT" || showName == "ASBT" || showName == "AGCT" || showName == "AOBT") ?
+                            (
+                                (isValidVariable(timeAuth) && timeAuth.show)
+                                    ? <div className="collaborate-dialog">
+                                        <div  className="title">
+                                            <span>{timeAuth.cn}修改</span>
+                                            <div
+                                                className="close-target"
+                                                onClick={ this.closeCollaborateDialog }
+                                            >
+                                                <Icon type="close" title="关闭"/>
+                                            </div>
+                                        </div>
+                                        <FormDialogIns
+                                            rowData={rowData}
+                                            showName={showName}
+                                            userId={userId}
+                                            timeAuth={timeAuth}
+                                            requestCallback = { this.requestCallback }
+                                        />
+                                    </div>
+                                    : <div className="collaborate-dialog">
+                                         <div>{timeAuth.reason}</div>
+                                      </div>
+                            ): ""
+
+                    )
+
                 }
             </div>
         )

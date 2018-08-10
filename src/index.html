@@ -11,11 +11,15 @@
         //根据你的地址对应修改
         //登录的接口
 //        var url = "http://192.168.243.120:8081/cdm-analysis/retrieve_user_property.action";
-        var url = "http://192.168.243.120:8081/cdm-analysis/retrieveFlights/ZUUU/201806150000/201806152359.action";
+        var url = "http://192.168.243.187:28180/retrieveFlowcontrolById.bo";
 
         $.ajax({
             url: url,
-            type: 'GET',
+            type: 'POST',
+            data: {
+                id: 119465618,
+                userId: 42
+            },
             dataType: 'json',
             success: function(data, status){
                 console.log(data, status)

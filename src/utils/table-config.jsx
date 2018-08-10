@@ -235,7 +235,7 @@ const handleRightClickFunc = function( thisProxy, colunmName, record, x, y ){
     if( isValidVariable(colunmName) ){
         const { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } = thisProxy.props;
         //根据列名和行对象，获取选中单元格的值
-        const optValue = record["OPERATION"] || [];
+        const optValue = record["FLIGHTIDOPERATION"] || [];
         //显示航班协调窗口
         updateOperationDatasAuth(optValue, record);
         //更新数据，需要展开的协调窗口名称和位置

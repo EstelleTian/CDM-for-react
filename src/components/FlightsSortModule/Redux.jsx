@@ -2,6 +2,7 @@
 //key命名规则：  操作类型（update,add,delete）+ 数据名称 + 操作对象 以下划线分隔,全部大写
 //value命名规则： 数据名称 + 操作类型（update,add,delete）+ 操作对象 以左划线分隔,小写
 const UPDATE_TABLE_DATAS= 'tableDatas/update/datas';
+const UPDATE_MULTI_TABLE_DATAS= 'tableDatas/update/multidatas';
 const UPDATE_TABLE_DATAS_PROPERTY= 'tableDatas/update/property';
 const UPDATE_TABLE_DATAS_COLUMNS= 'tableDatas/update/columns';
 //action-creator
@@ -9,6 +10,11 @@ const UPDATE_TABLE_DATAS_COLUMNS= 'tableDatas/update/columns';
 const updateTableDatas = dataMap => ({
     type: UPDATE_TABLE_DATAS,
     dataMap
+});
+//更新表格单条或多条数据集合
+const updateMultiTableDatas = multiDataMap => ({
+    type: UPDATE_MULTI_TABLE_DATAS,
+    multiDataMap
 });
 //更新表格配置属性值
 const updateTableDatasProperty = property => ({
@@ -49,6 +55,18 @@ const tableDatas = ( state = initData, action) => {
             return {
                 ...state,
                 tableDatasMap: dataMap
+            }
+        }
+        case UPDATE_MULTI_TABLE_DATAS: {
+            let multiDataMap = action.multiDataMap || {};
+            let newTableDatasMap = state.tableDatasMap;
+            for(let id in multiDataMap){
+                //若有该航班，更新;没有添加
+                newTableDatasMap[id] = multiDataMap[id];
+            }
+            return {
+                ...state,
+                tableDatasMap: newTableDatasMap
             }
         }
         case UPDATE_TABLE_DATAS_PROPERTY: {
@@ -250,7 +268,7 @@ const tableCondition = (state = initTableCondition, action) => {
 };
 //---------------------------------------------------------------------
 export {
-    tableDatas, updateTableDatas, updateTableDatasProperty, updateTableDatasColumns,
+    tableDatas, updateTableDatas, updateMultiTableDatas, updateTableDatasProperty, updateTableDatasColumns,
     generateInfo, updateGenerateInfo, generateTime, updateGenerateTime,
     tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy, updateTableConditionQuicklyFilters,
     updateTableConditionRangeByKey, updateTableConditionRange
