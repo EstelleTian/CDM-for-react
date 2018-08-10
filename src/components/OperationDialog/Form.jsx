@@ -275,6 +275,7 @@ class FormDialog extends React.Component{
                                     } }
                                     value = {  date.value == "" ? moment() : moment( date.value ) }
                                     onChange={ this.onDateChange }
+                                    format = "YYYYMMDD"
                                 />
                             </FormItem>
                             <FormItem

@@ -4,7 +4,8 @@ import { Menu, Checkbox, Radio, Icon, message} from 'antd';
 import { request } from 'utils/request-actions';
 import { logoutUrl } from 'utils/request-urls';
 import CreateLayer from "components/CreateLayer/CreateLayer";
-import APFlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/APFlowcontrolDialog/APFlowcontrolDialogContainer";
+import FlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/APFlowcontrolDialog/FlowcontrolDialogContainer";
+// import APFlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/APFlowcontrolDialog/APFlowcontrolDialogContainer";
 
 import './NavMenu.less';
 
@@ -310,7 +311,7 @@ class NavMenu extends React.Component{
                         <CreateLayer
                             className="flowcontol-layer"
                         >
-                            <APFlowcontrolDialogContainer
+                            <FlowcontrolDialogContainer
                                 titleName="发布机场受限"
                                 type="apPublish"
                                 width={ 1200 }
