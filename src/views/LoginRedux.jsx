@@ -60,10 +60,10 @@ const updateSystemConfig = configObj => ({
 
 //reducer system config
 const config = {
-    system: '',
-    systemAirport: '',
-    systemElem: '',
-    systemName: '',
+    system: '', // 所属系统
+    systemAirport: '', // 属性系统机场
+    systemElem: '', //
+    systemName: '', // 系统名称
 }
 
 const systemConfig = ( state = config, action ) => {
