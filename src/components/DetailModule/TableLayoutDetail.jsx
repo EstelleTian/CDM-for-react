@@ -195,7 +195,7 @@ class TableLayoutDetail extends React.Component{
                     dataIndex: "value",
                     align: 'center',
                     key: "value",
-                    width: 100
+                    width: 170
                 },
                 {
                     title: "协调备注",

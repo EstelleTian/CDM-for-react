@@ -1,14 +1,18 @@
 import React from 'react';
 import moment from 'moment';
-import { Checkbox, Input, Form, DatePicker, TimePicker, Button } from 'antd';
+import { Checkbox, Input, Form, DatePicker, TimePicker, Button, message } from 'antd';
 import './Form.less'
-import {isValidObject, isValidVariable} from "utils/basic-verify";
+import {getDayTimeFromString, isValidObject} from "utils/basic-verify";
 import {request} from "utils/request-actions";
 import { host } from "utils/request-urls";
-import {updateMultiTableDatas} from "components/FlightsSortModule/Redux";
 
 const FormItem = Form.Item;
 const { TextArea } = Input;
+
+message.config({
+    top: 140,
+    getContainer: () => document.getElementsByClassName("main-table")[0]
+});
 
 class FormDialog extends React.Component{
     constructor( props ){
@@ -18,6 +22,8 @@ class FormDialog extends React.Component{
         this.onDateChange = this.onDateChange.bind(this);
         this.onTimeChange = this.onTimeChange.bind(this);
         this.compareWithEOBT = this.compareWithEOBT.bind(this);
+        this.showLoading = this.showLoading.bind(this);
+        this.hideLoading = this.hideLoading.bind(this);
         const { rowData, showName } = this.props;
         const curValue = rowData[showName]; //获取当前点击单元格的数据
         this.state = {
@@ -32,6 +38,8 @@ class FormDialog extends React.Component{
                 help: ""
             },
             locked: true,
+            submitLoading: false,
+            cancleLoading: false,
         }
     };
 
@@ -125,19 +133,40 @@ class FormDialog extends React.Component{
         }
 
     };
+    
+    //显示按钮loading
+    showLoading( name ){
+        const str = name + 'Loading';
+        this.setState({
+            [str]: true
+        });
+    };
+
+    //隐藏按钮loading
+    hideLoading( name ){
+        const str = name + 'Loading';
+        this.setState({
+            [str]: false
+        });
+    };
 
     //表单提交
     submitForm(){
+        //按钮增加loading
+        this.showLoading('submit');
         const { date, time, locked } = this.state;
         const { timeAuth = {} } = this.props;
         //验证date和time的validateStatus为""，则允许提交
-        if( date.validateStatus == "" && time.validateStatus == "" ){
+        if( date.validateStatus != "error" && time.validateStatus != "error" ){
             const { showName, rowData, userId } = this.props;
-            const url = timeAuth.updateBtn.url || "";
+            let url = "";
+            if( isValidObject( timeAuth.updateBtn ) ){
+                url = timeAuth.updateBtn.url || "";
+            }
             const id = rowData["ID"]*1 || null; //id
             const str = date.value + time.value; //拼接时间
             const comment = this.refs.comment.textAreaRef.value || ""; //获取备注内容
-            let params = {};
+            let params = { userId, id, comment };
             if( showName == "COBT" || showName == "CTOT" ){
                 const lockedValue = locked ? 1 : 0; //是否禁止系统自动调整，1 禁止  0 允许
                 //根据showName，判断cobt和ctd提交值
@@ -160,37 +189,31 @@ class FormDialog extends React.Component{
                     lockedValue
                 }
             }else if( showName == "ASBT" ){//上客时间
-                params = {
-                    userId,
-                    id,
-                    boardingTime: str,
-                    comment
-                }
+                params["boardingTime"] = str;
             }else if( showName == "AGCT" ){//关舱门时间
-                params = {
-                    userId,
-                    id,
-                    close: str,
-                    comment
-                }
+                params["close"] = str;
             }else if( showName == "AOBT" ){//关舱门时间
-                params = {
-                    userId,
-                    id,
-                    aobt: str,
-                    comment
+                params["aobt"] = str;
+            }else if( showName == "HOBT" || showName == "TOBT" ){//关舱门时间
+                const btnStr = timeAuth.type + "Btn";
+                url = timeAuth[btnStr].url;
+                if( showName == "HOBT" ){
+                    params["hobt"] = str;
+                }else if( showName == "TOBT" ){
+                    params["tobt"] = str;
                 }
             }
-
-
-
             console.log(params, url);
-
             //发送请求
             request( `${host}/${url}`, "post", params, (res) => {
                 console.log(res);
+                this.hideLoading('submit');
+                message.success(rowData['FLIGHTID'] + "变更" + timeAuth.cn + "成功", 5 );
                 this.props.requestCallback(res);
-            } );
+            }, ( err ) => {
+                message.error(rowData['FLIGHTID'] + "变更" + timeAuth.cn + "失败", 5 );
+                this.hideLoading('submit');
+            });
 
 
         }
@@ -198,6 +221,7 @@ class FormDialog extends React.Component{
 
     //表单撤销提交
     submitCancelForm(){
+        this.showLoading('cancle');
         const { showName, rowData, userId, timeAuth = {} } = this.props;
         const url = timeAuth.cancelBtn.url || "";
         const id = rowData["ID"]*1 || null; //id
@@ -208,7 +232,16 @@ class FormDialog extends React.Component{
             comment
         }
         console.log(params, url);
-
+        //发送请求
+        request( `${host}/${url}`, "post", params, (res) => {
+            console.log(res);
+            this.hideLoading('cancle');
+            message.success(rowData['FLIGHTID'] + "撤销" + timeAuth.cn + "成功", 5 );
+            this.props.requestCallback(res);
+        }, ( err ) => {
+            message.error(rowData['FLIGHTID'] + "撤销" + timeAuth.cn + "失败", 5 );
+            this.hideLoading('cancle');
+        });
     };
 
     render(){
@@ -321,6 +354,7 @@ class FormDialog extends React.Component{
                                     (isValidObject( timeAuth.updateBtn ) &&  timeAuth.updateBtn.show) ?
                                         <Button className="c-btn c-btn-blue"
                                                 onClick = { this.submitForm }
+                                                loading = {this.state.submitLoading}
                                         >
                                             指定
                                         </Button> : ""
@@ -420,7 +454,7 @@ class FormDialog extends React.Component{
                         : ""
                 }
                 {
-                    (showName == "HOBT") ?
+                    (showName == "HOBT" || showName == "TOBT") ?
                         (timeAuth.type == "apply") ?
                             <Form>
                                 <FormItem
@@ -514,16 +548,16 @@ class FormDialog extends React.Component{
                                     label="原始值"
                                     {...formItemLayout}
                                 >
-                                    <span className="stable-div">
-                                        { originalVal }
+                                    <span className="stable-div" title={originalVal}>
+                                        { getDayTimeFromString(originalVal) || "" }
                                     </span>
                                 </FormItem>
                                 <FormItem
                                     label="申请值"
                                     {...formItemLayout}
                                 >
-                                    <span className="stable-div">
-                                        { applyVal }
+                                    <span className="stable-div" title={applyVal}>
+                                        { getDayTimeFromString(applyVal) || "" }
                                     </span>
                                 </FormItem>
                                 <FormItem

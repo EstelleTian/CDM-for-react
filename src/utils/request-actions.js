@@ -21,7 +21,7 @@ const requestGet = ( url, params, resFunc ) => {
  * @param resFunc 成功后的回调函数
  *
  */
-const request = ( url, type, params, resFunc ) => {
+const request = ( url, type, params, resFunc, errFunc ) => {
     axios({
         method: type,
         url,
@@ -33,6 +33,9 @@ const request = ( url, type, params, resFunc ) => {
         const data = response.data;
         resFunc( data );
     }).catch( err => {
+        if( typeof errFunc == 'function'){
+            errFunc( err );
+        }
         console.error(err);
     })
 };

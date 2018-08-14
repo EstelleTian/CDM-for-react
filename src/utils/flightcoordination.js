@@ -1273,7 +1273,7 @@ const OperationTypeForTimeColumn = {
     COBT_CLEAR: {
         en: "COBT",
         cn: "预撤时间",
-        url: "cleanFlightCobt.bo"
+        url: "clearFlightCobt.bo"
     },
     CTOT_UPDATE: {
         en: "CTOT",
@@ -1283,7 +1283,7 @@ const OperationTypeForTimeColumn = {
     CTOT_CLEAR: {
         en: "CTOT",
         cn: "预起时间",
-        url: "cleanFlightCtd.bo"
+        url: "clearFlightCtd.bo"
     },
     ASBT_UPDATE: {
         en: "ASBT",
@@ -1319,6 +1319,21 @@ const OperationTypeForTimeColumn = {
         en: "HOBT",
         cn: "HOBT批复",
         url: "refuseFlightHobt.bo"
+    },
+    TOBT_APPLY: {
+        en: "TOBT",
+        cn: "TOBT申请",
+        url: "applyFlightTobt.bo"
+    },
+    TOBT_APPROVE: {
+        en: "TOBT",
+        cn: "TOBT批复",
+        url: "approveFlightTobt.bo"
+    },
+    TOBT_REFUSE: {
+        en: "TOBT",
+        cn: "TOBT批复",
+        url: "refuseFlightTobt.bo"
     },
 };
 
