@@ -5,6 +5,7 @@ import FlowcontrolDialog from "./FlowcontrolDialog";
 
 const mapStateToProps = ( state, nextPorps ) =>({
     loginUserInfo: state.loginUserInfo || {},
+    systemConfig: state.systemConfig || {},
     generateTime : state.generateTime,
     titleName: nextPorps.titleName,
     dialogName: nextPorps.type,

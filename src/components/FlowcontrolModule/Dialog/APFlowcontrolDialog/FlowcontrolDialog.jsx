@@ -12,7 +12,7 @@ class FlowcontrolDialog extends React.Component{
     }
 
     render(){
-        const { titleName, clickCloseBtn, width = 1000, dialogName, x = 0, loginUserInfo, generateTime} = this.props;
+        const { titleName, clickCloseBtn, width = 1000, dialogName, x = 0, loginUserInfo, systemConfig, generateTime} = this.props;
         return (
             <DraggableModule
                 bounds = ".root"
@@ -37,6 +37,7 @@ class FlowcontrolDialog extends React.Component{
                             clickCloseBtn = {clickCloseBtn}
                             dialogName = {dialogName}
                             loginUserInfo = {loginUserInfo}
+                            systemConfig = {systemConfig}
                             generateTime = {generateTime}
                         />
                     </div>
