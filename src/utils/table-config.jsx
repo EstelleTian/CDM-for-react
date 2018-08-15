@@ -1,5 +1,6 @@
 //表格列名
 import React from 'react';
+import $ from 'jquery';
 import {isValidObject, isValidVariable} from "./basic-verify";
 import { getSingleAirportUrl } from "utils/request-urls";
 import { requestGet } from "utils/request-actions";
@@ -231,7 +232,7 @@ const handleColumnWidth = ( type, title ) => {
  * colunmName  列名
  * record  行对象
  */
-const handleRightClickFunc = function( thisProxy, colunmName, record, x, y ){
+const handleRightClickFunc = function( thisProxy, colunmName, record, x, y){
     if( isValidVariable(colunmName) ){
         const { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } = thisProxy.props;
         //根据列名和行对象，获取选中单元格的值
@@ -341,8 +342,24 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
                 onContextMenu: ( e ) => {
                     e.preventDefault();
                     //点击时候的位置
-                    const x = e.clientX;
-                    const y = e.clientY - 68;
+                    const targetParent = e.target.parentElement;
+                    const offsetLeft = targetParent.offsetLeft;
+                    const offsetTop = targetParent.offsetTop;
+                    const targetHeight = targetParent.clientHeight;
+                    const targetWidth = targetParent.clientWidth;
+                    const $scrollDom = $(".ant-table-body");
+                    //滚动条滚动高度
+                    const orgTop = $scrollDom[0].scrollTop;
+                    const orgLeft = $scrollDom[0].scrollLeft;
+                    //加上指示箭头宽度的1/2
+                    let x = offsetLeft - orgLeft + targetWidth + 6;
+                    //加上表格头和表格查询栏高度
+                    let y = offsetTop - orgTop + 68;
+
+                    if( x < 0 ){
+                        x = targetWidth + 6;
+                    }
+
                     handleRightClickFunc(thisProxy, colunmName, record, x, y);
                 },
                 //左键

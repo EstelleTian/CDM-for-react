@@ -7,9 +7,9 @@ import { request } from "utils/request-actions";
 import { host } from "utils/request-urls";
 import FormDialog from './Form';
 import { convertData, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "utils/flight-grid-table-data-util";
-
-import './OperationDialog.less';
 import {OperationTypeForTimeColumn} from "utils/flightcoordination";
+import './OperationDialog.less';
+
 
 const { TextArea } = Input;
 
@@ -26,16 +26,20 @@ class OperationDialog extends React.Component{
         this.getDisplayFontSize = getDisplayFontSize.bind(this);
         this.getTimeColumnsAuth = this.getTimeColumnsAuth.bind(this);
         this.requestCallback = this.requestCallback.bind(this);
+        this.resetDialogPositon = this.resetDialogPositon.bind(this);
     }
 
     componentDidUpdate(){
         const { showName } = this.props.operationDatas;
         //若协调窗口打开才监听，没打开不监听
         if( isValidVariable(showName) ){
+            this.resetDialogPositon();
             const $scrollDom = $(".ant-table-body");
             let orgTop = $scrollDom[0].scrollTop;
+            let orgLeft = $scrollDom[0].scrollLeft;
             const $colCanvas = $(".collaborate-canvas");
             let canvasTop = $colCanvas[0].offsetTop;
+            let canvasLeft = $colCanvas[0].offsetLeft;
 
             $scrollDom.off("scroll.collaborate").on("scroll.collaborate", ( e ) => {
                 //滚动的高度
@@ -47,6 +51,16 @@ class OperationDialog extends React.Component{
                 //更新高度
                 orgTop = newTop;
                 canvasTop = newCanvasTop;
+
+                //滚动的高度
+                const newLeft = $scrollDom[0].scrollLeft;
+                const diffLeft = newLeft - orgLeft;
+                const newCanvasLeft = canvasLeft - diffLeft;
+                //协调窗口位置重新定位
+                $colCanvas.css("left", newCanvasLeft + 'px' );
+                //更新高度
+                orgLeft = newLeft;
+                canvasLeft = newCanvasLeft;
             });
         }
     };
@@ -61,19 +75,23 @@ class OperationDialog extends React.Component{
         this.closeCollaborateDialog();
         const { updateMultiTableDatas } = this.props;
         const { flightView = {}, generateTime } = res;
-        const { flightFieldViewMap = {}, flightAuthMap = {} } = flightView;
-        const { ID = {} } =flightFieldViewMap;
-        const id = ID.value;
+        if( isValidVariable(flightView) ){
+            const { flightFieldViewMap = {}, flightAuthMap = {} } = flightView;
+            const { ID = {} } =flightFieldViewMap;
+            const id = ID.value;
 
-        const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
-        //将航班原数据补充到航班对象中
-        data.originalData = flightView;
-        const map = {
-            [id]: data
+            const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
+            //将航班原数据补充到航班对象中
+            data.originalData = flightView;
+            const map = {
+                [id]: data
+            }
+            updateMultiTableDatas( map );
+        }else{
+            //TODO 提示错误
         }
-        updateMultiTableDatas( map );
-    };
 
+    };
 
     //处理航班号id提交操作事件
     handleFlightIdClick( item, rowData ){
@@ -104,7 +122,7 @@ class OperationDialog extends React.Component{
         }else if( en == "QUALIFICATIONS_UN_MARK" ){ //取消二类飞行资质 0 标记没有二类飞行资质
             params["type"] = 0;
         }else if( en == "INPOOL_UPDATE" ){ //移入等待池 0
-            params["status"] = 0;
+            params["status"] = 2;
         }
         //发送请求
         request( `${host}/${url}`, "post", params, (res) => {
@@ -113,6 +131,7 @@ class OperationDialog extends React.Component{
         });
     };
 
+    //获取时间类协调窗口权限
     getTimeColumnsAuth( rowData, showName ){
         let res = "";
         if( isValidObject(rowData) && isValidVariable(showName) ){
@@ -149,7 +168,7 @@ class OperationDialog extends React.Component{
                     res.show = true;
                     res.cancelBtn.show = true;
                 }
-            }else if(showName == "HOBT"){
+            }else if(showName == "HOBT" || showName == "TOBT"){
                 const authMap = rowData.originalData.flightAuthMap;
                 const applyKey = showName+"_APPLY";  //申请
                 const applyAuth = authMap[applyKey] || {};
@@ -200,22 +219,66 @@ class OperationDialog extends React.Component{
         return res;
     };
 
+    //计重置协调窗口位置
+    resetDialogPositon(){
+        const { x = 0, y = 0 } = this.props.operationDatas;
+        let left = x;
+        let top = y;
+        const $tableDom = $(".main-table");
+        //协调窗口对象
+        const $collaborateDom = $(".collaborate-canvas");
+        if( x > 0 && y > 0 && $tableDom.length > 0 && $collaborateDom.length > 0 ){
+            const tableHeight = $tableDom.height();
+            const tableWidth = $tableDom.width();
+            const collaborateHeight = $collaborateDom.height();
+            const collaborateWidth = $collaborateDom.width();
+            //箭头对象
+            const $arrow = $(".popover-arrow", $collaborateDom);
+            //如果协调窗口高度 + y 超出了表高度，对称显示
+            if( collaborateHeight + y > tableHeight && y >= collaborateHeight){
+                top = y - collaborateHeight + 32;
+                //修改箭头位置 下
+                $arrow.removeClass("top").addClass("bottom");
+            }else{
+                top = y;
+                //上
+                $arrow.removeClass("bottom").addClass("top");
+            }
+            //如果协调窗口宽度 + x 超出了表宽度，对称显示
+            if( collaborateWidth + x > tableWidth && x >= tableWidth){
+                left = x - collaborateWidth;
+                //右
+                $arrow.removeClass("left").addClass("right");
+            }else{
+                left = x;
+                //左
+                $arrow.removeClass("right").addClass("left");
+            }
+            $collaborateDom.css({
+                top: top + 'px',
+                left: left + 'px'
+            })
+        }
+    };
+
     render(){
         const { userId } = this.props;
-        const { showName = "", x, y, auth, rowData = {} } = this.props.operationDatas;
+        const { showName = "", auth, rowData = {}, x = 0, y = 0 } = this.props.operationDatas;
         //时间列显示权限
         let timeAuth = this.getTimeColumnsAuth( rowData, showName );
 
         const dialogStyle = {
-          left: x,
-          top: y
+            left: x,
+            top: y
         };
+
         return (
             <div className="collaborate-canvas" style={ dialogStyle }>
                 {
                     (showName == "FLIGHTID") ?
                         <div className="collaborate-dialog">
-                            <div  className="title">
+                            <div className="popover-arrow left top"></div>
+                            <div className="title">
                                 <span>{ rowData["FLIGHTID"] }</span>
                                 <div
                                     className="close-target"
@@ -252,7 +315,8 @@ class OperationDialog extends React.Component{
                             (
                                 (isValidVariable(timeAuth) && timeAuth.show)
                                     ? <div className="collaborate-dialog">
-                                        <div  className="title">
+                                        <div className="popover-arrow left top"></div>
+                                        <div className="title">
                                             <span>{timeAuth.cn}变更</span>
                                             <div
                                                 className="close-target"
@@ -269,17 +333,21 @@ class OperationDialog extends React.Component{
                                             requestCallback = { this.requestCallback }
                                         />
                                     </div>
-                                    : <div className="collaborate-dialog">
-                                         <div>{timeAuth.reason}</div>
-                                      </div>
+                                    : <div className="collaborate-dialog popover-dialog">
+                                        <div className="popover-arrow left top"></div>
+                                        <div className="content">
+                                            {timeAuth.reason}
+                                        </div>
+                                    </div>
                             ): ""
                     )
                 }
                 {
-                    (showName == "HOBT") ?
+                    (showName == "HOBT" || showName == "TOBT") ?
                         (
                             (isValidVariable(timeAuth) && timeAuth.show)
                                 ? <div className="collaborate-dialog">
+                                    <div className="popover-arrow left top"></div>
                                     <div  className="title">
                                         <span>{timeAuth.cn}变更</span>
                                         <div
@@ -297,8 +365,11 @@ class OperationDialog extends React.Component{
                                         requestCallback = { this.requestCallback }
                                     />
                                 </div>
-                                : <div className="collaborate-dialog">
-                                    <div>{timeAuth.reason}</div>
+                                : <div className="collaborate-dialog popover-dialog">
+                                    <div className="popover-arrow left top"></div>
+                                    <div className="content">
+                                        {timeAuth.reason}
+                                    </div>
                                 </div>
                         ): ""
                 }
