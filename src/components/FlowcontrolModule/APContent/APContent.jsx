@@ -630,18 +630,26 @@ class APContent extends React.Component{
         //流控数值
         if(flow.type =='ASSIGN'){
             flow.value = flow.assignSlot.join(',');
+            // 删除无用的assignSlot字段
             delete flow.assignSlot;
-        }else {
-            delete flow.assignSlot;
+
+        }else if(flow.type =='TIME') {
+            flow.valueStr = flow.value;
+            delete flow.value;
         }
+
 
         if(flow.type !=='TIME' && flow.type !=='ASSIGN'){
             delete flow.value;
         }
 
         // 限制时间
-        flow.startTime = startDate + startTime;
-        flow.endTime = endDate + endTime;
+        const { startDateTime, endDateTime } = this.getDateTime(); // 获取开始和截止日期时间
+        flow.startTime = startDateTime;
+        flow.endTime = endDateTime;
+        // 删除无用字段
+        delete flow.startDate;
+        delete flow.endDate;
 
         // 限制高度
         flow.controlLevel = flow.controlLevel.join(',');
