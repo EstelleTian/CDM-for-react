@@ -158,7 +158,7 @@ const convertFlowcontrolData =(data, generateTime) => {
      * */
     const setDataTime= (data, generateTime) => {
         // 流控
-        let { status,  startTime = "", endTime = "",  placeType, relativeStartTime, relativeStatus } = data;
+        let { status,  startTime = "", endTime = "",  placeType, relativeStartTime, relativeEndTime, relativeStatus } = data;
 
 
         // 转换后的结果
