@@ -1,17 +1,18 @@
 @import '../../style/theme-color';
 
-.portal-layer{
+.portal-layer {
   position: absolute;
   top: 0;
   //left:50%;
   width: 0;
 
-
-    .content {
+  .content {
     max-height: 60rem;
     overflow: auto;
+    padding: 1rem;
   }
 }
+
 .portal-layer.flowcontol-layer {
   //left: 50%;
   //margin-left: -25%;
@@ -20,14 +21,15 @@
     .title {
       padding: 0.75rem .5rem;
       border-bottom: 1px solid @c-white-50;
+      font-size: 1.25rem;
     }
-    .close-target{
+    .close-target {
       display: inline-block;
       float: right;
-      &:hover{
+      &:hover {
         cursor: pointer;
       }
-      >i{
+      > i {
         font-size: 1.25rem;
       }
     }
@@ -41,7 +43,7 @@
     }
     //带搜索按钮的输入框样式
     .ant-input-search {
-      .ant-input-search-button.ant-btn-primary{
+      .ant-input-search-button.ant-btn-primary {
         color: #FFFFFF;
         border: 1px solid #578ebe;
         background-color: #578ebe;

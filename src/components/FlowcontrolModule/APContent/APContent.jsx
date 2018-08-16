@@ -27,26 +27,24 @@ class APContent extends React.Component{
 
         this.getPointByAirport = this.getPointByAirport.bind(this);
         this.updatePoints = this.updatePoints.bind(this);
-        this.handleChangeLevel = this.handleChangeLevel.bind(this);
-        this.handleChangeAssignSlot = this.handleChangeAssignSlot.bind(this);
 
         this.onChangeFlowcontrolPoint = this.onChangeFlowcontrolPoint.bind(this);
 
-        this.onStartDateChange = this.onStartDateChange.bind(this);
-        this.onStartTimeChange = this.onStartTimeChange.bind(this);
-        this.onEndDateChange = this.onEndDateChange.bind(this);
         this.onEndTimeChange = this.onEndTimeChange.bind(this);
-
+        this.getDateTime = this.getDateTime.bind(this);
         //验证规则
         this.validateFlowcontrolName = this.validateFlowcontrolName.bind(this);
         this.validateFlowcontrolValue = this.validateFlowcontrolValue.bind(this);
         this.validateFlowcontrolAssignSlot = this.validateFlowcontrolAssignSlot.bind(this);
         this.validateAirportFormat = this.validateAirportFormat.bind(this);
+        this.validateStartDate = this.validateStartDate.bind(this);
+        this.validateStartTime = this.validateStartTime.bind(this);
+        this.validateEndDate = this.validateEndDate.bind(this);
+        this.validateEndTime = this.validateEndTime.bind(this);
+        this.ForceTriggerValidate = this.ForceTriggerValidate.bind(this);
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleSubmitCallback = this.handleSubmitCallback.bind(this);
-        // 数据生成时间
-        const { time } = this.props.generateTime;
 
         this.state = {
             // 高度选项
@@ -60,11 +58,6 @@ class APContent extends React.Component{
             flowcontrolPointsList : [], // 流控点集合
             checkedControlPoints : [], // 勾选的限制流控点(含所属组,不用作最终表单提交)
             controlPoints : [], // 勾选的限制流控点(不含所属组,用于最终表单提交)
-
-            startDate : time.substring(0,8) || moment().format('YYYYMMDD'),
-            startTime : time.substring(8,12) || moment().format('HHmm'),
-            endDate : '',
-            endTime : '',
 
         }
     }
@@ -272,14 +265,8 @@ class APContent extends React.Component{
         }
     }
 
-    // 变更高度
-    handleChangeLevel(value){
 
-        this.setState({
-            controlLevel : value
-        })
-        console.log(value);
-    }
+
     // 变更限制流控点
     onChangeFlowcontrolPoint(e){
         // 删除与指定项组不同的其他项
@@ -344,11 +331,6 @@ class APContent extends React.Component{
         })
     }
 
-    // 变更指定分钟
-    handleChangeAssignSlot(value, option){
-
-    }
-
 
     //限制数值--校验规则
     validateFlowcontrolValue = (rule, value, callback) => {
@@ -362,9 +344,15 @@ class APContent extends React.Component{
         }else {
             callback();
         }
-    }
+    };
     // 指定分钟--校验规则
     validateFlowcontrolAssignSlot = (rule, value, callback) => {
+        const type = this.props.form.getFieldValue("type");
+        // 若限制类型不是ASSIGN，则始终设置此校验为通过
+        if(type != 'ASSIGN'){
+            callback();
+            return;
+        }
         // 数据无效
         if(!value){
             callback('请输入指定分钟数值');
@@ -402,14 +390,6 @@ class APContent extends React.Component{
                 }
                 callback();
 
-                // let secondLast = value[len-2];
-                // if( lastVal*1 <= secondLast*1 ){
-                //     callback('请按升序输入');
-                // }else if((lastVal*1 - secondLast*1) < 5 ){
-                //     callback('间隔要大于等于5');
-                // }else {
-                //     callback();
-                // }
             }
         }
     }
@@ -451,7 +431,139 @@ class APContent extends React.Component{
             }
 
         }
-    }
+    };
+    // 获取开始和截止日期时间
+    getDateTime = () => {
+        const _form = this.props.form;
+        let {startDate, startTime, endDate, endTime} = _form.getFieldsValue(['startDate', 'startTime', 'endDate', 'endTime']);
+        const dateFormat = 'YYYYMMDD';
+        const timeFormat = 'HHmm';
+        startDate = startDate ? startDate.format(dateFormat) : '';
+        startTime = startTime ? startTime.format(timeFormat) : '';
+        endDate = endDate ? endDate.format(dateFormat) : '';
+        endTime = endTime ? endTime.format(timeFormat) : '';
+        let startDateTime = startDate + startTime;
+        let endDateTime = endDate + endTime;
+        return {
+            startDate,
+            startTime,
+            endDate,
+            endTime,
+            startDateTime,
+            endDateTime
+        }
+    };
+    // 对指定表单域再次校验
+    /**
+     * @param  arr 指定表单域名 数组 每项必须为字符串
+     *
+     * @param  every 是否对指定的每一个表单域进行再次校验 布尔  false 仅对未通过的表单域进行再次校验  true 对每一个表单域进行再次校验
+     *
+     * */
+    ForceTriggerValidate = (arr, every) => {
+        const _form = this.props.form;
+        // 对指定的全部再次校验
+        if(every){
+            // 遍历对每一个进行再次校验
+            arr.map((item) => {
+                _form.validateFields([item], {
+                    force: true,
+                });
+            });
+        }else { // 仅对未通过的表单域进行再次校验
+
+            // 遍历
+            arr.map((item)=>{
+                // 获取这个输入控件的 Error
+                let err = _form.getFieldError(item);
+                // 若Error有效，即这个输入控件之前经过校验且校验不通过，则对其再次校验
+                if(err){
+                    _form.validateFields([item],{
+                        force:true,
+                    });
+                }
+            });
+        }
+    };
+
+    // 开始日期--校验规则
+    validateStartDate = (rule, value, callback) => {
+        const { startDate, startTime, endDate, endTime,startDateTime, endDateTime } = this.getDateTime();
+        // 结束日期和结束时间都为空时，校验通过
+        if(endDate == "" && endTime == ""){
+            callback();
+        }else if (startDate != "" && startTime != ""
+            && endDate != "" && endTime != "") {
+            if(startDateTime *1 >= endDateTime *1){
+                callback("开始时间不能晚于截止时间");
+            }else {
+                callback();
+                this.ForceTriggerValidate(['startTime','endDate', 'endTime'],false);
+            }
+        }
+    };
+    // 开始时间--校验规则
+    validateStartTime = (rule, value, callback) => {
+        const { startDate, startTime, endDate, endTime,startDateTime, endDateTime } = this.getDateTime();
+        // 结束日期和结束时间都为空时，校验通过
+        if(endDate == "" && endTime == ""){
+            callback();
+        }else if (startDate != "" && startTime != ""
+            && endDate != "" && endTime != "") {
+            if(startDateTime *1 >= endDateTime *1){
+                callback("开始时间不能晚于截止时间");
+            }else {
+                callback();
+                this.ForceTriggerValidate(['startDate','endDate', 'endTime'],false);
+            }
+        }
+
+
+    };
+    // 截止日期--校验规则
+    validateEndDate = (rule, value, callback) => {
+        const { startDate, startTime, endDate, endTime,startDateTime, endDateTime } = this.getDateTime();
+        // 结束日期和结束时间都为空时，校验通过
+        if(endDate == "" && endTime == ""){
+            callback();
+            this.ForceTriggerValidate(['endTime'],false);
+        }else if (startDate != "" && startTime != ""
+            && endDate != "" && endTime != "") {
+            if(startDateTime *1 >= endDateTime *1){
+                callback("截止时间不能早于开始时间");
+            }else {
+                callback();
+                this.ForceTriggerValidate(['startDate', 'startTime', 'endTime'],false);
+            }
+        }else if(endDate == "" && endTime != "" ){
+            callback("截止时间无效");
+        }else if(endDate != "" && endTime == "" ){
+            this.ForceTriggerValidate(['endTime'],true);
+        }
+
+
+    };
+    // 截止时间--校验规则
+    validateEndTime = (rule, value, callback) => {
+        const { startDate, startTime, endDate, endTime,startDateTime, endDateTime } = this.getDateTime();
+        // 结束日期和结束时间都为空时，校验通过
+        if(endDate == "" && endTime == ""){
+            callback();
+            this.ForceTriggerValidate(['endDate'],false);
+        }else if (startDate != "" && startTime != ""
+            && endDate != "" && endTime != "") {
+            if(startDateTime *1 >= endDateTime *1){
+                callback("截止时间不能早于开始时间");
+            }else {
+                callback();
+                // this.ForceTriggerValidate(['startDate', 'startTime', 'endDate'],false);
+            }
+        }else if(endDate != "" && endTime == "" ){
+            callback("截止时间无效");
+        }
+
+    };
+
     //流控名称--校验规则
     validateFlowcontrolName = (rule, value, callback) => {
         //若value值为空
@@ -462,52 +574,37 @@ class APContent extends React.Component{
         }
     };
 
-    // 开始日期改变
-    onStartDateChange( datemoment, dateString ){
-        const { startDate } = this.state;
-        if(dateString != ""){
-            //更新选中的日期
-            this.setState({
-                startDate: dateString
-            });
-        }
-    };
 
-    //开始时间改变
-    onStartTimeChange( timemoment, timeString ){
-        const { startTime } = this.state;
-        if( timeString != "" ){
-            //更新选中的时间
-            this.setState({
-                startTime: timeString
-            });
-        }
-    }
-    // 结束日期改变
-    onEndDateChange( datemoment, dateString ){
-        const { endDate } = this.state;
-        debugger
-        //更新选中的日期 可以为空
-        this.setState({
-            endDate: dateString
-        });
-    };
-
-    //结束时间改变
+    //截止时间改变
     onEndTimeChange( timemoment, timeString ){
-        const { endTime } = this.state;
+        const { startDate, startTime, endDate, endTime, } = this.getDateTime();
+        let newDate = '';
+        const dateFormat = 'YYYYMMDD';
+        // 自动填充结束日期
+        if(timeString!='' && endDate == ''){
+            // 截止时间小于或等于开始时间，则截止日期为开始日期后1天
+            if(timeString*1 <= startTime*1){
+                newDate = moment(moment(startDate).add(1, 'day')).endOf('day');
+            }else {
+                // 截止时间大于开始时间，则截止日期与开始日期相同
+                newDate =  moment(startDate,dateFormat);
+            }
+            const _form = this.props.form;
+            //更新截止日期
+            _form.setFieldsValue({
+                endDate: newDate
+            });
+        }
 
-        //更新选中的时间 可以为空
-        this.setState({
-            endTime: timeString
-        });
     }
 
     // 处理表单提交
     handleSubmit(e){
         e.preventDefault();
         const _form = this.props.form;
-        _form.validateFieldsAndScroll((err, values) => {
+        _form.validateFieldsAndScroll({
+            force:true,
+        },(err, values) => {
             //校验通过
             if (!err) {
                 // 转换表单字段数据
@@ -519,7 +616,7 @@ class APContent extends React.Component{
     // 转换表单字段数据
     handleConvertFormData(data){
         const { loginUserInfo, systemConfig } = this.props;
-        const { startDate, startTime, endDate, endTime, controlPoints, } = this.state;
+        const { controlPoints, } = this.state;
         // 拷贝数据
         let flow = JSON.parse(JSON.stringify(data));
         // 处理数据
@@ -551,6 +648,12 @@ class APContent extends React.Component{
 
         // 限制流控点
         flow.controlPoints = controlPoints.join(',');
+
+        // 受控降落机场
+        flow.controlDirection = flow.controlDirection.join(',').toUpperCase();
+        // 豁免降落机场
+        flow.exemptDirection = flow.exemptDirection.join(',').toUpperCase();
+
 
         // 发布者
         flow.publishUser = loginUserInfo.username;
@@ -621,10 +724,18 @@ class APContent extends React.Component{
         const Layout8 = { span: 8 };
         const Layout6 = { span: 6 };
         const Layout4 = { span: 4 };
-        const { flowcontrolPointsList, checkedControlPoints, levelOptions, startDate, startTime, endDate, endTime,} = this.state;
-        const { clickCloseBtn, dialogName} = this.props;
+        const { flowcontrolPointsList,  checkedControlPoints, levelOptions,} = this.state;
+
+        const { clickCloseBtn, dialogName, generateTime} = this.props;
+        // 数据生成时间
+        const {time} = generateTime;
+        // 数据日期
+        const standardDate = time ? time.substring(0,8):'';
+        // 数据时间
+        const standardTime = time ? time.substring(8,12):'';
+
         const dateFormat = 'YYYYMMDD';
-        const format = 'HHmm';
+        const timeFormat = 'HHmm';
         const { getFieldDecorator } = this.props.form;
         const type = this.props.form.getFieldValue("type");
         const flowcontrolTypeFlag = this.props.form.getFieldValue("flowcontrolType");
@@ -653,6 +764,50 @@ class APContent extends React.Component{
             originalPublishUnit: getFieldDecorator("originalPublishUnit",{
                 initialValue: "流量室",
                 rules: []
+            }),
+            // 开始日期
+            startDate: getFieldDecorator("startDate",{
+                initialValue: moment( standardDate, dateFormat ),
+                rules: [
+                    { required: true,
+                        message: "开始日期不能为空"
+                    },
+                    {
+                        validator :  this.validateStartDate
+                    } // 日期时间比较
+                ]
+            }),
+            // 开始时间
+            startTime: getFieldDecorator("startTime", {
+                initialValue: moment(standardTime, 'HHmm'),
+                rules: [
+                    {
+                        required: true,
+                        message: '开始时间不能为空'
+                    },
+                    {
+                        validator :  this.validateStartTime
+                    } // 日期时间比较
+
+                ]
+            }),
+            // 截止日期
+            endDate: getFieldDecorator("endDate",{
+                // initialValue: moment( endDate, dateFormat ),
+                rules: [
+                    {
+                        validator :  this.validateEndDate
+                    }, // 日期时间比较
+                ]
+            }),
+            // 截止时间
+            endTime: getFieldDecorator("endTime",{
+                // initialValue: moment( endTime, 'HHmm'),
+                rules: [
+                    {
+                        validator :  this.validateEndTime
+                    }, // 日期时间比较
+                ]
             }),
 
             // 限制类型
@@ -732,12 +887,15 @@ class APContent extends React.Component{
                 <Row className="content ap-flowcontrol-dialog">
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
-                            基本信息
+                            <div className="row-title">
+                                基本信息
+                            </div>
+
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
                                 <Col {...Layout4}>
-                                    流控名称
+                                    <div className="label">流控名称</div>
                                 </Col>
                                 <Col {...Layout10}>
                                     <FormItem>
@@ -770,7 +928,8 @@ class APContent extends React.Component{
                             </Row>
                             <Row>
                                 <Col {...Layout4}>
-                                    发布用户
+                                    <div className="label">发布用户</div>
+
                                 </Col>
                                 <Col {...Layout8}>
                                     {
@@ -781,7 +940,8 @@ class APContent extends React.Component{
 
                                 </Col>
                                 <Col {...Layout4} className="text-center">
-                                    原发布者
+                                    <div className="label">原发布者</div>
+
                                 </Col>
                                 <Col {...Layout8}>
                                     {
@@ -812,76 +972,122 @@ class APContent extends React.Component{
                     </Col>
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
-                            限制时间
+                            <div className="row-title">
+                                限制时间
+                            </div>
+
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
                                 <Col {...Layout4}>
-                                    起始时间
+                                    <div className="label">起始时间</div>
+
                                 </Col>
-                                <Col {...Layout8}>
-                                    <DatePicker
-                                        className = "date-picker"
-                                        disabledDate={ (current) => {
-                                            //不能选早于今天的 false显示 true不显示
-                                            //明天
-                                            const tomorrow = moment(moment(startDate).add(1, 'day')).endOf('day');
-                                            //今天
-                                            const today = moment(startDate).startOf('day');
-                                            //只能选今明两天
-                                            return current < today || current > tomorrow;
-                                        } }
-                                        value = {  startDate == "" ? moment() : moment( startDate, dateFormat ) }
-                                        format={dateFormat}
-                                        onChange={ this.onStartDateChange }
-                                    />
-                                    <TimePicker
-                                        className = "time-picker"
-                                        value = { startTime == "" ? moment() : moment( startTime, 'HHmm') }
-                                        format={format}
-                                        onChange={ this.onStartTimeChange }
-                                    />
+                                <Col {...Layout4}>
+                                    <FormItem>
+                                        {
+                                            rulesGenerate.startDate(
+                                                <DatePicker
+                                                    className = "date-picker"
+                                                    // allowClear = {false} // 不显示清除按钮
+                                                    disabledDate={ (current) => {
+                                                        //不能选早于今天的 false显示 true不显示
+                                                        //明天
+                                                        const tomorrow = moment(moment(standardDate).add(1, 'day')).endOf('day');
+                                                        //今天
+                                                        const today = moment(standardDate).startOf('day');
+                                                        //只能选今明两天
+                                                        return current < today || current > tomorrow;
+                                                    } }
+                                                    format={dateFormat}
+                                                    // onChange={ this.onStartDateChange }
+                                                    placeholder="开始日期,必选项"
+                                                />
+                                            )
+                                        }
+                                    </FormItem>
+                                </Col>
+                                <Col {...Layout4}>
+                                    <FormItem>
+                                        {
+                                            rulesGenerate.startTime(
+                                                <TimePicker
+                                                    className = "time-picker"
+                                                    // allowEmpty = { false} // 不显示清除按钮
+                                                    format={timeFormat}
+                                                    // onChange={ this.onStartTimeChange }
+                                                    placeholder="开始时间,必选项"
+                                                />
+                                            )
+                                        }
+                                    </FormItem>
                                 </Col>
                                 <Col {...Layout4} className="text-center">
-                                    截止时间
+                                    <div className="label">截止时间</div>
+
                                 </Col>
-                                <Col {...Layout8}>
-                                    <DatePicker
-                                        allowClear = {true} // 显示清除按钮
-                                        disabledDate={ (current) => {
-                                            //不能选早于今天的 false显示 true不显示
-                                            //今天
-                                            const today = moment(startDate).startOf('day');
-                                            //不能选早于今天
-                                            return current < today;
-                                        } }
-                                        // value = {  endDate }
-                                        format={dateFormat}
-                                        onChange={ this.onEndDateChange }
-                                    />
-                                    <TimePicker
-                                        // value = { endTime }
-                                        format={format}
-                                        onChange={ this.onEndTimeChange }
-                                    />
+                                <Col {...Layout4}>
+                                    <FormItem>
+                                        {
+                                            rulesGenerate.endDate(
+                                                <DatePicker
+                                                    allowClear={true} // 显示清除按钮
+                                                    placeholder="截止日期,可选项"
+                                                    disabledDate={ (current) => {
+                                                        //不能选早于今天的 false显示 true不显示
+                                                        //今天
+                                                        const today = moment(standardDate).startOf('day');
+                                                        //不能选早于今天
+                                                        return current < today;
+                                                    } }
+
+                                                    format={dateFormat}
+                                                    // onChange={ this.onEndDateChange }
+                                                />
+                                            )
+                                        }
+
+
+                                    </FormItem>
                                 </Col>
+                                <Col {...Layout4}>
+                                    <FormItem>
+                                        {
+                                            rulesGenerate.endTime(
+                                                <TimePicker
+                                                    format={timeFormat}
+                                                    onChange={ this.onEndTimeChange }
+                                                    placeholder="截止时间,可选项"
+
+                                                />
+                                            )
+                                        }
+
+                                    </FormItem>
+                                </Col>
+
                             </Row>
 
                         </Col>
                     </Col>
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
-                            限制类型
+                            <div className="row-title">
+                                限制类型
+                            </div>
+
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
                                 <Col {...Layout4}>
-                                    类型
+                                    <div className="label">类型</div>
+
                                 </Col>
                                 <Col {...Layout8}>
                                     {
                                         rulesGenerate.type(
                                             <RadioGroup
+                                                // onChange={this.handleChangeType}
                                             >
                                                 <Radio value="TIME">时间</Radio>
                                                 <Radio value="GS">地面停止</Radio>
@@ -892,8 +1098,11 @@ class APContent extends React.Component{
                                     }
                                 </Col>
                                 <Col {...Layout4} className="text-center">
-                                    { (type == 'TIME') ? "限制数值" : "" }
-                                    { (type == 'ASSIGN') ? "指定分钟" : "" }
+                                    <div className="label">
+                                        { (type == 'TIME') ? "限制数值" : "" }
+                                        { (type == 'ASSIGN') ? "指定分钟" : "" }
+                                    </div>
+
                                 </Col>
                                 <Col {...Layout6}>
                                     { (type == 'TIME') ?
@@ -903,7 +1112,7 @@ class APContent extends React.Component{
                                                     <Input placeholder="限制数值" className="limit-value" />
                                                 )
                                             }
-                                            <span className="unit">分钟</span>
+                                            <span className="unit label">分钟</span>
                                         </FormItem>
                                         : "" }
                                     { (type == 'ASSIGN') ?
@@ -914,7 +1123,6 @@ class APContent extends React.Component{
                                                     <Select
                                                         mode="tags"
                                                         placeholder="请输入00-59正整数,多个值以逗号分隔,以升序排序且间隔不小于5;"
-                                                        // onChange={this.handleChangeAssignSlot}
                                                     >
                                                     </Select>
                                                 )
@@ -928,12 +1136,16 @@ class APContent extends React.Component{
                     </Col>
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
-                            限制原因s
+
+                            <div className="row-title">
+                                限制原因
+                            </div>
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
                                 <Col {...Layout4}>
-                                    原因
+                                    <div className="label">原因</div>
+
                                 </Col>
                                 <Col {...Layout20}>
                                     <FormItem>
@@ -958,12 +1170,16 @@ class APContent extends React.Component{
                     </Col>
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
-                            限制方向
+
+                            <div className="row-title">
+                                限制方向
+                            </div>
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
                                 <Col {...Layout4}>
-                                    模板
+                                    <div className="label">模板</div>
+
                                 </Col>
                                 <Col {...Layout20}>
 
@@ -974,7 +1190,9 @@ class APContent extends React.Component{
                                     return (
                                         <Row key= {item.id}>
                                             <Col {...Layout4}>
+                                                <div className="label">
                                                 { item.description }
+                                                </div>
                                             </Col>
                                             <Col {...Layout20}>
                                                 {
@@ -998,7 +1216,8 @@ class APContent extends React.Component{
                             }
                             <Row>
                                 <Col {...Layout4}>
-                                    受控起飞机场
+                                    <div className="label">受控起飞机场</div>
+
                                 </Col>
                                 <Col {...Layout8}>
                                     {
@@ -1012,7 +1231,8 @@ class APContent extends React.Component{
 
                                 </Col>
                                 <Col {...Layout4} className="text-center">
-                                    受控降落机场
+                                    <div className="label">受控降落机场</div>
+
                                 </Col>
                                 <Col {...Layout8}>
                                     <FormItem>
@@ -1030,7 +1250,8 @@ class APContent extends React.Component{
                             </Row>
                             <Row>
                                 <Col {...Layout4} >
-                                    豁免起飞机场
+                                    <div className="label">豁免起飞机场</div>
+
                                 </Col>
                                 <Col {...Layout8}>
                                     {
@@ -1041,7 +1262,8 @@ class APContent extends React.Component{
 
                                 </Col>
                                 <Col {...Layout4} className="text-center">
-                                    豁免降落机场
+                                    <div className="label">豁免降落机场</div>
+
                                 </Col>
                                 <Col {...Layout8}>
                                     <FormItem>
@@ -1061,12 +1283,18 @@ class APContent extends React.Component{
                     </Col>
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
-                            限制高度
+
+                            <div className="row-title">
+                                限制高度
+                            </div>
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
                                 <Col {...Layout4}>
-                                    高度
+                                    <div className="label">
+                                        高度
+                                    </div>
+
                                 </Col>
                                 <Col {...Layout20}>
                                     {
@@ -1088,12 +1316,18 @@ class APContent extends React.Component{
                     </Col>
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
-                            备注
+
+                            <div className="row-title">
+                                备注
+                            </div>
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
                                 <Col {...Layout4}>
-                                    备注
+                                    <div className="label">
+                                        备注
+                                    </div>
+
                                 </Col>
                                 <Col {...Layout20}>
                                     {
