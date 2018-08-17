@@ -556,10 +556,12 @@ class APContent extends React.Component{
                 callback("截止时间不能早于开始时间");
             }else {
                 callback();
-                // this.ForceTriggerValidate(['startDate', 'startTime', 'endDate'],false);
+                this.ForceTriggerValidate(['startDate', 'startTime', 'endDate'],false);
             }
         }else if(endDate != "" && endTime == "" ){
             callback("截止时间无效");
+        }else if(endDate == "" && endTime != "" ){
+            this.ForceTriggerValidate(['endDate'],true);
         }
 
     };
@@ -581,7 +583,7 @@ class APContent extends React.Component{
         let newDate = '';
         const dateFormat = 'YYYYMMDD';
         // 自动填充结束日期
-        if(timeString!='' && endDate == ''){
+        if(timeString!='' && startDate !=''  && startTime !='' && endDate == ''){
             // 截止时间小于或等于开始时间，则截止日期为开始日期后1天
             if(timeString*1 <= startTime*1){
                 newDate = moment(moment(startDate).add(1, 'day')).endOf('day');
