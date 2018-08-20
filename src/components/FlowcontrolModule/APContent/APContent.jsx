@@ -1,6 +1,7 @@
 //机场流控页面
 import React from 'react';
-import { Row, Col, Icon, Button, Card, Form, Input, Checkbox, Select, Radio, DatePicker, TimePicker     } from 'antd';
+import { Row, Col, Icon, Button, Card, Form, Input, Checkbox, Select, Radio, DatePicker, TimePicker, Modal, Spin,    } from 'antd';
+import Loader from 'components/Loader/Loader';
 import { getPointByAirportUrl, publishFlowcontrolUrl } from 'utils/request-urls';
 import {  request } from 'utils/request-actions';
 import moment from 'moment';
@@ -10,6 +11,8 @@ import {isValidVariable} from "utils/basic-verify";
 const FormItem = Form.Item;
 const Search = Input.Search;
 const RadioGroup = Radio.Group;
+const { Option } = Select;
+
 
 class APContent extends React.Component{
     constructor( props ){
@@ -36,12 +39,14 @@ class APContent extends React.Component{
         this.validateFlowcontrolName = this.validateFlowcontrolName.bind(this);
         this.validateFlowcontrolValue = this.validateFlowcontrolValue.bind(this);
         this.validateFlowcontrolAssignSlot = this.validateFlowcontrolAssignSlot.bind(this);
+        this.validateFlowcontrolReserveSlots = this.validateFlowcontrolReserveSlots.bind(this);
         this.validateAirportFormat = this.validateAirportFormat.bind(this);
         this.validateStartDate = this.validateStartDate.bind(this);
         this.validateStartTime = this.validateStartTime.bind(this);
         this.validateEndDate = this.validateEndDate.bind(this);
         this.validateEndTime = this.validateEndTime.bind(this);
         this.ForceTriggerValidate = this.ForceTriggerValidate.bind(this);
+        this.handleChangeReserveSlots = this.handleChangeReserveSlots.bind(this);
 
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleSubmitCallback = this.handleSubmitCallback.bind(this);
@@ -58,6 +63,7 @@ class APContent extends React.Component{
             flowcontrolPointsList : [], // 流控点集合
             checkedControlPoints : [], // 勾选的限制流控点(含所属组,不用作最终表单提交)
             controlPoints : [], // 勾选的限制流控点(不含所属组,用于最终表单提交)
+            loading : false // 加载
 
         }
     }
@@ -324,7 +330,6 @@ class APContent extends React.Component{
             let val =  item.substring(0, item.indexOf('_'));
             points.push(val);
         });
-        console.log(points)
         // 更新controlPoints
         this.setState({
             controlPoints: points
@@ -392,7 +397,60 @@ class APContent extends React.Component{
 
             }
         }
-    }
+    };
+    // 预留时隙--校验规则
+    validateFlowcontrolReserveSlots = (rule, value, callback) => {
+        const type = this.props.form.getFieldValue("type");
+        // 若限制类型不是TIME，则始终设置此校验为通过
+        if(type != 'TIME'){
+            callback();
+            return;
+        }
+
+        // 数据无效则通过校验 (因为不是必填项)
+        if(!value){
+            callback();
+            return
+        }
+        let len = value.length;
+        // 未通过的数值集合
+        let invalid = [];
+        // 年月日校验规则 8位
+        const  regexp = /(([0-9]{3}[1-9]|[0-9]{2}[1-9][0-9]{1}|[0-9]{1}[1-9][0-9]{2}|[1-9][0-9]{3})(((0[13578]|1[02])(0[1-9]|[12][0-9]|3[01]))|((0[469]|11)(0[1-9]|[12][0-9]|30))|(02(0[1-9]|[1][0-9]|2[0-8]))))|((([0-9]{2})(0[48]|[2468][048]|[13579][26])|((0[48]|[2468][048]|[3579][26])00))0229)/;
+        // 时分校验规则 4位 0000~2359
+        const reg =  /(^[0-1][0-9]|^2[0-3])[0-5]{1}[0-9]{1}$/;
+        for (let i=0; i<len; i++){
+            var item = value[i];
+            // 长度等于12
+            if(item.length == 12){
+                // 日期
+                let date = item.substring(0,8);
+                // 时间
+                let time = item.substring(8,12);
+                // 日期校验
+                let dateValid = regexp.test(date);
+                // 时间校验
+                let timeValid = reg.test(time);
+                // 日期未通过校验或时间未通过校验
+                if(!dateValid || !timeValid){
+                    // 添加到未通过校验数值集合中
+                    invalid.push(item)
+                }
+            }else {
+                // 长度不等于12添加到未通过校验数值集合中
+                invalid.push(item);
+            }
+        }
+        // 若未通过的数值集合为空
+        if(invalid.length < 1){
+            // 通过校验
+            callback();
+        }else {
+            // 若未通过的数值集合不空，校验不通过并提示未通过校验的数值
+            callback(invalid.join(',')+'无效')
+        }
+
+    };
     // 机场名称格式--校验规则
     validateAirportFormat = (rule, value, callback) =>{
         // 数据为undefined，即没有输入任何值
@@ -485,6 +543,50 @@ class APContent extends React.Component{
             });
         }
     };
+    // 变更预留时隙
+    handleChangeReserveSlots(value,option){
+        const { startDate, startTime,} = this.getDateTime();
+        // 0000~2359规则
+        const regexp = /(^[0-1][0-9]|^2[0-3])[0-5]{1}[0-9]{1}$/;
+        // 数值集合
+        let len = value.length;
+        // 取最后一个值
+        let lastVal = value[len-1];
+
+        // 最后一个值是否满足0000~2359规则
+        const valid = regexp.test(lastVal);
+        let newDate = '';
+        const dateFormat = 'YYYYMMDD';
+        // 开始日期和开始时间不为空且最后一个值满足规则,进行自动填充为
+        if(startDate !='' && startTime !='' && valid ){
+            // 录入值小于或等于开始时间，则自动填充日期为开始日期后1天
+            if(lastVal*1 <= startTime*1){
+                newDate = moment(moment(startDate).add(1, 'day')).endOf('day');
+            }else {
+                // 截止时间大于开始时间，则截止日期与开始日期相同
+                newDate =  moment(startDate,dateFormat);
+            }
+            // 最后计算得12位日期时间字符串
+            const res = newDate.format(dateFormat) + lastVal;
+            // 是否有重复
+            let repeat = false;
+            // 遍历
+            for(var i=0; i<len; i++){
+                // 若与结果数值相同
+                if(res == value[i]){
+                    // 删除最后这个值
+                    value.splice(len-1,1);
+                    repeat = true;
+                    break;
+                }
+            }
+            // 若没有有重复,则更新最后一个值
+            if(!repeat){
+                // 更新最后一个值
+                value[len-1] = res;
+            }
+        }
+    }
 
     // 开始日期--校验规则
     validateStartDate = (rule, value, callback) => {
@@ -611,7 +713,6 @@ class APContent extends React.Component{
             if (!err) {
                 // 转换表单字段数据
                 this.handleConvertFormData(values);
-                console.log( values );
             }
         });
     }
@@ -622,7 +723,6 @@ class APContent extends React.Component{
         // 拷贝数据
         let flow = JSON.parse(JSON.stringify(data));
         // 处理数据
-
         // 流控类型 (1:非长期  0:长期)
         if(flow.flowcontrolType){
             flow.flowcontrolType = 0;
@@ -631,15 +731,10 @@ class APContent extends React.Component{
         }
         //流控数值
         if(flow.type =='ASSIGN'){
-            flow.value = flow.assignSlot.join(',');
-            // 删除无用的assignSlot字段
-            delete flow.assignSlot;
-
+            flow.assignSlot = flow.assignSlot ? flow.assignSlot.join(',') : '';
         }else if(flow.type =='TIME') {
             flow.valueStr = flow.value;
-            delete flow.value;
         }
-
 
         if(flow.type !=='TIME' && flow.type !=='ASSIGN'){
             delete flow.value;
@@ -664,7 +759,9 @@ class APContent extends React.Component{
         // 豁免降落机场
         flow.exemptDirection = flow.exemptDirection.join(',').toUpperCase();
 
-
+        if(flow.reserveSlots){
+            flow.reserveSlots = flow.reserveSlots.join(',');
+        }
         // 发布者
         flow.publishUser = loginUserInfo.username;
         // 系统
@@ -694,12 +791,38 @@ class APContent extends React.Component{
             // 流控数据集合
             flowcontrol : flow
         };
-        console.log(params);
+        // 开启加载
+        this.setState({
+            loading : true
+        });
         request(publishFlowcontrolUrl,'POST',JSON.stringify(params),this.handleSubmitCallback);
     }
     // 表单提交回调函数
     handleSubmitCallback(res){
-        console.log(res);
+        const { status, flowcontrol} = res;
+        //
+        const { clickCloseBtn, dialogName } = this.props;
+        // 关闭加载
+        this.setState({
+            loading : false
+        });
+        if(status == 200){
+            Modal.success({
+                title: '流控发布成功',
+                content: '流控发布成功',
+                okText: '确认',
+                onOk(){
+                    clickCloseBtn(dialogName);
+                },
+            });
+        }else if(status != 200 && res.error){
+            Modal.error({
+                title: '流控发布失败',
+                content: res.error.message,
+                okText: '确认',
+                onOk(){ },
+            });
+        }
     }
 
     //
@@ -886,13 +1009,21 @@ class APContent extends React.Component{
                     }
                 ]
             }),
+            // 预留时隙
+            reserveSlots: getFieldDecorator("reserveSlots", {
+                rules: [
+                    {
+                        validator : this.validateFlowcontrolReserveSlots
+                    }
+                ]
+            }),
             // 备注
             comments: getFieldDecorator("comments",{
                 rules: []
             })
         };
         return (
-            <Form className="" layout="vertical" onSubmit={this.handleSubmit} >
+            <Form className="ap-flowcontrol-form" layout="vertical" onSubmit={this.handleSubmit} >
                 {/*/!* 内容 *!/*/}
                 <Row className="content ap-flowcontrol-dialog">
                     <Col {...Layout24}>
@@ -1186,15 +1317,15 @@ class APContent extends React.Component{
                             </div>
                         </Col>
                         <Col {...ContentLayout} >
-                            <Row>
-                                <Col {...Layout4}>
-                                    <div className="label">模板</div>
+                            {/*<Row>*/}
+                                {/*<Col {...Layout4}>*/}
+                                    {/*<div className="label">模板</div>*/}
 
-                                </Col>
-                                <Col {...Layout20}>
+                                {/*</Col>*/}
+                                {/*<Col {...Layout20}>*/}
 
-                                </Col>
-                            </Row>
+                                {/*</Col>*/}
+                            {/*</Row>*/}
                             {
                                 flowcontrolPointsList.map((item) =>{
                                     return (
@@ -1313,7 +1444,6 @@ class APContent extends React.Component{
                                                 allowClear = {true}
                                                 mode="multiple"
                                                 placeholder="请选择限制高度"
-                                                // onChange={this.handleChangeLevel}
                                             >
                                                 { levelOptions }
                                             </Select>
@@ -1324,6 +1454,41 @@ class APContent extends React.Component{
                             </Row>
                         </Col>
                     </Col>
+                    { (type == 'TIME') ?
+                    <Col {...Layout24}>
+                        <Col {...BasicTitleLayout} >
+
+                            <div className="row-title">
+                                预留时隙
+                            </div>
+                        </Col>
+                        <Col {...ContentLayout} >
+                            <Row>
+                                <Col {...Layout4}>
+                                    <div className="label">
+                                        时隙
+                                    </div>
+
+                                </Col>
+                                <Col {...Layout20}>
+                                    <FormItem>
+                                    {
+                                        rulesGenerate.reserveSlots(
+                                            <Select
+                                                mode="tags"
+                                                placeholder="请输入时隙"
+                                                onChange={this.handleChangeReserveSlots}
+                                            >
+
+                                            </Select>
+                                        )
+                                    }
+                                    </FormItem>
+                                </Col>
+                            </Row>
+                        </Col>
+                    </Col> : ''
+                    }
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
 
@@ -1372,6 +1537,9 @@ class APContent extends React.Component{
                         </Button>
                     </Col>
                 </Row>
+                {
+                    this.state.loading ? <Loader/> : ''
+                }
             </Form>
         )
     }
