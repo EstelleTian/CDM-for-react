@@ -17,6 +17,8 @@ const { Option } = Select;
 class APContent extends React.Component{
     constructor( props ){
         super(props);
+
+        this.computeFlowcontrolName = this.computeFlowcontrolName.bind(this);
         this.splicingName = this.splicingName.bind(this);
         this.splicingGSTypeName = this.splicingGSTypeName.bind(this);
         this.splicingREQTypeName = this.splicingREQTypeName.bind(this);
@@ -51,8 +53,12 @@ class APContent extends React.Component{
         this.validateEndTime = this.validateEndTime.bind(this);
         this.ForceTriggerValidate = this.ForceTriggerValidate.bind(this);
         this.handleChangeReserveSlots = this.handleChangeReserveSlots.bind(this);
+        this.checkFlowcontrolPoints = this.checkFlowcontrolPoints.bind(this);
+        this.checkFlowcontrolName = this.checkFlowcontrolName.bind(this);
+        this.confirmSubmit = this.confirmSubmit.bind(this);
 
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleConvertFormData = this.handleConvertFormData.bind(this);
         this.handleSubmitCallback = this.handleSubmitCallback.bind(this);
 
         this.state = {
@@ -191,6 +197,46 @@ class APContent extends React.Component{
         this.setState({
             template : data
         });
+    }
+    // 拼接流控名称
+    computeFlowcontrolName() {
+        let res = '';
+        const { type,controlDepDirection,value, assignSlot  } = this.props.form.getFieldsValue(['type', 'controlDepDirection', 'value', 'assignSlot']);
+        const { controlPoints } = this.state;
+        if(type == 'GS'){ // 限制类型为地面停止
+            // 若未勾选限制流控点,则以受控起飞机场命名
+            if(controlPoints.length < 1) {
+                res = controlDepDirection + ' 地面停止'
+            }else {
+                // 若勾选限制流控点,则以勾选的限制流控点命名
+                res = controlPoints.join(',') + ' 地面停止'
+            }
+        }else if(type == 'REQ'){ // 限制类型为开车申请
+            // 若未勾选限制流控点,则以受控起飞机场命名
+            if(controlPoints.length < 1) {
+                res = controlDepDirection + ' 开车申请'
+            }else {
+                // 若勾选限制流控点,则以勾选的限制流控点命名
+                res = controlPoints.join(',') + ' 开车申请'
+            }
+        }else if(type == 'TIME'){ // 限制类型为时间
+            // 若未勾选限制流控点,则以受控起飞机场命名
+            if(controlPoints.length < 1) {
+                res = controlDepDirection + '放行 限制间隔' + value + '分钟'
+            }else {
+                // 若勾选限制流控点,则以勾选的限制流控点命名
+                res = controlPoints.join(',') + ' 限制间隔' + value + '分钟'
+            }
+        }else if(type == 'ASSIGN'){ // 限制类型为指定时隙
+            // 若未勾选限制流控点,则以受控起飞机场命名
+            if(controlPoints.length < 1) {
+                res = controlDepDirection + '放行 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
+            }else {
+                // 若勾选限制流控点,则以勾选的限制流控点命名
+                res = controlPoints.join(',') + ' 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
+            }
+        }
+        return res;
     }
 
     // 拼接流控名称
@@ -834,26 +880,79 @@ class APContent extends React.Component{
         }
 
     }
+    //检验流控点是否选择并提示
+    checkFlowcontrolPoints(){
+        const { controlPoints } = this.state;
+        const checkFlowcontrolName = this.checkFlowcontrolName;
+        if(!controlPoints || controlPoints.length == 0){
+            Modal.confirm({
+                iconType : 'exclamation-circle',
+                title: '提示',
+                content: '尚未选择限制方向，则影响的航班将不再考虑受控点因素，建议返回添加受控点。',
+                cancelText: '修改方向',
+                okText: '确认发布',
+                onOk(){ checkFlowcontrolName() },
+            });
+        }else {
+            //检验流控名称与流控限制条件是否一致，不一致提示
+            this.checkFlowcontrolName();
+        }
+    }
+    //检验流控名称与流控限制条件是否一致，不一致提示
+    checkFlowcontrolName(){
+        const name = this.props.form.getFieldValue('name');
+        const calculationName = this.computeFlowcontrolName();
+        const confirmSubmit = this.confirmSubmit;
+        if(name == calculationName){
+            // 确认提交
+            this.confirmSubmit();
+        }else {
 
+            Modal.confirm({
+                iconType : 'exclamation-circle',
+                title: '提示',
+                content: '流控限制条件与流控名称暂不相符，建议返回修改流控名称。',
+                cancelText: '修改名称',
+                okText: '确认发布',
+                onOk(){ confirmSubmit() },
+            });
+        }
+    }
     // 处理表单提交
     handleSubmit(e){
         e.preventDefault();
+        // 全部校验表单组件
         const _form = this.props.form;
         _form.validateFieldsAndScroll({
             force:true,
         },(err, values) => {
             //校验通过
             if (!err) {
-                // 转换表单字段数据
-                this.handleConvertFormData(values);
+                // 检验流控点是否选择并提示
+                this.checkFlowcontrolPoints()
+
             }
         });
     }
-    // 转换表单字段数据
-    handleConvertFormData(data){
+    // 确认提交
+    confirmSubmit() {
+        const handleConvertFormData = this.handleConvertFormData;
+        Modal.confirm({
+            // iconType : 'exclamation-circle',
+            title: '提示',
+            content: '确定发布本条流控',
+            cancelText: '取消',
+            okText: '确认发布',
+            onOk(){ handleConvertFormData() },
+        });
+    }
+    // 转换表单字段数据并提交
+    handleConvertFormData(){
+        // 获取全部组件的值
+        const data = this.props.form.getFieldsValue();
         const { loginUserInfo, systemConfig } = this.props;
         const { controlPoints, } = this.state;
-        // 拷贝数据
+        // 拷贝组件数据
         let flow = JSON.parse(JSON.stringify(data));
         // 处理数据
         // 流控类型 (1:非长期  0:长期)
@@ -928,6 +1027,7 @@ class APContent extends React.Component{
         this.setState({
             loading : true
         });
+        // 提交数据
         request(publishFlowcontrolUrl,'POST',JSON.stringify(params),this.handleSubmitCallback);
     }
     // 表单提交回调函数

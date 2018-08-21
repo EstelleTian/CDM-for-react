@@ -62,7 +62,15 @@
   border: 1px solid @c-white-30;
   border-radius: 4px;
   background-clip: padding-box;
-  .ant-btn-primary{
+  .ant-confirm-btns > .ant-btn {
+    color: #333333;
+    background-color: #E5E5E5;
+    &:hover, &:focus, &:active {
+      color: #333333;
+      background-color: #d3d3d3;
+    }
+  }
+  .ant-confirm-btns > .ant-btn.ant-btn-primary{
     color: #FFFFFF;
     background-color: #578ebe;
     &:hover, &:focus, &:active {
@@ -71,6 +79,8 @@
     }
   }
 }
+
+
 
 //----------------覆盖antd样式---------end----------------------------
 
