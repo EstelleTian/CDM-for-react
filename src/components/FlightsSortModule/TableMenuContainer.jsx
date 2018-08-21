@@ -16,6 +16,7 @@ const calculateGroundNumber = (generateInfo) => {
 }
 const mapStateToProps = ( state ) => ({
     generateInfo: calculateGroundNumber(state.generateInfo),
+    autoScroll: state.tableCondition.scroll
 });
 
 const mapDispatchToProps = {

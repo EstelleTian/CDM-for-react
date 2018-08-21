@@ -267,9 +267,40 @@ const tableCondition = (state = initTableCondition, action) => {
     }
 };
 //---------------------------------------------------------------------
+const UPDATE_BASIC_CONFIG_INFO = 'basicConfigInfo/update';
+//更新表格当前是否是自动滚动
+const updateBasicConfigInfo = ( key, data ) => ({
+    type: UPDATE_BASIC_CONFIG_INFO,
+    key,
+    data
+});
+//系统基本参数信息
+const initBasicConfigInfo = {
+    physicsRunwayGap: "", //跑道配置信息  "02L/20R,02L;02R/20L,02R"
+    airportConfigurationMap: {}, //机场参数信息
+    systemConfigMap: {}, //系统参数信息
+};
+//store table data 系统基本参数-- 跑道配置、机场参数、系统参数
+const basicConfigInfo = (state = initBasicConfigInfo, action) => {
+    switch ( action.type ){
+        case UPDATE_BASIC_CONFIG_INFO: {
+            const { key, data } = action;
+                return {
+                    ...state,
+                    [key]: data
+                }
+
+        }
+        default:
+            return state;
+    }
+};
+
+
 export {
     tableDatas, updateTableDatas, updateMultiTableDatas, updateTableDatasProperty, updateTableDatasColumns,
-    generateInfo, updateGenerateInfo, generateTime, updateGenerateTime,
-    tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy, updateTableConditionQuicklyFilters,
-    updateTableConditionRangeByKey, updateTableConditionRange
+    generateInfo, updateGenerateInfo,
+    generateTime, updateGenerateTime,
+    tableCondition, updateTableConditionScroll, updateTableConditionScrollId, updateTableConditionOrderBy, updateTableConditionQuicklyFilters, updateTableConditionRangeByKey, updateTableConditionRange,
+    basicConfigInfo, updateBasicConfigInfo
 };

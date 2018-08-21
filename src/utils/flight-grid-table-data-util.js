@@ -227,6 +227,10 @@ const convertData = function( flight, flightAuthMap, generateTime ){
                 setDeicePositionAttrs.call(this, key, options);
                 break;
             }
+            case 'DEICE_STATUS': {
+                setDeiceStatusAttrs.call(this, key, options);
+                break;
+            }
             case 'RUNWAY': {
                 setRunwayAttrs.call(this, key, options);
                 break;
@@ -321,7 +325,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
     };
 
     //配置 内/外控点  title信息
-    function setAppfixAndAccFixAttrs(key,obj){
+    function setAppfixAndAccFixAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let value = '';
@@ -396,7 +400,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         };
     };
     //配置 计划时间
-    function setSOBTAttrs(key,obj){
+    function setSOBTAttrs( key, obj ){
         //title
         let titlekey = key + "_title";
         //单元格样式
@@ -411,7 +415,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         data[titlekey] = titlestr;
     };
     //配置 预计撤轮档时间  title信息
-    function setEOBTAttrs(key,obj){
+    function setEOBTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let value = obj.value || '';
@@ -439,7 +443,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         }
     };
 
-    function setTOBTAttrs(key,obj){
+    function setTOBTAttrs( key, obj ){
         let titlekey = key + "_title";
         let stylekey = key + "_style";
         //let tobtRecord = flight.coordinationWorkerflows[FlightCoordinationRecord.TYPE_TOBT]
@@ -498,7 +502,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         data[stylekey] = this.getDisplayFontSize('TOBT') + style;
     };
     //配置 协关时间  title信息
-    function setHOBTAttrs(key,obj){
+    function setHOBTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let stylestr = '';
@@ -542,7 +546,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
 
     };
     //配置 预撤时间  title信息
-    function setCOBTAttrs(key,obj){
+    function setCOBTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let stylestr = '';
@@ -579,7 +583,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         }
     };
     //配置 预起时间  title信息
-    function setCTOTAttrs(key,obj){
+    function setCTOTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let stylestr = '';
@@ -616,7 +620,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         }
     };
     //配置 上客时间  title信息
-    function setASBTAttrs(key,obj){
+    function setASBTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let stylestr = '';
@@ -651,7 +655,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         data[titlekey] = titlestr;
     };
     //配置 关舱门时间  title信息
-    function setAGCTAttrs(key,obj){
+    function setAGCTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let stylestr = '';
@@ -714,7 +718,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
 
     };
     //配置 推出时间  title信息
-    function setAOBTAttrs(key,obj){
+    function setAOBTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let stylestr = '';
@@ -813,7 +817,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         data[titlekey] = titlestr;
     };
     //配置 实际起飞 和 实际降落时间   title信息
-    function setATOTAndALDTAttrs(key,obj){
+    function setATOTAndALDTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let stylekey = key + "_style";
@@ -830,7 +834,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
     };
 
     //配置 前端航班号  title信息
-    function setFormerFlightIdAttrs(key,obj){
+    function setFormerFlightIdAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let formerDepap = '';
@@ -907,7 +911,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         }
     };
     //配置 前端起飞  title信息
-    function setFormerDepAttrs(key,obj){
+    function setFormerDepAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let value = '';
@@ -937,7 +941,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         }
     };
     //配置 前端降落  title信息
-    function setFormerArrAttrs(key,obj){
+    function setFormerArrAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let stylestr = '';
@@ -983,7 +987,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
     };
 
     //配置 入池状态 title信息
-    function setPoolStatusAttrs(key,obj){
+    function setPoolStatusAttrs( key, obj ){
         let value = obj.value;
         if(!isValidVariable(value)){
             //未发报不显示
@@ -996,7 +1000,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         data[stylekey] = this.getDisplayStyle('DEFAULT') + this.getDisplayFontSize('POOL_STATUS');
     };
     //配置 航班状态title信息
-    function setStatusAttrs(key,obj){
+    function setStatusAttrs( key, obj ){
         let value = obj.value;
         if (isValidVariable(value)) {
             let flight = {};
@@ -1008,7 +1012,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
     }
 
     //配置 停机位  title信息
-    function setSPOTAttrs(key,obj){
+    function setSPOTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let value = obj.value || '';
@@ -1034,7 +1038,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
     };
 
     //配置 除冰位  title信息
-    function setDeicePositionAttrs(key,obj){
+    function setDeicePositionAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let source = obj.source || '';
@@ -1053,8 +1057,19 @@ const convertData = function( flight, flightAuthMap, generateTime ){
             data[stylekey] = this.getDisplayStyle('DEFAULT') + this.getDisplayFontSize('DEICE_POSITION') ;
         }
     };
+    //配置 是否除冰  value信息
+    function setDeiceStatusAttrs( key, obj ){
+        const value = obj.value*1 || 0;
+        let valueStr = ''
+        if( value == 0 ){
+            valueStr = '';
+        }else if( value == 1 ){
+            valueStr = '除冰';
+        }
+        data[key] = valueStr;
+    };
     //配置 跑道  title信息
-    function setRunwayAttrs(key,obj){
+    function setRunwayAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let stylestr = '';
@@ -1095,9 +1110,8 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         }
     };
     //配置 流控状态  title信息
-    function setFlowcontrolStatusAttrs(key,obj){
-        let titlekey = key + "_title";
-        let titlestr = '';
+    function setFlowcontrolStatusAttrs( key, obj ){
+        const titlekey = key + "_title";
         let value = obj.value || '';
         let valueStr = ''
         if( value == 'ISCONT' ){
@@ -1112,7 +1126,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
     };
 
     //配置 普通信息  title信息
-    function setNormalAttrs(key,obj){
+    function setNormalAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let diff = obj.value || '';
@@ -1144,7 +1158,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
     };
 
     //配置  延误原因  title信息
-    function setDelayReasonAttrs(key,obj){
+    function setDelayReasonAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let value = obj.value || '';
@@ -1163,7 +1177,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
     };
 
     //配置 
-    function setGSOBTAttrs(key,obj){
+    function setGSOBTAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let value = obj.value || '';
@@ -1174,7 +1188,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
     };
 
     //配置 流控点时间
-    function setFlowcontrolPointPassTimeAttrs(key,obj){
+    function setFlowcontrolPointPassTimeAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let processMap = obj.processMap || '';
@@ -1203,7 +1217,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         data[titlekey] = titlestr;
     };
     //电子进程单 相关时间
-    function setEfpsTimeAttrs(key,obj){
+    function setEfpsTimeAttrs( key, obj ){
         let titlekey = key + "_title";
         let titlestr = '';
         let value = obj.value || '';

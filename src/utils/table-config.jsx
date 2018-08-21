@@ -99,7 +99,7 @@ const handleColumnRender = (value, row, index, colunmName) => {
             }
         }else{
             return {
-                children: "",
+                children: <span></span>,
                 props:{
                     title: title
                 }
@@ -342,7 +342,11 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
                 onContextMenu: ( e ) => {
                     e.preventDefault();
                     //点击时候的位置
-                    const targetParent = e.target.parentElement;
+                    const localName = e.target.localName;
+                    let targetParent = e.target;
+                    if( localName != "td"){
+                        targetParent = e.target.parentElement;
+                    }
                     const offsetLeft = targetParent.offsetLeft;
                     const offsetTop = targetParent.offsetTop;
                     const targetHeight = targetParent.clientHeight;

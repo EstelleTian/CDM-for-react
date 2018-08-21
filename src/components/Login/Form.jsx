@@ -65,20 +65,21 @@ class Loginform extends React.Component{
         // 200 成功
         if( 200 == res.status*1 ){
             // 用户信息
-            let {username, id:userId, allAuthority, waypoints,  system, flowAssemblyAirports, systemProgram,  airports, description } = res.user;
-            let params = {
+            const { username = "", id:userId, allAuthority, waypoints,  system, flowAssemblyAirports, systemProgram,  airports, description, deiceGroupName } = res.user;
+            const params = {
                 username, // 用户名
                 loginStatus: true, // 登录状态
                 userId, // 用户id
                 allAuthority, // 用户权限
                 airports, // 用户机场
                 description, // 用户中文名称
+                deiceGroupName, // 除冰分组
             }
             // 更新用户信息
             updateUserInfo(params);
 
             // 获取流控数据请求中所需参数
-            let para = {
+            const para = {
                 startWaypoints : flowAssemblyAirports,
                 waypoints,
                 system,
@@ -92,22 +93,22 @@ class Loginform extends React.Component{
             // 错误信息
             const { error ={} } = res;
             const errmsg = error.message ? error.message : "";
-            let param = {
-                errmsg: errmsg
+            const param = {
+                errmsg
             };
             updateUserInfo(param);
         }else if( 400 == res.status*1 && res.error ){ //    400 失败
             // 错误信息
             const { error ={} } = res;
             const errmsg = error.message ? error.message : "";
-            let param = {
-                errmsg: errmsg
+            const param = {
+                errmsg
             };
             updateUserInfo(param);
         }else {
-            let errmsg = `登录出现异常，请联系管理员`;
-            let param = {
-                errmsg: errmsg
+            const errmsg = `登录出现异常，请联系管理员`;
+            const param = {
+                errmsg
             };
             updateUserInfo(param);
         }
@@ -123,7 +124,7 @@ class Loginform extends React.Component{
         const { updateSystemConfig } = this.props;
         if( 200 == res.status*1 ){
             const  {system,systemAirport,systemElem,systemName} = res;
-            let params = {
+            const params = {
                 system,
                 systemAirport,
                 systemElem,

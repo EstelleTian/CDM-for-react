@@ -11,7 +11,7 @@ class TableMenu extends React.Component{
     constructor( props ){
         super(props);
         this.state = {
-            autoScroll: true
+            autoScroll: props.autoScroll
         }
         this.onQuicklySearch = this.onQuicklySearch.bind(this);
         this.onAutoScrollChange = this.onAutoScrollChange.bind(this);
@@ -35,6 +35,16 @@ class TableMenu extends React.Component{
         const { updateTableConditionScroll } = this.props;
         updateTableConditionScroll( checked );
     }
+
+    componentWillUpdate(){
+        const curAutoScroll = this.props.autoScroll;
+        const autoScroll = this.state.autoScroll;
+        if( curAutoScroll != autoScroll ){
+            this.setState({
+                autoScroll: curAutoScroll
+            })
+        }
+    };
 
     render(){
         const { generateInfo } = this.props;

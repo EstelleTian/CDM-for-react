@@ -1,19 +1,38 @@
 //航班表格上右键协调对话框
 import React from 'react';
-import { Icon, Input, Form } from 'antd';
+import { Icon, Input, Form, message, Radio } from 'antd';
 import $ from 'jquery';
 import {isValidObject, isValidVariable} from "utils/basic-verify";
 import { request } from "utils/request-actions";
 import { host } from "utils/request-urls";
 import FormDialog from './Form';
 import { convertData, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "utils/flight-grid-table-data-util";
-import {OperationTypeForTimeColumn} from "utils/flightcoordination";
+import { OperationTypeForTimeColumn, OperationReason } from "utils/flightcoordination";
 import './OperationDialog.less';
 
+message.config({
+    top: 140,
+    getContainer: () => document.getElementsByClassName("main-table")[0]
+});
 
 const { TextArea } = Input;
 
-const FormDialogIns = Form.create()(FormDialog)
+const FormDialogIns = Form.create()(FormDialog);
+
+const ReasonDialog = ({timeAuth, closeCollaborateDialog}) => (
+    <div className="collaborate-dialog popover-dialog">
+        <div className="popover-arrow left top"></div>
+        <div className="content">
+            <span>{OperationReason[timeAuth.reason] || "不可操作"}</span>
+            <div
+                className="reason close-target"
+                onClick={ closeCollaborateDialog }
+            >
+                <Icon type="close" title="关闭"/>
+            </div>
+        </div>
+    </div>
+);
 
 class OperationDialog extends React.Component{
     constructor( props ){
@@ -40,7 +59,6 @@ class OperationDialog extends React.Component{
             const $colCanvas = $(".collaborate-canvas");
             let canvasTop = $colCanvas[0].offsetTop;
             let canvasLeft = $colCanvas[0].offsetLeft;
-
             $scrollDom.off("scroll.collaborate").on("scroll.collaborate", ( e ) => {
                 //滚动的高度
                 const newTop = $scrollDom[0].scrollTop;
@@ -64,6 +82,7 @@ class OperationDialog extends React.Component{
             });
         }
     };
+
     //关闭协调窗口
     closeCollaborateDialog(){
         const { updateOperationDatasShowNameAndPosition } = this.props;
@@ -71,33 +90,39 @@ class OperationDialog extends React.Component{
         updateOperationDatasShowNameAndPosition( "", 0, 0 );
     };
     //表单提交后--单条数据更新方法
-    requestCallback( res ){
+    requestCallback( res, mes ){
         this.closeCollaborateDialog();
         const { updateMultiTableDatas } = this.props;
-        const { flightView = {}, generateTime } = res;
+        const { flightView, generateTime, error } = res;
         if( isValidVariable(flightView) ){
             const { flightFieldViewMap = {}, flightAuthMap = {} } = flightView;
             const { ID = {} } =flightFieldViewMap;
             const id = ID.value;
-
+            //数据转化
             const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
             //将航班原数据补充到航班对象中
             data.originalData = flightView;
-            const map = {
-                [id]: data
-            }
+            const map = { [id]: data };
+            //更新数据
             updateMultiTableDatas( map );
+            //提示成功
+            message.success( mes + "成功", 5 );
+
         }else{
-            //TODO 提示错误
+            //提示失败
+            const message = error.message || "";
+            const showMes = mes + "失败," + message;
+            message.error( showMes, 0 );
+
         }
 
     };
 
     //处理航班号id提交操作事件
     handleFlightIdClick( item, rowData ){
-        const { userId = "", updateMultiTableDatas } = this.props;
+        const { userId = "" } = this.props;
         //选中的操作名称
-        const { en = "", url = "" } = item;
+        const { en = "", cn = "", url = "" } = item;
         //航班ID
         const id = rowData["ID"]*1 || null;
         //备注输入的值
@@ -127,7 +152,9 @@ class OperationDialog extends React.Component{
         //发送请求
         request( `${host}/${url}`, "post", params, (res) => {
             console.log(res);
-            this.requestCallback(res);
+            this.requestCallback(res, rowData['FLIGHTID'] + " " + cn);
+        }, ( err ) => {
+            message.error(rowData['FLIGHTID'] + " " + cn + "请求失败", 5 );
         });
     };
 
@@ -137,7 +164,12 @@ class OperationDialog extends React.Component{
         if( isValidObject(rowData) && isValidVariable(showName) ){
             if( showName == "FLIGHTID" ){
                 res =  "";
-            }else if(showName == "COBT" || showName == "CTOT" || showName == "ASBT" || showName == "AGCT" || showName == "AOBT"){
+            }else if(showName == "COBT" || showName == "CTOT" || showName == "ASBT" || showName == "AGCT" || showName == "AOBT"
+             || showName == "DELAY_REASON" || showName == "DEICE_STATUS" || showName == "DEICE_GROUP" || showName == "DEICE_POSITION"
+            ){ // 两个按钮的【申请】【清除】
+                if(showName == "DEICE_STATUS" || showName == "DEICE_GROUP" || showName == "DEICE_POSITION"){
+                    showName = "DEICE";
+                }
                 const authMap = rowData.originalData.flightAuthMap;
                 const updateKey = showName+"_UPDATE";
                 const cancelKey = showName+"_CLEAR";
@@ -168,7 +200,8 @@ class OperationDialog extends React.Component{
                     res.show = true;
                     res.cancelBtn.show = true;
                 }
-            }else if(showName == "HOBT" || showName == "TOBT"){
+            }else if(showName == "HOBT" || showName == "TOBT" || showName == "PRIORITY"){ // HOBT TOBT 优先级(TASK)申请
+                // 两种情况 三个按钮的： 申请=>【申请】 批复=>【批复】【拒绝】
                 const authMap = rowData.originalData.flightAuthMap;
                 const applyKey = showName+"_APPLY";  //申请
                 const applyAuth = authMap[applyKey] || {};
@@ -262,8 +295,9 @@ class OperationDialog extends React.Component{
     };
 
     render(){
-        const { userId } = this.props;
+        const { userId, deiceGroupName, deicePositionArray } = this.props;
         const { showName = "", auth, rowData = {}, x = 0, y = 0 } = this.props.operationDatas;
+
         //时间列显示权限
         let timeAuth = this.getTimeColumnsAuth( rowData, showName );
 
@@ -287,7 +321,7 @@ class OperationDialog extends React.Component{
                                     <Icon type="close" title="关闭"/>
                                 </div>
                             </div>
-                            <div className="content flightid">
+                            <div className={`content ${showName}`}>
                                 {
                                     auth.map((item, index) => {
                                         return (
@@ -311,13 +345,17 @@ class OperationDialog extends React.Component{
                 }
                 {
                     (
-                        (showName == "COBT" || showName == "CTOT" || showName == "ASBT" || showName == "AGCT" || showName == "AOBT") ?
+                        (showName == "COBT" || showName == "CTOT" || showName == "ASBT" || showName == "AGCT" ||
+                         showName == "AOBT" || showName == "HOBT" || showName == "TOBT" || showName == "PRIORITY" ||
+                         showName == "DELAY_REASON" || showName == "DEICE_STATUS" || showName == "DEICE_GROUP" ||
+                         showName == "DEICE_POSITION"
+                        ) ?
                             (
                                 (isValidVariable(timeAuth) && timeAuth.show)
                                     ? <div className="collaborate-dialog">
                                         <div className="popover-arrow left top"></div>
                                         <div className="title">
-                                            <span>{timeAuth.cn}变更</span>
+                                            <span>{timeAuth.cn}</span>
                                             <div
                                                 className="close-target"
                                                 onClick={ this.closeCollaborateDialog }
@@ -329,49 +367,18 @@ class OperationDialog extends React.Component{
                                             rowData={rowData}
                                             showName={showName}
                                             userId={userId}
+                                            deiceGroupName={deiceGroupName}
+                                            deicePositionArray={deicePositionArray}
                                             timeAuth={timeAuth}
                                             requestCallback = { this.requestCallback }
                                         />
                                     </div>
-                                    : <div className="collaborate-dialog popover-dialog">
-                                        <div className="popover-arrow left top"></div>
-                                        <div className="content">
-                                            {timeAuth.reason}
-                                        </div>
-                                    </div>
+                                    : <ReasonDialog
+                                        timeAuth = {timeAuth}
+                                        closeCollaborateDialog = { this.closeCollaborateDialog }
+                                    />
                             ): ""
                     )
-                }
-                {
-                    (showName == "HOBT" || showName == "TOBT") ?
-                        (
-                            (isValidVariable(timeAuth) && timeAuth.show)
-                                ? <div className="collaborate-dialog">
-                                    <div className="popover-arrow left top"></div>
-                                    <div  className="title">
-                                        <span>{timeAuth.cn}变更</span>
-                                        <div
-                                            className="close-target"
-                                            onClick={ this.closeCollaborateDialog }
-                                        >
-                                            <Icon type="close" title="关闭"/>
-                                        </div>
-                                    </div>
-                                    <FormDialogIns
-                                        rowData={rowData}
-                                        showName={showName}
-                                        userId={userId}
-                                        timeAuth={timeAuth}
-                                        requestCallback = { this.requestCallback }
-                                    />
-                                </div>
-                                : <div className="collaborate-dialog popover-dialog">
-                                    <div className="popover-arrow left top"></div>
-                                    <div className="content">
-                                        {timeAuth.reason}
-                                    </div>
-                                </div>
-                        ): ""
                 }
             </div>
         )
