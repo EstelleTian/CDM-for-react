@@ -26,23 +26,25 @@ const obj = {
     allAuthority : [], // 用户权限集合
     airports: '', // 用户机场
     description: '', // 用户中文名
+    deiceGroupName: '', // 除冰分组
 }
 const loginUserInfo = ( state = obj, action ) => {
     switch( action.type ){
         case UPDATE_USERINFO:{
+            const { userObj = {} } = action;
             return {
                 ...state,
-                username: action.userObj.username || '',
-                password: action.userObj.password || '',
-                loginStatus: action.userObj.loginStatus || '',
-                userId : action.userObj.userId || '',
-                errmsg: action.userObj.errmsg || '',
-                allAuthority: action.userObj.allAuthority || [],
-                airports: action.userObj.airports || '',
-                description: action.userObj.description || '',
+                username: userObj.username || '',
+                password: userObj.password || '',
+                loginStatus: userObj.loginStatus || '',
+                userId : userObj.userId || '',
+                errmsg: userObj.errmsg || '',
+                allAuthority: userObj.allAuthority || [],
+                airports: userObj.airports || '',
+                description: userObj.description || '',
+                deiceGroupName: userObj.deiceGroupName || '',
             }
         }
-
         case USER_LOGOUT:{
             return obj
         }

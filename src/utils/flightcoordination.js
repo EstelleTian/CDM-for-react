@@ -1113,6 +1113,29 @@ const AlarmType = {
     FLIGHT_SLOT_UPDATE : '7'
 };
 
+//协调操作常量---不可操作原因字典
+const OperationReason = {
+    "WF": "暂无操作权限",
+    "CRS": "航班为CRS航班",
+    "DEP": "航班已起飞",
+    "ARR": "航班已落地",
+    "CNL": "航班已取消",
+    "FPL": "航班已发FPL报",
+    "UN_FPL": "航班尚未拍发FPL报",
+    "LOCK": "航班已锁定",
+    "OTHER": "其他",
+    "LOCKEDNOEQL": "Locked不同",
+    "RECORDVALUE": "记录值不同",
+    "RECORDSTATUS": "记录状态不同",
+    "ARDTMANUAL": "有准备完毕时间",
+    "UNARDTMANUAL": "无准备完毕时间",
+    "EXEMPT": "航班已豁免",
+    "UNEXEMPT": "航班尚未豁免",
+    "POOL": "航班已入池",
+    "UNPOOL": "航班尚未入池",
+    "UN_AUTH": "当前用户无操作权限",
+};
+
 //协调操作常量---航班号
 const OperationTypeForFlightId = {
     FLIGHT_DETAIL: {
@@ -1246,7 +1269,7 @@ const OperationTypeForFlightId = {
         cn: "取消豁免",
         type: "cancel",
         simple: "豁",
-        url: "updateExemptCancle.bo"
+        url: "updateExemptCancel.bo"
     },
     QUALIFICATIONS_MARK: {
         en: "QUALIFICATIONS_MARK",
@@ -1263,79 +1286,142 @@ const OperationTypeForFlightId = {
         url: "updateQualifications.bo"
     }
 };
-//协调操作常量---时间列 COBT CTOT AGCT ASBT
+//协调操作常量---时间列 COBT CTOT AGCT ASBT AGCT HOBT TOBT
 const OperationTypeForTimeColumn = {
     COBT_UPDATE: {
         en: "COBT",
-        cn: "预撤时间",
+        cn: "预撤时间变更",
         url: "updateFlightCobt.bo"
     },
     COBT_CLEAR: {
         en: "COBT",
-        cn: "预撤时间",
+        cn: "预撤时间变更",
         url: "clearFlightCobt.bo"
     },
     CTOT_UPDATE: {
         en: "CTOT",
-        cn: "预起时间",
+        cn: "预起时间变更",
         url: "updateFlightCtd.bo"
     },
     CTOT_CLEAR: {
         en: "CTOT",
-        cn: "预起时间",
+        cn: "预起时间变更",
         url: "clearFlightCtd.bo"
     },
     ASBT_UPDATE: {
         en: "ASBT",
-        cn: "上客时间",
+        cn: "上客时间修改",
         url: "updateFlightAsbt.bo"
     },
     ASBT_CLEAR: {
         en: "ASBT",
-        cn: "上客时间",
-        url: ""
+        cn: "上客时间修改",
+        url: "clearFlightAsbt.bo"
     },
     AGCT_UPDATE: {
         en: "AGCT",
-        cn: "关门时间",
+        cn: "关门时间修改",
         url: "updateFlightAgct.bo"
     },
     AGCT_CLEAR: {
         en: "AGCT",
-        cn: "关门时间",
-        url: ""
+        cn: "关门时间修改",
+        url: "clearFlightAgct.bo"
     },
     HOBT_APPLY: {
         en: "HOBT",
-        cn: "HOBT申请",
+        cn: "HOBT申请变更",
         url: "applyFlightHobt.bo"
     },
     HOBT_APPROVE: {
         en: "HOBT",
-        cn: "HOBT批复",
+        cn: "HOBT批复变更",
         url: "approveFlightHobt.bo"
     },
     HOBT_REFUSE: {
         en: "HOBT",
-        cn: "HOBT批复",
+        cn: "HOBT批复变更",
         url: "refuseFlightHobt.bo"
     },
     TOBT_APPLY: {
         en: "TOBT",
-        cn: "TOBT申请",
+        cn: "TOBT申请变更",
         url: "applyFlightTobt.bo"
     },
     TOBT_APPROVE: {
         en: "TOBT",
-        cn: "TOBT批复",
+        cn: "TOBT批复变更",
         url: "approveFlightTobt.bo"
     },
     TOBT_REFUSE: {
         en: "TOBT",
-        cn: "TOBT批复",
+        cn: "TOBT批复变更",
         url: "refuseFlightTobt.bo"
     },
+    AOBT_UPDATE: {
+        en: "AOBT",
+        cn: "推出时间修改",
+        url: "updateFlightAobt.bo"
+    },
+    AOBT_CLEAR: {
+        en: "AOBT",
+        cn: "推出时间修改",
+        url: "clearFlightAobt.bo"
+    },
+    PRIORITY_APPLY: {
+        en: "PRIORITY",
+        cn: "优先级申请",
+        url: "applyPriority.bo"
+    },
+    PRIORITY_APPROVE: {
+        en: "PRIORITY",
+        cn: "优先级批复",
+        url: "approvePriority.bo"
+    },
+    PRIORITY_REFUSE: {
+        en: "PRIORITY",
+        cn: "优先级批复",
+        url: "refusePriority.bo"
+    },
+    DELAY_REASON_UPDATE: {
+        en: "DELAY_REASON",
+        cn: "延误原因修改",
+        url: "updateDelayReason.bo"
+    },
+    DELAY_REASON_CLEAR: {
+        en: "DELAY_REASON",
+        cn: "延误原因修改",
+        url: "clearDelayReason.bo"
+    },
+    DEICE_UPDATE: {
+        en: "DEICE",
+        cn: "除冰状态修改",
+        url: "updateFlightDeice.bo"
+    },
+    DEICE_CLEAR: {
+        en: "DEICE",
+        cn: "除冰状态修改",
+        url: "clearFlightDeice.bo"
+    },
+};
+//协调操作常量--优先级
+const PriorityList = {
+    "0": "普通",
+    "10": "特别协调",
+    "30": "国内转国际",
+    "48": "豁免",
+    "50": "航班要客"
+};
+//协调操作常量--延误原因
+const DelayReasonList = {
+    "MILITARY": "军方",
+    "WEATHER": "天气",
+    "CONTROL": "流量",
+    "EQUIPMENT": "设备",
+    "FORMER": "前序",
+    "AOC": "公司",
+    "OTHER": "其他"
 };
 
 
-export { FlightCoordination, AlarmType, OperationTypeForFlightId, OperationTypeForTimeColumn };
+export { FlightCoordination, AlarmType, OperationTypeForFlightId, OperationTypeForTimeColumn, PriorityList, DelayReasonList, OperationReason };

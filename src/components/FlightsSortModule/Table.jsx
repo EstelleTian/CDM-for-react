@@ -67,7 +67,7 @@ class Table extends React.Component{
     //更新航班数据
     refreshAirportsList( res ){
         // console.log("refreshAirportsList");
-        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateTableConditionRange } = this.props;
+        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateTableConditionRange, updateTableConditionScroll } = this.props;
         //表格数据
         // let dataArr = [];
         let dataMap = {};
@@ -137,6 +137,7 @@ class Table extends React.Component{
                 }
             };
             updateTableConditionRange( start, end );
+            updateTableConditionScroll( false );
         };
         //更新表格航班数据
         console.time("updateTableDatas----------");
@@ -240,14 +241,16 @@ class Table extends React.Component{
         const status = res.status*1;
         //成功
         if( 200 == status){
+            const { physicsRunwayGap = "", systemConfigMap = {}, airportConfigurationMap = {}, userPropertyList = {} } = res;
+            const { updateBasicConfigInfo } = this.props;
             //跑道配置信息  "02L/20R,02L;02R/20L,02R"
-            const physicsRunwayGap = res.physicsRunwayGap;
+            updateBasicConfigInfo("physicsRunwayGap", physicsRunwayGap);
             //系统参数信息
-            const systemConfigMap = res.systemConfigMap;
+            updateBasicConfigInfo("systemConfigMap", systemConfigMap);
             //机场参数信息
-            const airportConfigurationMap = res.airportConfigurationMap;
+            updateBasicConfigInfo("airportConfigurationMap", airportConfigurationMap);
             //用户基本参数配置
-            this.convertUserProperty( res.userPropertyList );
+            this.convertUserProperty( userPropertyList );
         }else{
             //TODO 错误提示
             const error = res.error || {};

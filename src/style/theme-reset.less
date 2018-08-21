@@ -1,5 +1,3 @@
-
-
 /*
  *  项目组件样式
  */
@@ -69,6 +67,78 @@
       color: #FFFFFF;
       background-color: #437cae;
     }
+  }
+}
+
+//重置radio-button样式
+.ant-radio-group{
+  .ant-radio-button-wrapper{
+    background: @bc-black-80;
+  }
+  .ant-radio-button-wrapper-checked{
+    background: #578ebe;
+    border-color: #578ebe;
+    color: #fff;
+  }
+  .ant-radio-button-wrapper:hover, .ant-radio-button-wrapper-focused {
+    color: #cccccc;
+  }
+}
+//协调窗口日历
+.ant-calendar{
+  background-color: @bc-black-100;
+  .ant-calendar-last-month-cell,.ant-calendar-next-month-btn-day {
+    .ant-calendar-date{
+      color: rgb(107, 107, 107);
+    }
+  }
+  //今天按钮样式
+  .ant-calendar-footer-btn{
+    line-height: 3rem;
+    >a{
+      color: #fff;
+    }
+  }
+  //日期控件--当日按钮字体颜色
+  .ant-calendar-last-month-cell,.ant-calendar-next-month-btn-day, .ant-calendar-today{
+    .ant-calendar-date{
+      color: #cccccc;
+    }
+  }
+  //日期按钮hover底色
+  .ant-calendar-date:hover{
+    background: #888888;
+  }
+  //不可选日期按钮底色
+  .ant-calendar-disabled-cell .ant-calendar-date{
+    background: #1d1c1c;
+    &:hover{
+      background: #1d1c1c;
+    }
+  }
+  //可选日期按钮底色
+  .ant-calendar-selected-date , .ant-calendar-selected-start-date, .ant-calendar-selected-end-date{
+    .ant-calendar-date{
+      background: #4c4c4c;
+      color: #000;
+      &:hover{
+        background: #4c4c4c;
+      }
+    }
+  }
+}
+//日期时间控件样式
+.ant-time-picker-panel-inner{
+  background-color: @bc-black-100;
+  .ant-time-picker-panel-input{
+    background-color: @bc-black-100;
+    font-size: 1.25rem;
+  }
+  li.ant-time-picker-panel-select-option-selected{
+    background: #a9a3a3;
+  }
+  .ant-time-picker-panel-clear-btn:after{
+    color: #a9a3a3;
   }
 }
 

@@ -1,11 +1,15 @@
 import React from 'react';
 import moment from 'moment';
-import { Checkbox, Input, Form, DatePicker, TimePicker, Button, message } from 'antd';
-import './Form.less'
-import {getDayTimeFromString, isValidObject} from "utils/basic-verify";
+import { Checkbox, Input, Form, DatePicker, TimePicker, Button, message, Radio, Select } from 'antd';
+import {getDayTimeFromString, isValidObject, isValidVariable, addStringTime} from "utils/basic-verify";
 import {request} from "utils/request-actions";
 import { host } from "utils/request-urls";
+import { PriorityList, DelayReasonList } from "utils/flightcoordination";
+import './Form.less'
 
+const RadioGroup = Radio.Group;
+const RadioButton = Radio.Button;
+const Option = Select.Option;
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
@@ -24,9 +28,28 @@ class FormDialog extends React.Component{
         this.compareWithEOBT = this.compareWithEOBT.bind(this);
         this.showLoading = this.showLoading.bind(this);
         this.hideLoading = this.hideLoading.bind(this);
+        this.onRadioChange = this.onRadioChange.bind(this);
+        this.handleDeiceChange = this.handleDeiceChange.bind(this);
+
         const { rowData, showName } = this.props;
         const curValue = rowData[showName]; //获取当前点击单元格的数据
+        let priorityVal = "0";
+        let delayReasonVal = "OTHER";
+        if( showName == "PRIORITY" ){
+            const { originalData = {} } = rowData;
+            const { flightFieldViewMap = {} } = originalData;
+            const { DELAYREASON = {}, PRIORITY = {} } = flightFieldViewMap;
+            priorityVal = PRIORITY.value+"" || "0";
+            //默认OTHER
+            delayReasonVal = DELAYREASON.value || "OTHER";
+            // 优先级有不存在的值时，默认为'普通'
+            if( !isValidVariable(PriorityList[priorityVal]) ){
+                priorityVal = "0";
+            }
+        }
         this.state = {
+            delay: delayReasonVal,
+            priority: priorityVal,
             date: {
                 value: curValue.substring(0,8) || moment().format('YYYYMMDD'),
                 validateStatus: "",
@@ -40,6 +63,14 @@ class FormDialog extends React.Component{
             locked: true,
             submitLoading: false,
             cancleLoading: false,
+            deice: {
+                show: "deice-position",
+                deicePosition: rowData["DEICE_POSITION"] || "", //除冰坪/机位
+                deiceGroup: rowData["DEICE_GROUP"] || "", //除冰分组
+                validateStatus: "",
+                help: ""
+            }
+
         }
     };
 
@@ -133,6 +164,25 @@ class FormDialog extends React.Component{
         }
 
     };
+    //单选按钮赋值
+    onRadioChange(e, name){
+        this.setState({
+            ...this.state,
+            [name]: e.target.value
+        });
+    };
+    //除冰下拉框
+    handleDeiceChange(e){
+        this.setState({
+            ...this.state,
+            deice: {
+                ...this.state.deice,
+                show: e.target.value,
+                validateStatus: "",
+                help: ""
+            }
+        });
+    };
     
     //显示按钮loading
     showLoading( name ){
@@ -154,11 +204,31 @@ class FormDialog extends React.Component{
     submitForm(){
         //按钮增加loading
         this.showLoading('submit');
-        const { date, time, locked } = this.state;
-        const { timeAuth = {} } = this.props;
+        const { date, time, locked, deice } = this.state;
+        const { timeAuth = {}, showName, rowData, userId } = this.props;
+        //除冰组 除冰坪 是否除冰 验证机位是否为空
+        let positionValue = "";
+        if( showName == "DEICE_STATUS" || showName == "DEICE_GROUP" || showName == "DEICE_POSITION" ) {
+            if( deice.show == 'position'){ //机位
+                //获取机位数据
+                positionValue = this.refs.position.input.value || ""; //获取机位内容
+                //如果是空，提示错误
+                if( !isValidVariable(positionValue) ){
+                    this.setState({
+                        ...this.state,
+                        deice: {
+                            ...deice,
+                            validateStatus: "error",
+                            help: '必填项，请输入机位'
+                        }
+                    });
+                    return;
+                }
+            }
+        }
+
         //验证date和time的validateStatus为""，则允许提交
-        if( date.validateStatus != "error" && time.validateStatus != "error" ){
-            const { showName, rowData, userId } = this.props;
+        if( date.validateStatus != "error" && time.validateStatus != "error" && deice.validateStatus != "error" ){
             let url = "";
             if( isValidObject( timeAuth.updateBtn ) ){
                 url = timeAuth.updateBtn.url || "";
@@ -175,9 +245,15 @@ class FormDialog extends React.Component{
                 if( showName == "COBT" ){
                     cobt = str;
                     ctd = rowData["CTOT"];
+                    if( !isValidVariable(ctd) ){
+                        ctd = addStringTime(str, rowData["TAXI"] * 60 * 1000);
+                    }
                 }else if( showName == "CTOT" ){
                     cobt = rowData["COBT"];
                     ctd = str;
+                    if( !isValidVariable(cobt) ){
+                        cobt = addStringTime(str, -(rowData["TAXI"] * 60 * 1000));
+                    }
                 }
                 //拼接为接口提交数据集合
                 params = {
@@ -191,8 +267,8 @@ class FormDialog extends React.Component{
             }else if( showName == "ASBT" ){//上客时间
                 params["boardingTime"] = str;
             }else if( showName == "AGCT" ){//关舱门时间
-                params["close"] = str;
-            }else if( showName == "AOBT" ){//关舱门时间
+                params["closeTime"] = str;
+            }else if( showName == "AOBT" ){//推出时间
                 params["aobt"] = str;
             }else if( showName == "HOBT" || showName == "TOBT" ){//关舱门时间
                 const btnStr = timeAuth.type + "Btn";
@@ -202,20 +278,31 @@ class FormDialog extends React.Component{
                 }else if( showName == "TOBT" ){
                     params["tobt"] = str;
                 }
+            }else if( showName == "PRIORITY" ) {//航班优先级
+                const btnStr = timeAuth.type + "Btn";
+                url = timeAuth[btnStr].url;
+                params["priority"] = this.state.priority*1;
+            }else if( showName == "DEICE_STATUS" || showName == "DEICE_GROUP" || showName == "DEICE_POSITION" ) {//除冰组 除冰坪 是否除冰
+
+                params["deiceGroup"] = deice.deiceGroup;
+                if( deice.show == 'position'){ //机位
+                    params["deicePosition"] = positionValue;
+                }else{
+                    params["deicePosition"] = deice.deicePosition;
+                }
             }
             console.log(params, url);
-            //发送请求
-            request( `${host}/${url}`, "post", params, (res) => {
-                console.log(res);
-                this.hideLoading('submit');
-                message.success(rowData['FLIGHTID'] + "变更" + timeAuth.cn + "成功", 5 );
-                this.props.requestCallback(res);
-            }, ( err ) => {
-                message.error(rowData['FLIGHTID'] + "变更" + timeAuth.cn + "失败", 5 );
-                this.hideLoading('submit');
-            });
-
-
+            if( isValidVariable(url) ){
+                //发送请求
+                request( `${host}/${url}`, "post", params, (res) => {
+                    console.log(res);
+                    this.hideLoading('submit');
+                    this.props.requestCallback( res, rowData['FLIGHTID'] + "变更" + timeAuth.cn );
+                }, ( err ) => {
+                    message.error(rowData['FLIGHTID'] + "变更" + timeAuth.cn + "请求失败", 5 );
+                    this.hideLoading('submit');
+                });
+            }
         }
     };
 
@@ -223,7 +310,14 @@ class FormDialog extends React.Component{
     submitCancelForm(){
         this.showLoading('cancle');
         const { showName, rowData, userId, timeAuth = {} } = this.props;
-        const url = timeAuth.cancelBtn.url || "";
+        const { cancelBtn = {}, refuseBtn = {} } = timeAuth;
+        let url = "";
+        if( isValidObject(cancelBtn) ){
+            url = cancelBtn.url || "";
+        }else if( isValidObject(refuseBtn) ){
+            url = refuseBtn.url || "";
+        }
+
         const id = rowData["ID"]*1 || null; //id
         const comment = this.refs.comment.textAreaRef.value || ""; //获取备注内容
         const params = {
@@ -232,41 +326,55 @@ class FormDialog extends React.Component{
             comment
         }
         console.log(params, url);
-        //发送请求
-        request( `${host}/${url}`, "post", params, (res) => {
-            console.log(res);
-            this.hideLoading('cancle');
-            message.success(rowData['FLIGHTID'] + "撤销" + timeAuth.cn + "成功", 5 );
-            this.props.requestCallback(res);
-        }, ( err ) => {
-            message.error(rowData['FLIGHTID'] + "撤销" + timeAuth.cn + "失败", 5 );
-            this.hideLoading('cancle');
-        });
+        if( isValidVariable(url) ){
+            //发送请求
+            request( `${host}/${url}`, "post", params, (res) => {
+                console.log(res);
+                this.hideLoading('cancle');
+                this.props.requestCallback( res, rowData['FLIGHTID'] + "撤销" + timeAuth.cn );
+            }, ( err ) => {
+                message.error(rowData['FLIGHTID'] + "撤销" + timeAuth.cn + "失败", 5 );
+                this.hideLoading('cancle');
+            });
+        }
+
     };
 
     render(){
-        const { rowData, showName, timeAuth } = this.props;
+        const radioStyle = {
+            display: 'block',
+            marginLeft: '1rem'
+        };
+        const { rowData, showName, timeAuth, deiceGroupName, deicePositionArray } = this.props;
+        const deiceGroupArr = deiceGroupName.split(",");
         //时间列显示权限
         const formItemLayout = {
             labelCol: {
-                xs: { span: 22 },
-                sm: { span: 6 },
+                xs: { span: 20 },
+                sm: { span: 8 },
             },
             wrapperCol: {
-                xs: { span: 22 },
+                xs: { span: 20 },
                 sm: { span: 16 },
-            },
+            }
         };
         const flightid = rowData["FLIGHTID"]; //航班id
         const DEPAP = rowData["DEPAP"]; //起飞机场
         const ARRAP = rowData["ARRAP"]; //降落机场
-        const { date, time, locked } = this.state;
+        const { date, time, locked, deice } = this.state;
 
         let originalVal = "";
         let applyVal = "";
-        if( showName == "HOBT" && timeAuth.type == "approve"){
-            originalVal = rowData[showName];
-            applyVal = rowData.originalData.flightCoordinationRecordsMap[showName].value || "";
+        if( timeAuth.type == "approve" ){
+            if( showName == "HOBT"){
+                const map = rowData.originalData.flightCoordinationRecordsMap[showName];
+                originalVal = map.originalValue || "";
+                applyVal = map.value || "";
+            }else if( showName == "HOBT" || showName == "PRIORITY"){
+                const map = rowData.originalData.flightCoordinationRecordsMap[showName];
+                originalVal = PriorityList[map.originalValue+""] || "";
+                applyVal = PriorityList[map.value+""] || "";
+            }
         }
 
         return(
@@ -588,7 +696,7 @@ class FormDialog extends React.Component{
                                 >
                                     <TimePicker
                                         format = 'HHmm'
-                                        value = { time.value == "" ? moment() : moment( time.value, 'HHmm') }
+                                        value = { applyVal == "" ? moment() : moment( applyVal.substring(8,12), 'HHmm') }
                                         onChange={ this.onTimeChange }
                                     />
                                 </FormItem>
@@ -623,6 +731,271 @@ class FormDialog extends React.Component{
                             </Form>
                         : ""
                 }
+                {
+                    (showName == "PRIORITY") ?
+                        (timeAuth.type == "apply") ?
+                            <Form>
+                                <FormItem
+                                    label=""
+                                    {...formItemLayout}
+                                >
+                                    <RadioGroup
+                                        onChange={(e) => {
+                                            this.onRadioChange(e, 'priority')
+                                        }}
+                                        value={ this.state.priority }>
+                                        {
+                                            Object.keys(PriorityList).map((item, index) => {
+                                                return (
+                                                    <Radio style={radioStyle} key={item} value={item}> {PriorityList[item]} </Radio>
+                                                )
+                                            })
+                                        }
+                                    </RadioGroup>
+                                </FormItem>
+
+                                <FormItem
+                                    span={ 24 }
+                                    label=""
+                                >
+                                    <TextArea ref="comment" placeholder="备注(最多100个字符)"/>
+                                </FormItem>
+                                <FormItem
+                                    wrapperCol = {{ sm: {offset: 2, span: 22}, xs: {span: 24} }}
+                                    label=""
+                                    className="footer"
+                                >
+                                    {
+                                        (isValidObject( timeAuth.applyBtn ) &&  timeAuth.applyBtn.show) ?
+                                            <Button className="c-btn c-btn-blue"
+                                                    onClick = { this.submitForm }
+                                            >
+                                                申请
+                                            </Button> : ""
+                                    }
+                                </FormItem>
+                            </Form>
+                            :
+                            <Form>
+                                <FormItem
+                                    label="原始值"
+                                    {...formItemLayout}
+                                >
+                                    <span className="stable-div" title={originalVal}>
+                                        { getDayTimeFromString(originalVal) || "" }
+                                    </span>
+                                </FormItem>
+                                <FormItem
+                                    label="申请值"
+                                    {...formItemLayout}
+                                >
+                                    <span className="stable-div" title={applyVal}>
+                                        { getDayTimeFromString(applyVal) || "" }
+                                    </span>
+                                </FormItem>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="申请备注"
+                                >
+                                    <TextArea className="stable-div" ref="comment" placeholder=""/>
+                                </FormItem>
+                                <FormItem
+                                    {...formItemLayout}
+                                    label="批复备注"
+                                >
+                                    <TextArea ref="comment" placeholder="备注(最多100个字符)"/>
+                                </FormItem>
+                                <FormItem
+                                    wrapperCol = {{ sm: {offset: 2, span: 22}, xs: {span: 24} }}
+                                    label=""
+                                    className="footer"
+                                >
+                                    {
+                                        (isValidObject( timeAuth.approveBtn ) &&  timeAuth.approveBtn.show) ?
+                                            <Button className="c-btn c-btn-blue"
+                                                    onClick = { this.submitForm }
+                                            >
+                                                批复
+                                            </Button> : ""
+                                    }
+                                    {
+                                        (isValidObject( timeAuth.refuseBtn ) &&  timeAuth.refuseBtn.show) ?
+                                            <Button className="c-btn c-btn-red"
+                                                    onClick = { this.submitCancelForm }
+                                            >
+                                                拒绝
+                                            </Button> : ""
+                                    }
+                                </FormItem>
+                            </Form>
+                        : ""
+                }
+                {
+                    (showName == "DELAY_REASON") ?
+                        <Form>
+                            <FormItem
+                                label=""
+                                {...formItemLayout}
+                            >
+                                <RadioGroup
+                                    onChange={(e) => {
+                                        this.onRadioChange(e, 'delay')
+                                    }}
+                                    value={ this.state.delay }>
+                                    {
+                                        Object.keys(DelayReasonList).map((item, index) => {
+                                            return (
+                                                <Radio style={radioStyle} key={item} value={item}> {DelayReasonList[item]} </Radio>
+                                            )
+                                        })
+                                    }
+                                </RadioGroup>
+                            </FormItem>
+                            {
+                                this.state.delay == "OTHER" ?
+                                    <FormItem
+                                        span={ 24 }
+                                        label=""
+                                    >
+                                        <TextArea ref="comment" placeholder="备注(最多100个字符)"/>
+                                    </FormItem>
+                                : ""
+                            }
+                            <FormItem
+                                wrapperCol = {{ sm: {offset: 2, span: 22}, xs: {span: 24} }}
+                                label=""
+                                className="footer"
+                            >
+                                {
+                                    (isValidObject( timeAuth.updateBtn ) &&  timeAuth.updateBtn.show) ?
+                                        <Button className="c-btn c-btn-blue"
+                                                onClick = { this.submitForm }
+                                        >
+                                            确定
+                                        </Button> : ""
+                                }
+                                {
+                                    (isValidObject( timeAuth.cancelBtn ) &&  timeAuth.cancelBtn.show) ?
+                                        <Button className="c-btn c-btn-red"
+                                                onClick = { this.submitCancelForm }
+                                        >
+                                            清除
+                                        </Button> : ""
+                                }
+                            </FormItem>
+                        </Form>
+                        :""
+                }
+                {
+                    (showName == "DEICE_STATUS" || showName == "DEICE_GROUP" || showName == "DEICE_POSITION") ?
+                        <Form>
+                            <FormItem
+                                label="状态"
+                                {...formItemLayout}
+                            >
+                                <RadioGroup defaultValue="deice-position" onChange={this.handleDeiceChange}>
+                                    <RadioButton value="deice-position">冰坪</RadioButton>
+                                    <RadioButton value="position">机位</RadioButton>
+                                </RadioGroup>
+                            </FormItem>
+                            <FormItem
+                                {...formItemLayout}
+                                label={ deice.show == "deice-position" ? "冰坪" : "机位"}
+                                validateStatus={ deice.validateStatus }
+                                help={ deice.help }
+                            >
+                                {
+                                    deice.show == "deice-position" ?
+                                    <Select
+                                        defaultValue={ deice.deicePosition == "" ? "待定" : deice.deicePosition }
+                                         onChange={(value) => {
+                                            this.setState({
+                                                ...this.state,
+                                                deice: {
+                                                    ...deice,
+                                                    deicePosition: value
+                                                }
+                                            })
+                                        }}
+                                    >
+                                        <Option value="0">待定</Option>
+                                        {
+                                            deicePositionArray.map(( item, index ) => (
+                                                <Option key={index} value={item}>{item}</Option>
+                                            ))
+                                        }
+                                    </Select> :
+                                        <Input
+                                            ref="position"
+                                            placeholder="请输入机位"
+                                            onChange={(e) => {
+                                                const val = e.target.value;
+                                                if( isValidVariable(val.trim()) && this.state.deice.validateStatus != ""){
+                                                    this.setState({
+                                                        ...this.state,
+                                                        deice: {
+                                                            ...this.state.deice,
+                                                            validateStatus: "",
+                                                            help: ""
+                                                        }
+                                                    })
+                                                }
+                                            }}
+                                        />
+                                }
+                            </FormItem>
+                            <FormItem
+                                label="分组"
+                                {...formItemLayout}
+                            >
+                                <Select defaultValue={ deice.deiceGroup == "" ? deiceGroupArr[0] : deice.deiceGroup } onChange={(value) => {
+                                    this.setState({
+                                        ...this.state,
+                                        deice: {
+                                            ...deice,
+                                            deiceGroup: value
+                                        }
+                                    })
+                                }}>
+                                    {
+                                        deiceGroupArr.map(( item, index ) => (
+                                            <Option key={index} value={item}>{item}</Option>
+                                        ))
+                                    }
+                                </Select>
+                            </FormItem>
+                            <FormItem
+                                label="备注"
+                                {...formItemLayout}
+                            >
+                                <TextArea ref="comment" placeholder="备注(最多100个字符)"/>
+                            </FormItem>
+                            <FormItem
+                                wrapperCol = {{ sm: {offset: 2, span: 22}, xs: {span: 24} }}
+                                label=""
+                                className="footer"
+                            >
+                                {
+                                    (isValidObject( timeAuth.updateBtn ) &&  timeAuth.updateBtn.show) ?
+                                        <Button className="c-btn c-btn-blue"
+                                                onClick = { this.submitForm }
+                                        >
+                                            确定
+                                        </Button> : ""
+                                }
+                                {
+                                    (isValidObject( timeAuth.cancelBtn ) &&  timeAuth.cancelBtn.show) ?
+                                        <Button className="c-btn c-btn-red"
+                                                onClick = { this.submitCancelForm }
+                                        >
+                                            清除
+                                        </Button> : ""
+                                }
+                            </FormItem>
+                        </Form>
+                        :""
+                }
+
             </div>
         )
 

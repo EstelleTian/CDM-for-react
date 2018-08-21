@@ -2,10 +2,11 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import {isValidObject, isValidVariable} from 'utils/basic-verify';
-import { updateTableDatas, updateTableDatasProperty, updateTableDatasColumns, updateTableConditionScrollId, updateGenerateInfo, updateGenerateTime, updateTableConditionRangeByKey, updateTableConditionRange } from './Redux';
+import { updateTableDatas, updateTableDatasProperty, updateTableDatasColumns, updateTableConditionScrollId, updateGenerateInfo, updateGenerateTime, updateTableConditionRangeByKey, updateTableConditionRange, updateBasicConfigInfo } from './Redux';
 import { updateSubTableDatasProperty, updateSubTableDatas } from '../SubTable/Redux';
 import { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } from '../OperationDialog/Redux';
 import { updateDetailModalDatasVisible, updateDetailModalDatasByName } from '../DetailModule/Redux';
+import {updateTableConditionScroll} from "components/FlightsSortModule/Redux";
 import Table from './Table';
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
@@ -180,7 +181,9 @@ const mapDispatchToProps = {
     updateOperationDatasShowNameAndPosition,
     updateOperationDatasAuth,
     updateDetailModalDatasVisible,
-    updateDetailModalDatasByName
+    updateDetailModalDatasByName,
+    updateTableConditionScroll,
+    updateBasicConfigInfo
 };
 
 const TableContainer = connect(
