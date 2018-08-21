@@ -2,8 +2,8 @@
 import React from 'react';
 import { Row, Col, Icon, Button, Card, Form, Input, Checkbox, Select, Radio, DatePicker, TimePicker, Modal, Spin,    } from 'antd';
 import Loader from 'components/Loader/Loader';
-import { getPointByAirportUrl, publishFlowcontrolUrl } from 'utils/request-urls';
-import {  request } from 'utils/request-actions';
+import { getPointByAirportUrl, getFlowcontrolTemplateUrl, publishFlowcontrolUrl } from 'utils/request-urls';
+import {  request, requestGet } from 'utils/request-actions';
 import moment from 'moment';
 import './APContent.less';
 import {isValidVariable} from "utils/basic-verify";
@@ -27,9 +27,13 @@ class APContent extends React.Component{
         this.handleValidateFlowcontrolType = this.handleValidateFlowcontrolType.bind(this);
         this.handleValidateFlowcontrolValue = this.handleValidateFlowcontrolValue.bind(this);
         this.handleValidateFlowcontrolAssignSlot = this.handleValidateFlowcontrolAssignSlot.bind(this);
+        this.handleChangeTemplate = this.handleChangeTemplate.bind(this);
 
         this.getPointByAirport = this.getPointByAirport.bind(this);
+        this.getFlowcontrolTemplate = this.getFlowcontrolTemplate.bind(this);
         this.updatePoints = this.updatePoints.bind(this);
+        this.updateTemplate = this.updateTemplate.bind(this);
+        this.resetALLFields = this.resetALLFields.bind(this);
 
         this.onChangeFlowcontrolPoint = this.onChangeFlowcontrolPoint.bind(this);
 
@@ -63,12 +67,15 @@ class APContent extends React.Component{
             flowcontrolPointsList : [], // 流控点集合
             checkedControlPoints : [], // 勾选的限制流控点(含所属组,不用作最终表单提交)
             controlPoints : [], // 勾选的限制流控点(不含所属组,用于最终表单提交)
+
+            template : {}, // 流控模板数据对象
+            templateOptions: [], // 模板选项
             loading : false // 加载
 
         }
     }
     // 转换高度选项
-    connetLevel(){
+    connectLevel(){
         let arr = this.state.levelValues;
         let result = [];
         arr.map((item)=>{
@@ -80,6 +87,22 @@ class APContent extends React.Component{
         })
     }
 
+    // 获取流控模板数据
+    getFlowcontrolTemplate(){
+        // 用户登录信息
+        const { loginUserInfo } = this.props;
+        // 用户名
+        const { username } = loginUserInfo;
+        // 类型
+        const placetype = 'AP';
+        // 参数
+        const params = {
+            username,
+            placetype,
+        };
+        // 发送请求
+        requestGet(getFlowcontrolTemplateUrl, params, this.updateTemplate);
+    }
     // 依据机场获取流控点(受控点)数据
     getPointByAirport(){
         const { loginUserInfo } = this.props;
@@ -114,6 +137,60 @@ class APContent extends React.Component{
         this.setState({
             flowcontrolPointsList
         })
+    }
+    // 重置所有表单组件
+    resetALLFields() {
+        // 重置所有Form托管的组件值（为 initialValue）与状态
+        this.props.form.resetFields();
+        // 清空所有组件值
+        this.props.form.setFieldsValue({
+            name: '',
+            type: '',
+            flowcontrolType: false,
+            originalPublishUnit: '',
+            startDate: undefined,
+            startTime: undefined,
+            endDate: undefined,
+            endTime: undefined,
+            value: undefined,
+            assignSlot: [],
+            controlDepDirection: '',
+            exemptDepDirection: '',
+            controlDirection: [],
+            exemptDirection: [],
+            controlLevel: [],
+            reason:'',
+            reserveSlots:[],
+            comments: '',
+        });
+
+
+        // 清空勾选的航路点
+        this.setState({
+            checkedControlPoints : [],
+            controlPoints : [],
+        })
+    }
+
+    // 更新流控模板
+    updateTemplate(res) {
+        let result = [];
+        let data = {};
+        // 取流控模板集合
+        let  { flowcontrolTemplateList = [] } = res;
+        flowcontrolTemplateList.map((item)=>{
+            result.push(<Option key={item.id}>{item.name}</Option>);
+            data[item.id] = item;
+        });
+        // 更新流控模板Select选项
+        this.setState({
+            templateOptions : result
+        });
+
+        // 更新流控数据对象
+        this.setState({
+            template : data
+        });
     }
 
     // 拼接流控名称
@@ -334,6 +411,62 @@ class APContent extends React.Component{
         this.setState({
             controlPoints: points
         })
+    }
+    // 变更模板
+    handleChangeTemplate(value) {
+        console.log(arguments);
+        const { template } =this.state;
+        // 重置所有表单组件
+        this.resetALLFields();
+        let templateData = template[value];
+        const { generateTime} = this.props;
+        // 数据生成时间
+        const {time} = generateTime;
+        // 数据日期
+        const standardDate = time ? time.substring(0,8):'';
+        // 数据时间
+        const standardTime = time ? time.substring(8,12):'';
+
+        const dateFormat = 'YYYYMMDD';
+        const timeFormat = 'HHmm';
+
+        if(value && templateData){
+
+            // 设置模板对应字段数值
+            this.props.form.setFieldsValue({
+                name : templateData.name || '',
+                type : templateData.type || '',
+                originalPublishUnit: templateData.publishUnit || '',
+                controlDepDirection: templateData.controlDepDirection || '',
+                controlDirection : templateData.controlDirection ?  templateData.controlDirection.split(',') : [],
+                exemptDirection : templateData.exemptDirection ?  templateData.exemptDirection.split(',') : [],
+                startDate : moment( standardDate, dateFormat ),
+                startTime:moment(standardTime, timeFormat),
+            });
+            // 勾选流控点
+            if(templateData.pointsType &&templateData.controlPoints ){
+                // 将模板数据中的流控点转为数组
+                let points = templateData.controlPoints.split(',');
+                // 用于存储对应流控点+所属组
+                let checkedValue = [];
+                points = points.map((item) =>{
+                    item = item.trim();
+                    const p = item+'_'+ templateData.pointsType;
+                    checkedValue.push(p);
+                    return item;
+                });
+
+                // 更新controlPoints
+                this.setState({
+                    controlPoints: points
+                });
+                // 更新checkedControlPoints
+                this.setState({
+                    checkedControlPoints : checkedValue
+                });
+            }
+        }
+
     }
 
 
@@ -829,7 +962,10 @@ class APContent extends React.Component{
     componentDidMount(){
         //获取受控点
         this.getPointByAirport();
-        this.connetLevel();
+        // 获取流控模板
+        this.getFlowcontrolTemplate();
+        // 转换高度选项
+        this.connectLevel();
     }
 
 
@@ -857,7 +993,7 @@ class APContent extends React.Component{
         const Layout8 = { span: 8 };
         const Layout6 = { span: 6 };
         const Layout4 = { span: 4 };
-        const { flowcontrolPointsList,  checkedControlPoints, levelOptions,} = this.state;
+        const { flowcontrolPointsList,  checkedControlPoints, levelOptions, templateOptions} = this.state;
 
         const { clickCloseBtn, dialogName, generateTime} = this.props;
         // 数据生成时间
@@ -1317,15 +1453,21 @@ class APContent extends React.Component{
                             </div>
                         </Col>
                         <Col {...ContentLayout} >
-                            {/*<Row>*/}
-                                {/*<Col {...Layout4}>*/}
-                                    {/*<div className="label">模板</div>*/}
+                            <Row>
+                                <Col {...Layout4}>
+                                    <div className="label">模板</div>
 
-                                {/*</Col>*/}
-                                {/*<Col {...Layout20}>*/}
-
-                                {/*</Col>*/}
-                            {/*</Row>*/}
+                                </Col>
+                                <Col {...Layout20}>
+                                    <Select
+                                        allowClear = {true}
+                                        placeholder="请选择模板"
+                                        onChange={ this.handleChangeTemplate}
+                                    >
+                                        { templateOptions }
+                                    </Select>
+                                </Col>
+                            </Row>
                             {
                                 flowcontrolPointsList.map((item) =>{
                                     return (
