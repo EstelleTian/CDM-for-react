@@ -116,24 +116,23 @@ const handleColumnRender = (value, row, index, colunmName) => {
         value = handleDateFormat( value );
     }
 
-    // let resStyleObj = styleObj;
-
     let resStyleObj = {};
     if( isValidVariable(row[colunmName]) ){
         //如果背景色不是transparent,加圆点
-        const { backgroundColor = "", fontSize = "" } = styleObj;
+        const { backgroundColor = "", fontSize = "", textDecoration = "", fontStyle = "" } = styleObj;
         if( colunmName == "COBT" || colunmName == "CTOT" ){
             if( backgroundColor == "#FF99FF"){ //锁定
-                value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-lock" style={{color: backgroundColor}}></i>{value}</span>);
+                value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}><i className="iconfont icon-lock" style={{color: backgroundColor}}></i>{value}</span>);
             }else if( backgroundColor == "#FFFF00"){ //预锁
-                value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-unlock" style={{color: backgroundColor}}></i>{value}</span>);
+                value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}><i className="iconfont icon-unlock" style={{color: backgroundColor}}></i>{value}</span>);
             }else{
-                value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
+                value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
             }
-        }else if( colunmName == "FLIGHTID" ){
+        }else if( colunmName == "HOBT" ){ //增加失效航班样式
+            value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}>{value}</span>);
+        }else if( colunmName == "FLIGHTID" ){ //字体样式为背景色
             value = (<span style={{fontSize: fontSize, color: backgroundColor}}>{value}</span>);
-
-        }else if( isValidVariable(backgroundColor) && backgroundColor != "transparent"){
+        }else if( isValidVariable(backgroundColor) && backgroundColor != "transparent"){ //其余有背景色的，均改为圆点风格样式
             value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
         }
     }
