@@ -2,7 +2,7 @@
 //key命名规则：  操作类型（update,add,delete）+ 数据名称 + 操作对象 以下划线分隔,全部大写
 //value命名规则： 数据名称 + 操作类型（update,add,delete）+ 操作对象 以左划线分隔,小写
 import { isValidVariable } from "../../utils/basic-verify";
-
+//------------------------------协调窗口数据-----------------------------------------
 const UPDATE_OPERATION_DATAS_SHOWNAME_AND_POSITION= 'operationDatas/update/showNameAndPosition';
 const UPDATE_OPERATION_DATAS_AUTH= 'operationDatas/update/auth';
 //action-creator
@@ -19,7 +19,6 @@ const updateOperationDatasAuth = ( auth, rowData ) => ({
     auth,
     rowData
 });
-
 //reducer 协调窗口数据
 const initData = {
     showName: '', //需要展示的协调窗口名称
@@ -29,7 +28,7 @@ const initData = {
     auth: [], //航班对应权限对象集合
     rowData: {}, //航班行数据对象集合
 };
-//store 协调窗口数据--
+//store 协调窗口数据
 const operationDatas = ( state = initData, action) => {
     switch ( action.type ){
         case UPDATE_OPERATION_DATAS_SHOWNAME_AND_POSITION: {
@@ -51,8 +50,39 @@ const operationDatas = ( state = initData, action) => {
             return state;
     }
 };
+//------------------------------协调窗口数据-----------------------------------------
+//------------------------------协调记录数据-----------------------------------------
+const UPDATE_COLLABORATE_RECORDS= 'collaborateRecords/update';
+//action-creator
+//更新协调记录数据和数据生成时间
+const updateCollaborateRecords = ( records, generateTime ) => ({
+    type: UPDATE_COLLABORATE_RECORDS,
+    records,
+    generateTime
+});
+
+const initRecordData = {
+    records: {}, //协调记录
+    generateTime: ""  //协调记录生成时间
+};
+//store 协调窗口数据
+const collaborateRecords = ( state = initRecordData, action) => {
+    switch ( action.type ){
+        case UPDATE_COLLABORATE_RECORDS: {
+            return {
+                ...state,
+                records: action.records || {},
+                generateTime: action.generateTime || ""
+            }
+        }
+        default:
+            return state;
+    }
+};
+
+//------------------------------协调记录数据-----------------------------------------
 
 export {
-    operationDatas,
-    updateOperationDatasShowNameAndPosition, updateOperationDatasAuth
+    operationDatas,updateOperationDatasShowNameAndPosition, updateOperationDatasAuth,
+    collaborateRecords, updateCollaborateRecords
 };

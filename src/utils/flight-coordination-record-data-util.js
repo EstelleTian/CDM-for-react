@@ -43,9 +43,8 @@ const FlightCoordinationRecordGridTableDataUtil = {
 			}
 			
 			if(isValidVariable(record.timestamp)){
-				data.timestamp = record.timestamp;
-				data.timestamp_title = record.timestamp.substring(6,8) + 
-				"/" +record.timestamp.substring(8,12);
+			    const time = record.timestamp.substring(0, 12);
+				data.timestamp = time;
 			}
 			
 			if(isValidVariable(record.username)){
@@ -57,7 +56,7 @@ const FlightCoordinationRecordGridTableDataUtil = {
 			}
 			
 			if(isValidVariable(record.status)){
-				data.status = FlightCoordination.getStatusZh(record.status);
+				data.status = FlightCoordinationRecord.getStatusZh(record.status);
 			}
 
             if(isValidVariable(record.type)){

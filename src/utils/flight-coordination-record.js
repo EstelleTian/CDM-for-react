@@ -53,7 +53,7 @@ const FlightCoordinationRecord = {
 	 * @param status
 	 * @returns
 	 */
-	getStatusZh : (status) => {
+	getStatusZh : function(status){
 		let s = parseInt(status, 10); 
 		let zh = null;
 		switch (s) {

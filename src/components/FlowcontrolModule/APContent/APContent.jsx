@@ -1752,18 +1752,14 @@ class APContent extends React.Component{
                                             <textarea placeholder="请输入备注" rows="4"  className="comments"></textarea>
                                         )
                                     }
-
                                 </Col>
                             </Row>
                         </Col>
                     </Col>
-
-
                 </Row>
                 {/* 底部*/}
                 <Row className="footer">
                     <Col className="" {...Layout24} >
-
                         <Button className= 'c-btn c-btn-default'
                                 onClick={ () => {
                                     clickCloseBtn(dialogName);

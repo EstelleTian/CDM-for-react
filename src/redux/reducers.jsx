@@ -7,7 +7,7 @@ import { flowcontrolDatas, flowcontrolCondition, flowGenerateTime } from "compon
 import { restrictionDatas, restrictionCondition, restrictionGenerateTime } from "components/RestrictionModule/List/Redux"
 import { noticeDatas, noticeGenerateTime } from "components/NoticeModule/List/Redux"
 import { subTableDatas } from "components/SubTable/Redux"
-import { operationDatas } from "components/OperationDialog/Redux"
+import { operationDatas, collaborateRecords } from "components/OperationDialog/Redux"
 import { sidebarConfig } from "components/Sidebar/Redux"
 import { detailModalDatas } from "components/DetailModule/Redux"
 const appReducer = combineReducers({
@@ -19,7 +19,7 @@ const appReducer = combineReducers({
     restrictionDatas, restrictionCondition, restrictionGenerateTime,
     noticeDatas, noticeGenerateTime,
     sidebarConfig,
-    operationDatas,
+    operationDatas, collaborateRecords,
     detailModalDatas
 });
 

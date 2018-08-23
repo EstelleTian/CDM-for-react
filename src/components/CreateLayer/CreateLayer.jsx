@@ -5,6 +5,7 @@
  *      id={`id`} //tring，可以不设置
  *      className={`classnameA classnameB`} //String，可以不设置
  *      style={{width: '100px'}} //Object，可以不设置
+ *      rootDom = { document.getElementByClassName("aaa") } // 要加入到的根节点 ElementDom,可不设置
  *  >
  *      此处插入div或者react组件
  *  </CreateLayer>
@@ -23,7 +24,11 @@ function CreateLayer() {
             super(props)
             this.el = document.createElement('div');
             this.el.className = 'portal-layer ' // 默认设有 portal-layer
+            this.rootDom = document.body;
             if (!!props) {
+                if(props.rootDom){
+                    this.rootDom = props.rootDom[0];
+                }
                 if(props.id){
                     this.el.id = props.id;
                 }
@@ -35,16 +40,16 @@ function CreateLayer() {
                         this.el.style[v] = props.style[v]
                     })
                 }
-                document.body.appendChild(this.el)
+                this.rootDom.appendChild(this.el)
             }
         }
         //将dom添加到body下面
         componentDidMount() {
-            document.body.appendChild(this.el);
+            this.rootDom.appendChild(this.el);
         }
         //清除DOM结构
         componentWillUnmount() {
-            document.body.removeChild(this.el)
+            this.rootDom.removeChild(this.el)
         }
         // 用createPortal创建Layer
         render() {

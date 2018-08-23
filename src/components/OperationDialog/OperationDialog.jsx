@@ -1,6 +1,6 @@
 //航班表格上右键协调对话框
 import React from 'react';
-import { Icon, Input, Form, message, Radio } from 'antd';
+import { Icon, Input, Form, message } from 'antd';
 import $ from 'jquery';
 import {isValidObject, isValidVariable} from "utils/basic-verify";
 import { request } from "utils/request-actions";
@@ -8,6 +8,8 @@ import { host } from "utils/request-urls";
 import FormDialog from './Form';
 import { convertData, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "utils/flight-grid-table-data-util";
 import { OperationTypeForTimeColumn, OperationReason } from "utils/flightcoordination";
+import CreateLayer from "components/CreateLayer/CreateLayer";
+import CollaborateRecordsContainer from "components/OperationDialog/CollaborateRecordsContainer";
 import './OperationDialog.less';
 
 message.config({
@@ -46,6 +48,13 @@ class OperationDialog extends React.Component{
         this.getTimeColumnsAuth = this.getTimeColumnsAuth.bind(this);
         this.requestCallback = this.requestCallback.bind(this);
         this.resetDialogPositon = this.resetDialogPositon.bind(this);
+        this.closeCollaborateRecordDialog = this.closeCollaborateRecordDialog.bind(this);
+
+        this.state = {
+            collaborateRecords: { //协调记录窗口显隐
+                show: false
+            }
+        }
     }
 
     componentDidUpdate(){
@@ -89,6 +98,15 @@ class OperationDialog extends React.Component{
         //更新数据，需要展开的协调窗口名称和位置
         updateOperationDatasShowNameAndPosition( "", 0, 0 );
     };
+    //关闭协调记录窗口
+    closeCollaborateRecordDialog() {
+        this.setState({
+            collaborateRecords: { //协调记录窗口关闭
+                show: false
+            }
+        });
+    };
+
     //表单提交后--单条数据更新方法
     requestCallback( res, mes ){
         this.closeCollaborateDialog();
@@ -123,8 +141,13 @@ class OperationDialog extends React.Component{
         const { userId = "" } = this.props;
         //选中的操作名称
         const { en = "", cn = "", url = "" } = item;
-        if( en == "COORDINATION_DETAIL" ){ // TODO 查看协调记录
-
+        if( en == "COORDINATION_DETAIL" ){ // 查看协调记录
+            this.setState({
+                collaborateRecords: { //协调记录窗口显隐
+                    show: true
+                }
+            });
+            this.closeCollaborateDialog();
         }else{
             //航班ID
             const id = rowData["ID"]*1 || null;
@@ -399,6 +422,24 @@ class OperationDialog extends React.Component{
                                     />
                             ): ""
                     )
+                }
+                {
+                    this.state.collaborateRecords.show ? (
+                        <CreateLayer
+                            className="collaborate-records-layer"
+                            style = {{
+                                top: "20rem",
+                                left: "25rem"
+                            }}
+                        >
+                            <CollaborateRecordsContainer
+                                flightid = { rowData["FLIGHTID"] }
+                                id = { rowData["ID"]  }
+                                clickCloseBtn = { this.closeCollaborateRecordDialog }
+                            />
+
+                        </CreateLayer>
+                    ) : ""
                 }
             </div>
         )
