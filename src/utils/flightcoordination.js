@@ -1138,13 +1138,13 @@ const OperationReason = {
 
 //协调操作常量---航班号
 const OperationTypeForFlightId = {
-    FLIGHT_DETAIL: {
-        en: "FLIGHT_DETAIL",
-        cn: "航班详情",
-        type: "detail",
-        simple: "详",
-        url: "retrieveDetailById.bo"
-    },
+    // FLIGHT_DETAIL: {
+    //     en: "FLIGHT_DETAIL",
+    //     cn: "航班详情",
+    //     type: "detail",
+    //     simple: "详",
+    //     url: "retrieveDetailById.bo"
+    // },
     COORDINATION_DETAIL: {
         en: "COORDINATION_DETAIL",
         cn: "协调记录",
@@ -1171,14 +1171,14 @@ const OperationTypeForFlightId = {
         cn: "标记航班取消",
         type: "mark",
         simple: "取",
-        url: "***"
+        url: "updateEditStatus.bo"
     },
     CANCEL_UN_MARK: {
         en: "CANCEL_UN_MARK",
         cn: "标记取消恢复",
         type: "huifu",
         simple: "恢",
-        url: "***"
+        url: "updateEditStatus.bo"
     },
     READY_MARK: {
         en: "READY_MARK",
@@ -1402,6 +1402,26 @@ const OperationTypeForTimeColumn = {
         en: "DEICE",
         cn: "除冰状态修改",
         url: "clearFlightDeice.bo"
+    },
+    POSITION_UPDATE: {
+        en: "POSITION",
+        cn: "停机位修改",
+        url: "updatePosition.bo"
+    },
+    POSITION_CLEAR: {
+        en: "POSITION",
+        cn: "停机位修改",
+        url: "clearPosition.bo"
+    },
+    RUNWAY_UPDATE: {
+        en: "RUNWAY",
+        cn: "跑道修改",
+        url: "updateFlightRunway.bo"
+    },
+    RUNWAY_CLEAR: {
+        en: "RUNWAY",
+        cn: "跑道修改",
+        url: "clearFlightRunway.bo"
     },
 };
 //协调操作常量--优先级

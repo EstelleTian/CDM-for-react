@@ -123,39 +123,46 @@ class OperationDialog extends React.Component{
         const { userId = "" } = this.props;
         //选中的操作名称
         const { en = "", cn = "", url = "" } = item;
-        //航班ID
-        const id = rowData["ID"]*1 || null;
-        //备注输入的值
-        const comment = this.refs.comment.textAreaRef.value || "";
-        // 标记准备完毕 标记未准备完毕 标记豁免 取消豁免
-        let params = {
-            id,
-            userId,
-            comment
-        };
+        if( en == "COORDINATION_DETAIL" ){ // TODO 查看协调记录
 
-        if( en == "ASSIGNSLOT_MARK"  ){ //退出时隙分配
-            params["assignSlotStatus"] = 3;
-        }else if( en == "ASSIGNSLOT_UN_MARK" ){ //参加时隙分配
-            params["assignSlotStatus"] = 0;
-        }else if( en == "CLEARANCE_MARK"  ){ //标记已放行 1 标记已放行
-            params["status"] = 1;
-        }else if( en == "CLEARANCE_UN_MARK" ){ //标记未放行 0 标记未放行
-            params["status"] = 0;
-        }else if( en == "QUALIFICATIONS_MARK"  ){ //标记二类飞行资质 2 标记二类飞行
-            params["type"] = 2;
-        }else if( en == "QUALIFICATIONS_UN_MARK" ){ //取消二类飞行资质 0 标记没有二类飞行资质
-            params["type"] = 0;
-        }else if( en == "INPOOL_UPDATE" ){ //移入等待池 0
-            params["status"] = 2;
+        }else{
+            //航班ID
+            const id = rowData["ID"]*1 || null;
+            //备注输入的值
+            const comment = this.refs.comment.textAreaRef.value || "";
+            // 标记准备完毕 标记未准备完毕 标记豁免 取消豁免
+            let params = {
+                id,
+                userId,
+                comment
+            };
+            if( en == "ASSIGNSLOT_MARK"  ){ //退出时隙分配
+                params["assignSlotStatus"] = 3;
+            }else if( en == "ASSIGNSLOT_UN_MARK" ){ //参加时隙分配
+                params["assignSlotStatus"] = 0;
+            }else if( en == "CLEARANCE_MARK"  ){ //标记已放行 1 标记已放行
+                params["status"] = 1;
+            }else if( en == "CLEARANCE_UN_MARK" ){ //标记未放行 0 标记未放行
+                params["status"] = 0;
+            }else if( en == "QUALIFICATIONS_MARK"  ){ //标记二类飞行资质 2 标记二类飞行
+                params["type"] = 2;
+            }else if( en == "QUALIFICATIONS_UN_MARK" ){ //取消二类飞行资质 0 标记没有二类飞行资质
+                params["type"] = 0;
+            }else if( en == "INPOOL_UPDATE" ){ //移入等待池 0
+                params["status"] = 2;
+            }else if( en == "CANCEL_MARK" ){ //标记航班取消 3
+                params["status"] = 3;
+            }else if( en == "CANCEL_UN_MARK" ){ //标记航班恢复 0
+                params["status"] = 0;
+            }
+            //发送请求
+            request( `${host}/${url}`, "post", params, (res) => {
+                console.log(res);
+                this.requestCallback(res, rowData['FLIGHTID'] + " " + cn);
+            }, ( err ) => {
+                message.error(rowData['FLIGHTID'] + " " + cn + "请求失败", 5 );
+            });
         }
-        //发送请求
-        request( `${host}/${url}`, "post", params, (res) => {
-            console.log(res);
-            this.requestCallback(res, rowData['FLIGHTID'] + " " + cn);
-        }, ( err ) => {
-            message.error(rowData['FLIGHTID'] + " " + cn + "请求失败", 5 );
-        });
     };
 
     //获取时间类协调窗口权限
@@ -166,6 +173,7 @@ class OperationDialog extends React.Component{
                 res =  "";
             }else if(showName == "COBT" || showName == "CTOT" || showName == "ASBT" || showName == "AGCT" || showName == "AOBT"
              || showName == "DELAY_REASON" || showName == "DEICE_STATUS" || showName == "DEICE_GROUP" || showName == "DEICE_POSITION"
+             || showName == "POSITION" || showName == "RUNWAY"
             ){ // 两个按钮的【申请】【清除】
                 if(showName == "DEICE_STATUS" || showName == "DEICE_GROUP" || showName == "DEICE_POSITION"){
                     showName = "DEICE";
@@ -199,6 +207,18 @@ class OperationDialog extends React.Component{
                 if( isValidVariable(cancelAuth.status) && cancelAuth.status == "Y" ){
                     res.show = true;
                     res.cancelBtn.show = true;
+                }
+                //跑道，增加跑道值
+                if( showName == "RUNWAY" ){
+                    const { availableInfo } = updateAuth;
+                    if( isValidVariable(availableInfo) ){
+                        const { ORUNWAY = "" } = availableInfo;
+                        const runwayArr = ORUNWAY.split(',');
+                        res["runwayArr"] = runwayArr;
+                    }else{
+                        res["runwayArr"] = [];
+                    }
+
                 }
             }else if(showName == "HOBT" || showName == "TOBT" || showName == "PRIORITY"){ // HOBT TOBT 优先级(TASK)申请
                 // 两种情况 三个按钮的： 申请=>【申请】 批复=>【批复】【拒绝】
@@ -333,7 +353,7 @@ class OperationDialog extends React.Component{
                                     })
                                 }
                                 {
-                                    auth.length == 2 ? "" :
+                                    auth.length == 1 ? "" :
                                         <div className="comment" key="comment" title="操作备注">
                                             <TextArea placeholder="操作备注"  ref="comment"/>
                                         </div>
@@ -348,7 +368,7 @@ class OperationDialog extends React.Component{
                         (showName == "COBT" || showName == "CTOT" || showName == "ASBT" || showName == "AGCT" ||
                          showName == "AOBT" || showName == "HOBT" || showName == "TOBT" || showName == "PRIORITY" ||
                          showName == "DELAY_REASON" || showName == "DEICE_STATUS" || showName == "DEICE_GROUP" ||
-                         showName == "DEICE_POSITION"
+                         showName == "DEICE_POSITION" || showName == "POSITION" || showName == "RUNWAY"
                         ) ?
                             (
                                 (isValidVariable(timeAuth) && timeAuth.show)
