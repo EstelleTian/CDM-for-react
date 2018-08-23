@@ -1,0 +1,45 @@
+@import '../../../../style/theme-color';
+.portal-layer.flowcontol-layer {
+  .dialog {
+    // 禁用输入框样式
+    .ant-input-disabled {
+      background-color: @bc-black-20;
+      opacity: 1;
+      cursor: not-allowed;
+      color: @c-white-50;
+    }
+    //带搜索按钮的输入框样式
+    .ant-input-search {
+      .ant-input-search-button.ant-btn-primary {
+        color: #FFFFFF;
+        border: 1px solid #578ebe;
+        background-color: #578ebe;
+        &:hover, &:focus, &:active {
+          color: #FFFFFF;
+          background-color: #437cae;
+        }
+      }
+    }
+    //Card 组件样式
+    .ant-card-head {
+      min-height: 30px;
+      .ant-card-head-title {
+        padding: 6px 0;
+      }
+    }
+    .ant-card-wider-padding .ant-card-body {
+      padding: 4px 32px;
+    }
+    // footer 按钮样式
+    .footer {
+      width: 100%;
+      padding: 0.75rem .5rem;
+      border-top: 1px solid @c-white-50;
+      float: right;
+      .ant-btn {
+        float: right;
+        margin-left: 0.5rem;
+      }
+    }
+  }
+}

@@ -3,15 +3,15 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import FlowcontrolDialog from "./FlowcontrolDialog";
 
-const mapStateToProps = ( state, nextPorps ) =>({
+const mapStateToProps = ( state, nextProps ) =>({
     loginUserInfo: state.loginUserInfo || {},
     systemConfig: state.systemConfig || {},
     generateTime : state.generateTime,
-    titleName: nextPorps.titleName,
-    dialogName: nextPorps.type,
-    clickCloseBtn: nextPorps.clickCloseBtn,
-    width: nextPorps.width,
-    x: nextPorps.x
+    titleName: nextProps.titleName,
+    dialogName: nextProps.type,
+    clickCloseBtn: nextProps.clickCloseBtn,
+    width: nextProps.width,
+    x: nextProps.x
 
 });
 
