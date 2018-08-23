@@ -86,9 +86,10 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         setDataValue.call(thisProxy, key, value );
         setTitleAndStyleData.call(thisProxy, key, value, flight );
     }
-
     //增加操作列---航班号列
     setOperationForFlightid( "FLIGHTIDOPERATION", flightAuthMap);
+    //处理是否是失效航班（加中划线）
+    setInvalidData.call(thisProxy, flight);
 
     //处理操作列---航班号列
     function setOperationForFlightid( key, flightAuthMap ){
@@ -1231,7 +1232,47 @@ const convertData = function( flight, flightAuthMap, generateTime ){
             data[stylekey] = this.getDisplayStyle('DEFAULT') + this.getDisplayFontSize(key) ;
         }
     };
-    
+    // 若航班已经入池  则认为航班原先锁定或者指定的CTOT,COBT时间失效时间以下划线显示
+    function setInvalidData(flight){
+        const statusMap = flight.POOL_STATUS || {};
+        const poolStatus = statusMap.value || 0;
+        let invalid = false;
+        if(poolStatus == FlightCoordination.IN_POOL || poolStatus == FlightCoordination.IN_POOL_M) {
+            invalid = true;
+        }
+        // 判断时间是否失效
+        if(invalid){
+            const { invalidDataStyle = "" } = this.props.property;
+            if (isValidVariable(data.CTOT)) {
+                data.CTOT_style = this.getDisplayStyle('DEFAULT') + this.getDisplayFontSize('CTOT')
+                    + invalidDataStyle;
+                data.CTOT_title = data.CTOT.substring(6, 8) + '/'
+                    + data.CTOT.substring(8, 12) + '\n失效CTOT时间';
+            }
+            if (isValidVariable(data.COBT)) {
+                data.COBT_style = this.getDisplayStyle('DEFAULT') + this.getDisplayFontSize('COBT')
+                    + invalidDataStyle;
+                data.COBT_title = data.COBT.substring(6, 8) + '/'
+                    + data.COBT.substring(8, 12) + '\n失效COBT时间';
+            }
+            if (isValidVariable(data.HOBT)) {
+                data.HOBT_style = this.getDisplayStyle('DEFAULT') + this.getDisplayFontSize('HOBT')
+                    + invalidDataStyle;
+                data.HOBT_title = data.HOBT.substring(6, 8) + '/'
+                    + data.HOBT.substring(8, 12) + '\n失效HOBT时间';
+            }
+            if (isValidVariable(data.FLOWCONTROL_POINT_PASSTIME)) {
+                // 判断航班是否已起飞
+                var flightDepStatus = flight.HADDEP.value;
+                if(!flightDepStatus) {
+                    data.FLOWCONTROL_POINT_PASSTIME_style = this.getDisplayStyle('DEFAULT') + this.getDisplayFontSize('FLOWCONTROL_POINT_PASSTIME')
+                        + invalidDataStyle;
+                    data.FLOWCONTROL_POINT_PASSTIME_title = data.FLOWCONTROL_POINT_PASSTIME.substring(6, 8) + '/'
+                        + data.FLOWCONTROL_POINT_PASSTIME.substring(8, 12) + '\n失效时间';
+                }
+            }
+        }
+    };
 
     // 返回结果
     return data;
