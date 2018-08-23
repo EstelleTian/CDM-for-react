@@ -250,8 +250,6 @@ class FormDialog extends React.Component{
                 return;
             }
         };
-
-
         //验证date和time的validateStatus为""，则允许提交
         if( date.validateStatus != "error" && time.validateStatus != "error" && deice.validateStatus != "error" && position.validateStatus != "error"  ){
             let url = "";
@@ -264,30 +262,12 @@ class FormDialog extends React.Component{
             let params = { userId, id, comment };
             if( showName == "COBT" || showName == "CTOT" ){
                 const lockedValue = locked ? 1 : 0; //是否禁止系统自动调整，1 禁止  0 允许
+                params["lockedValue"] = lockedValue;
                 //根据showName，判断cobt和ctd提交值
-                let ctd = "";
-                let cobt = "";
                 if( showName == "COBT" ){
-                    cobt = str;
-                    ctd = rowData["CTOT"];
-                    if( !isValidVariable(ctd) ){
-                        ctd = addStringTime(str, rowData["TAXI"] * 60 * 1000);
-                    }
+                    params["cobt"] = str;
                 }else if( showName == "CTOT" ){
-                    cobt = rowData["COBT"];
-                    ctd = str;
-                    if( !isValidVariable(cobt) ){
-                        cobt = addStringTime(str, -(rowData["TAXI"] * 60 * 1000));
-                    }
-                }
-                //拼接为接口提交数据集合
-                params = {
-                    userId,
-                    id,
-                    cobt,
-                    ctd,
-                    comment,
-                    lockedValue
+                    params["ctd"] = str;
                 }
             }else if( showName == "ASBT" ){//上客时间
                 params["boardingTime"] = str;

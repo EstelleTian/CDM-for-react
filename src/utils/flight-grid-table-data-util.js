@@ -565,7 +565,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('COBT');
             stylestr = this.getDisplayStyle('COBT');
-        }else if(source == "COBT_SLOT"){
+        }else if(source == "COBT_AUTO"){
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('COBT_AUTO');
             stylestr = this.getDisplayStyle('COBT_AUTO');
@@ -602,7 +602,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('CTOT');
             stylestr = this.getDisplayStyle('CTOT');
-        }else if(source == "CTOT_SLOT"){
+        }else if(source == "CTOT_AUTO"){
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('CTOT_AUTO');
             stylestr = this.getDisplayStyle('CTOT_AUTO');
