@@ -1,7 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import { Checkbox, Input, Form, DatePicker, TimePicker, Button, message, Radio, Select } from 'antd';
-import {getDayTimeFromString, isValidObject, isValidVariable, addStringTime} from "utils/basic-verify";
+import {getDayTimeFromString, isValidObject, isValidVariable} from "utils/basic-verify";
 import {request} from "utils/request-actions";
 import { host } from "utils/request-urls";
 import { PriorityList, DelayReasonList } from "utils/flightcoordination";
@@ -15,6 +15,7 @@ const { TextArea } = Input;
 
 message.config({
     top: 140,
+    duration: 5,
     getContainer: () => document.getElementsByClassName("main-table")[0]
 });
 
@@ -258,7 +259,10 @@ class FormDialog extends React.Component{
             }
             const id = rowData["ID"]*1 || null; //id
             const str = date.value + time.value; //拼接时间
-            const comment = this.refs.comment.textAreaRef.value || ""; //获取备注内容
+            let comment;
+            if( isValidVariable(this.refs.comment)){
+                comment = this.refs.comment.textAreaRef.value || ""; //获取备注内容
+            }
             let params = { userId, id, comment };
             if( showName == "COBT" || showName == "CTOT" ){
                 const lockedValue = locked ? 1 : 0; //是否禁止系统自动调整，1 禁止  0 允许
@@ -307,7 +311,7 @@ class FormDialog extends React.Component{
                     this.hideLoading('submit');
                     this.props.requestCallback( res, rowData['FLIGHTID'] + "变更" + timeAuth.cn );
                 }, ( err ) => {
-                    message.error(rowData['FLIGHTID'] + "变更" + timeAuth.cn + "请求失败", 5 );
+                    message.error(rowData['FLIGHTID'] + "变更" + timeAuth.cn + "请求失败" );
                     this.hideLoading('submit');
                 });
             }
@@ -340,9 +344,6 @@ class FormDialog extends React.Component{
                 console.log(res);
                 this.hideLoading('cancle');
                 this.props.requestCallback( res, rowData['FLIGHTID'] + "撤销" + timeAuth.cn );
-            }, ( err ) => {
-                message.error(rowData['FLIGHTID'] + "撤销" + timeAuth.cn + "失败", 5 );
-                this.hideLoading('cancle');
             });
         }
 

@@ -128,9 +128,9 @@ class OperationDialog extends React.Component{
 
         }else{
             //提示失败
-            const message = error.message || "";
-            const showMes = mes + "失败," + message;
-            message.error( showMes, 0 );
+            const msg = error.message || "";
+            const showMes = mes + "失败," + OperationReason[msg];
+            message.error( showMes, 5 );
 
         }
 

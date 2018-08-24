@@ -155,14 +155,14 @@ class Table extends React.Component{
         console.timeEnd("updateOtherTableDatas----------");
 
 
-        // const airportTimerId = setTimeout(() => {
-        //     //获取机场航班
-        //     const params = this.getAirportsParams();
-        //     requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
-        // }, 30*1000);
-        // this.setState({
-        //     airportTimerId
-        // });
+        const airportTimerId = setTimeout(() => {
+            //获取机场航班
+            const params = this.getAirportsParams();
+            requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
+        }, 30*1000);
+        this.setState({
+            airportTimerId
+        });
 
     };
     //表格数据排序

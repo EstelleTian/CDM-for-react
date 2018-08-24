@@ -667,40 +667,36 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         // 判断来源
         if (isValidVariable(value) && isValidVariable(source)) {
             // 判断是否有协调记录
-            if(source=='CLOSE_MANUAL'){
+            if(source=='AGCT_MANUAL'){
                 stylestr = this.getDisplayStyle('AGCT_MANUAL');
                 if(isValidVariable(processMap) ){
-                    if(isValidVariable(processMap.AGCT_MANUAL)){
+                    if(isValidObject(processMap.AGCT_MANUAL)){
                         // 人工
                         titlestr = convertToTableStandardDate(processMap.AGCT_MANUAL.value) + '\n'
                             + styleZh;
                         // 显示录入时间
                         titlestr = titlestr + '\n' + '录入时间: '
                             + convertToTableStandardDate(processMap.AGCT_MANUAL.timestamp);
-                    }
-                    if(isValidVariable(processMap.AGCT_TELE)){
+                    }else if(isValidObject(processMap.AGCT_TELE)){
                         //如果同时存在报文
                         titlestr = titlestr + '\n'
                             + convertToTableStandardDate(processMap.AGCT_TELE.value) + '\n'
                             + this.getDisplayStyleZh(processMap.AGCT_TELE.source);
                     }
                 }
-            }else if(source=='CLOSE_IMPORT'){
+            }else if(source=='AGCT_IMPORT'){
                 // 引接
-                titlestr = convertToTableStandardDate(value) + '\n'
-                    + styleZh;
-                if(isValidVariable(processMap) && isValidVariable(processMap.AGCT_TELE)){
+                titlestr = convertToTableStandardDate(value) + '\n' + styleZh;
+                stylestr = this.getDisplayStyle('AGCT_IMPORT');
+                if(isValidVariable(processMap) && isValidVariable(processMap.AGCT_IMPORT)){
                     //如果同时存在报文
                     titlestr = titlestr + '\n'
-                        + convertToTableStandardDate(processMap.AGCT_TELE.value) + '\n'
-                        + this.getDisplayStyleZh(processMap.AGCT_TELE.source);
+                        + convertToTableStandardDate(processMap.AGCT_IMPORT.value) + '\n'
+                        + this.getDisplayStyleZh(processMap.AGCT_IMPORT.source);
                 }
-                stylestr = this.getDisplayStyle('AGCT_IMPORT');
-            }else if(source=='CLOSE_TELE'){
+            }else if(source=='AGCT_TELE'){
                 //报文
-                titlestr = titlestr + '\n'
-                    + convertToTableStandardDate(value) + '\n'
-                    + styleZh;
+                titlestr = titlestr + '\n' + convertToTableStandardDate(value) + '\n' + styleZh;
                 stylestr = this.getDisplayStyle('AGCT_TELE');
             }
             if(ifDep(obj)){
@@ -730,7 +726,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         let timestamp = obj.timestamp || '';
         if(isValidVariable(source) && isValidVariable(value)){
             // 判断来源
-            if(source == 'OUT_EFPS') {
+            if(source == 'AOBT_EFPS') {
                 // 进程单许可的推出时间
                 titlestr = convertToTableStandardDate(value) + '\n'
                     + styleZh;
@@ -759,7 +755,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
                     }
                 }
 
-            } else if (source == 'OUT_IMPORT') {
+            } else if (source == 'AOBT_IMPORT') {
                 // 引接
                 titlestr = convertToTableStandardDate(value) + '\n'
                     + styleZh;
@@ -781,7 +777,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
                             + this.getDisplayStyleZh(processMap.AOBT_TELE.source);
                     }
                 }
-            } else if(source == 'OUT_MANUAL'){
+            } else if(source == 'AOBT_MANUAL'){
                 titlestr = convertToTableStandardDate(value) + '\n'
                     + styleZh;
                 stylestr = this.getDisplayStyle('AOBT_MANUAL');
@@ -796,7 +792,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
                         + convertToTableStandardDate(processMap.AOBT_TELE.value) + '\n'
                         + this.getDisplayStyleZh(processMap.AOBT_TELE.source);
                 }
-            } else if (source == 'OUT_TELE') {
+            } else if (source == 'AOBT_TELE') {
                 // 报文
                 titlestr = convertToTableStandardDate(value) + '\n'
                     + styleZh;
