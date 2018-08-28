@@ -9,7 +9,6 @@ import './Form.less'
 
 const RadioGroup = Radio.Group;
 const RadioButton = Radio.Button;
-const Option = Select.Option;
 const FormItem = Form.Item;
 const { TextArea } = Input;
 
@@ -140,8 +139,6 @@ class FormDialog extends React.Component{
             //做校验
             this.compareWithEOBT("date", val);
         }
-
-
     };
     //时间改变
     onTimeChange( timemoment, timeString ){
@@ -222,7 +219,6 @@ class FormDialog extends React.Component{
                 //如果是空，提示错误
                 if( !isValidVariable(positionValue) ){
                     this.setState({
-                        ...this.state,
                         deice: {
                             ...deice,
                             validateStatus: "error",
@@ -241,7 +237,6 @@ class FormDialog extends React.Component{
             //如果是空，提示错误
             if( !isValidVariable(gatePositionValue) ){
                 this.setState({
-                    ...this.state,
                     position: {
                         ...position,
                         validateStatus: "error",
@@ -307,7 +302,6 @@ class FormDialog extends React.Component{
             if( isValidVariable(url) ){
                 //发送请求
                 request( `${host}/${url}`, "post", params, (res) => {
-                    console.log(res);
                     this.hideLoading('submit');
                     this.props.requestCallback( res, rowData['FLIGHTID'] + "变更" + timeAuth.cn );
                 }, ( err ) => {
@@ -315,6 +309,9 @@ class FormDialog extends React.Component{
                     this.hideLoading('submit');
                 });
             }
+        }
+        else{
+            this.hideLoading('submit');
         }
     };
 
@@ -337,11 +334,9 @@ class FormDialog extends React.Component{
             id,
             comment
         }
-        console.log(params, url);
         if( isValidVariable(url) ){
             //发送请求
             request( `${host}/${url}`, "post", params, (res) => {
-                console.log(res);
                 this.hideLoading('cancle');
                 this.props.requestCallback( res, rowData['FLIGHTID'] + "撤销" + timeAuth.cn );
             });
@@ -919,7 +914,6 @@ class FormDialog extends React.Component{
                                         defaultValue={ deice.deicePosition == "" ? "待定" : deice.deicePosition }
                                          onChange={(value) => {
                                             this.setState({
-                                                ...this.state,
                                                 deice: {
                                                     ...deice,
                                                     deicePosition: value
@@ -941,7 +935,6 @@ class FormDialog extends React.Component{
                                                 const val = e.target.value;
                                                 if( isValidVariable(val.trim()) && deice.validateStatus != ""){
                                                     this.setState({
-                                                        ...this.state,
                                                         deice: {
                                                             ...deice,
                                                             validateStatus: "",
@@ -959,7 +952,6 @@ class FormDialog extends React.Component{
                             >
                                 <Select defaultValue={ deice.deiceGroup == "" ? deiceGroupArr[0] : deice.deiceGroup } onChange={(value) => {
                                     this.setState({
-                                        ...this.state,
                                         deice: {
                                             ...deice,
                                             deiceGroup: value
@@ -1021,7 +1013,6 @@ class FormDialog extends React.Component{
                                         const val = e.target.value;
                                         if( isValidVariable(val.trim()) && position.validateStatus != ""){
                                             this.setState({
-                                                ...this.state,
                                                 position: {
                                                     ...position,
                                                     validateStatus: "",

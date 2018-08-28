@@ -22,6 +22,7 @@ const getDeicePosition = (state) => {
 
 const mapStateToProps = ( state ) => ({
     userId: state.loginUserInfo.userId || "",
+    generateTime: state.generateTime.time || "",
     deiceGroupName: state.loginUserInfo.deiceGroupName || "",
     deicePositionArray: getDeicePosition( state ), //冰坪下拉框
     operationDatas: state.operationDatas,

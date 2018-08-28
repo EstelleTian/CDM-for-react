@@ -282,8 +282,8 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         let stylekey = key + "_style";
         let stylestr = data.default_style;
         let { source = '', processMap = '' } = obj;
-        if(isValidVariable(processMap) && isValidVariable(processMap.FLIGHTID)){
-            titlestr += 'ID:' + processMap.FLIGHTID.value;
+        if(isValidVariable(processMap) && isValidVariable(processMap.FLIGHTIDSTYLE)){
+            titlestr += 'ID:' + processMap.FLIGHTIDSTYLE.value;
             if( source == "FLIGHTID_CDM" ){
                 //CDM航班
                 titlestr += '\n' + "CDM航班";
@@ -291,7 +291,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
                 //CRS航班
                 titlestr += '\n' + "CRS航班";
             }
-            const styleSource = processMap.FLIGHTID.source || "";
+            const styleSource = processMap.FLIGHTIDSTYLE.source || "";
             if( isValidVariable(styleSource) ){
                 if( styleSource == "MARK_NEED_SLOT"){
                     stylestr = this.getDisplayStyle('MARK_NEED_SLOT');
