@@ -50,39 +50,7 @@ const operationDatas = ( state = initData, action) => {
             return state;
     }
 };
-//------------------------------协调窗口数据-----------------------------------------
-//------------------------------协调记录数据-----------------------------------------
-const UPDATE_COLLABORATE_RECORDS= 'collaborateRecords/update';
-//action-creator
-//更新协调记录数据和数据生成时间
-const updateCollaborateRecords = ( records, generateTime ) => ({
-    type: UPDATE_COLLABORATE_RECORDS,
-    records,
-    generateTime
-});
-
-const initRecordData = {
-    records: {}, //协调记录
-    generateTime: ""  //协调记录生成时间
-};
-//store 协调窗口数据
-const collaborateRecords = ( state = initRecordData, action) => {
-    switch ( action.type ){
-        case UPDATE_COLLABORATE_RECORDS: {
-            return {
-                ...state,
-                records: action.records || {},
-                generateTime: action.generateTime || ""
-            }
-        }
-        default:
-            return state;
-    }
-};
-
-//------------------------------协调记录数据-----------------------------------------
 
 export {
-    operationDatas,updateOperationDatasShowNameAndPosition, updateOperationDatasAuth,
-    collaborateRecords, updateCollaborateRecords
+    operationDatas,updateOperationDatasShowNameAndPosition, updateOperationDatasAuth
 };

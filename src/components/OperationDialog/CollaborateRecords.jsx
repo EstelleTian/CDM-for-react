@@ -7,8 +7,16 @@ import TableLayoutDetail from "components/DetailModule/TableLayoutDetail";
 
 
 class CollaborateRecords extends React.Component{
-    componentWillUpdate(){
-        const { id, userId, updateCollaborateRecords } = this.props;
+    constructor(props){
+        super(props);
+        this.getRecordRequest = this.getRecordRequest.bind(this);
+        this.state = {
+            records: {}
+        };
+    };
+    //请求方法
+    getRecordRequest(){
+        const { id, userId } = this.props;
         //根据航班id获取协调记录
         const params = {
             userId: userId,
@@ -17,20 +25,40 @@ class CollaborateRecords extends React.Component{
         requestGet( getSingleCollaborateRecordUrl, params, (res) => {
             const { result = {}, generateTime = "" } = res;
             //更新协调记录
-            updateCollaborateRecords( result, generateTime );
+            this.setState({
+                records: result
+            });
         })
+    };
+    componentWillMount(){
+        this.getRecordRequest();
+    };
+    componentWillUpdate(){
+        this.getRecordRequest();
     };
     shouldComponentUpdate(nextProps, nextState){
         if( nextProps.id == this.props.id ){
-            return false;
+            var keysA = Object.keys(this.state.records);
+            var keysB = Object.keys(nextState.records);
+            if (keysA.length !== keysB.length) {
+                return true;
+            }else{
+                for (let idx = 0; idx < keysA.length; idx++) {
+                    let key = keysA[idx];
+                    if( keysB.indexOf(key) == -1 ){
+                        return true;
+                    }
+                }
+                return false;
+            }
         }else{
             return true;
         }
     };
 
     render(){
-        const { width = 1000, flightid, clickCloseBtn, collaborateRecords } = this.props;
-        const { records = {} } = collaborateRecords;
+        const { width = 1000, flightid, clickCloseBtn } = this.props;
+        const { records = {} } = this.state;
         return (
             <DraggableModule
                 bounds = ".root"

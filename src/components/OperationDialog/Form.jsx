@@ -35,6 +35,8 @@ class FormDialog extends React.Component{
         const curValue = rowData[showName]; //获取当前点击单元格的数据
         let priorityVal = "0";
         let delayReasonVal = "OTHER";
+        let initTimeWarningType = "";
+        let initTimeWarning = "";
         if( showName == "PRIORITY" ){
             const { originalData = {} } = rowData;
             const { flightFieldViewMap = {} } = originalData;
@@ -45,6 +47,12 @@ class FormDialog extends React.Component{
             // 优先级有不存在的值时，默认为'普通'
             if( !isValidVariable(PriorityList[priorityVal]) ){
                 priorityVal = "0";
+            }
+        }else if( showName == "TOBT" ){
+            //没发FPL 或者 有COBT 或者 有CTOT
+            if( !rowData["HADFPL"] || isValidVariable(rowData["COBT"]) || isValidVariable(rowData["CTOT"]) ){
+                initTimeWarningType = "warning";
+                initTimeWarning = '调整TOBT,会清空COBT/CTOT,造成航班向后移动';
             }
         }
         this.state = {
@@ -58,8 +66,8 @@ class FormDialog extends React.Component{
             },
             time: {
                 value: curValue.substring(8, 12) || moment().format('HHmm'),
-                validateStatus: "",
-                help: ""
+                validateStatus: initTimeWarningType,
+                help: initTimeWarning
             },
             locked: true,
             submitLoading: false,
@@ -115,6 +123,7 @@ class FormDialog extends React.Component{
     //日期改变
     onDateChange( datemoment, dateString ){
         const { date, time } = this.state;
+        const { showName } = this.props;
         if( dateString == "" ){
             //更新选中的日期
             this.setState({
@@ -137,12 +146,15 @@ class FormDialog extends React.Component{
             //拼接为12位值
             const val = dateString + time.value;
             //做校验
-            this.compareWithEOBT("date", val);
+            if( showName == "COBT" || showName == "CTOT" ){
+                this.compareWithEOBT("date", val);
+            }
         }
     };
     //时间改变
     onTimeChange( timemoment, timeString ){
         const { date, time } = this.state;
+        const { showName } = this.props;
         if( timeString == "" ){
             //更新选中的日期
             this.setState({
@@ -163,7 +175,10 @@ class FormDialog extends React.Component{
             //拼接为12位值
             const val = date.value + timeString;
             //做校验
-            this.compareWithEOBT("time", val);
+            if( showName == "COBT" || showName == "CTOT" ){
+                this.compareWithEOBT("time", val);
+            }
+
         }
 
     };
@@ -354,12 +369,10 @@ class FormDialog extends React.Component{
         //时间列显示权限
         const formItemLayout = {
             labelCol: {
-                xs: { span: 20 },
-                sm: { span: 8 },
+                sm: { span: 6 },
             },
             wrapperCol: {
-                xs: { span: 20 },
-                sm: { span: 16 },
+                sm: { span: 18 },
             }
         };
         const flightid = rowData["FLIGHTID"]; //航班id
@@ -369,15 +382,18 @@ class FormDialog extends React.Component{
 
         let originalVal = "";
         let applyVal = "";
+        let applyComment = "";
         if( timeAuth.type == "approve" ){
             if( showName == "HOBT"){
                 const map = rowData.originalData.flightCoordinationRecordsMap[showName];
                 originalVal = map.originalValue || "";
                 applyVal = map.value || "";
+                applyComment = map.comment || "";
             }else if( showName == "HOBT" || showName == "PRIORITY"){
                 const map = rowData.originalData.flightCoordinationRecordsMap[showName];
                 originalVal = PriorityList[map.originalValue+""] || "";
                 applyVal = PriorityList[map.value+""] || "";
+                applyComment = map.comment || "";
             }
         }
 
@@ -786,7 +802,7 @@ class FormDialog extends React.Component{
                                     {...formItemLayout}
                                 >
                                     <span className="stable-div" title={originalVal}>
-                                        { getDayTimeFromString(originalVal) || "" }
+                                        { originalVal || "" }
                                     </span>
                                 </FormItem>
                                 <FormItem
@@ -794,14 +810,14 @@ class FormDialog extends React.Component{
                                     {...formItemLayout}
                                 >
                                     <span className="stable-div" title={applyVal}>
-                                        { getDayTimeFromString(applyVal) || "" }
+                                        { applyVal || "" }
                                     </span>
                                 </FormItem>
                                 <FormItem
                                     {...formItemLayout}
                                     label="申请备注"
                                 >
-                                    <TextArea className="stable-div" ref="comment" placeholder=""/>
+                                    <TextArea className="stable-div" ref="comment" placeholder={applyComment} readOnly />
                                 </FormItem>
                                 <FormItem
                                     {...formItemLayout}
@@ -866,7 +882,7 @@ class FormDialog extends React.Component{
                                 : ""
                             }
                             <FormItem
-                                wrapperCol = {{ sm: {offset: 2, span: 22}, xs: {span: 24} }}
+                                wrapperCol = {{span: 24}}
                                 label=""
                                 className="footer"
                             >
