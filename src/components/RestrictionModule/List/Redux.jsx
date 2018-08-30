@@ -68,6 +68,7 @@ const restrictionCondition = (state = initRestrictionCondition, action) => {
                     scope: action.scope
                 }
             }
+            return state;
         }
         case UPDATE_RESTRICTION_CONDITION_ORDER_BY: {
             if( state.orderBy != action.data ){
@@ -76,6 +77,7 @@ const restrictionCondition = (state = initRestrictionCondition, action) => {
                     orderBy: action.data
                 }
             }
+            return state;
         }
         case UPDATE_RESTRICTION_CONDITION_QUICKLY_FILTERS: {
             return {

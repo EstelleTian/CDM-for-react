@@ -209,6 +209,7 @@ const tableCondition = (state = initTableCondition, action) => {
                     scroll: action.flag
                 }
             }
+            return state;
         }
         case UPDATE_TABLE_CONDITION_SCROLL_ID: {
             if( state.scrollId != action.id ){
@@ -217,6 +218,7 @@ const tableCondition = (state = initTableCondition, action) => {
                     scrollId: action.id
                 }
             }
+            return state;
         }
         case UPDATE_TABLE_CONDITION_ORDER_BY: {
             if( state.orderBy != action.data ){
@@ -225,6 +227,7 @@ const tableCondition = (state = initTableCondition, action) => {
                     orderBy: action.data
                 }
             }
+            return state;
         }
         case UPDATE_TABLE_CONDITION_QUICKLY_FILTERS: {
             return {

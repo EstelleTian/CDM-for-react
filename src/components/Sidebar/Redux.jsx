@@ -30,6 +30,7 @@ const sidebarConfig = (state = initSidebar, action) => {
                     show: action.show
                 }
             }
+            return state;
         }
         case UPDATE_SIDEBAR_KEY: {
             if( state.key != action.key ){
@@ -38,6 +39,7 @@ const sidebarConfig = (state = initSidebar, action) => {
                     key: action.key
                 }
             }
+            return state;
         }
 
         default:

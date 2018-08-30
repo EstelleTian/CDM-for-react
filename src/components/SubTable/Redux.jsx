@@ -76,8 +76,7 @@ const subTableDatas = ( state = initData, action) => {
                 };
                 return res
             }
-
-
+            return state;
         }
         case UPDATE_SUB_TABLE_DATAS_PROPERTY: {
             return {

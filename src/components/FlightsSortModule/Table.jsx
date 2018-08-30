@@ -66,103 +66,102 @@ class Table extends React.Component{
     };
     //更新航班数据
     refreshAirportsList( res ){
-        // console.log("refreshAirportsList");
-        const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateTableConditionRange, updateTableConditionScroll } = this.props;
-        //表格数据
-        // let dataArr = [];
-        let dataMap = {};
-        //数据生成时间
-        const generateTime = res.generateTime;
-        //生成信息
-        const generateInfo = res.generateInfo;
+        //如果协调窗口开启，不更新
+        if( $(".dialog-container").length <= 0 ){
+            const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateTableConditionRange, updateTableConditionScroll } = this.props;
+                    //表格数据
+            let dataMap = {};
+            //数据生成时间
+            const generateTime = res.generateTime;
+            //生成信息
+            const generateInfo = res.generateInfo;
+            //获取放行管理的航班id集合
+            const departureClearanceFlightsArr = res.departureClearanceFlights || [];
+            //航班集合
+            const flightViewMap = res.flightViewMap || {};
 
-        //获取放行管理的航班id集合
-        const departureClearanceFlightsArr = res.departureClearanceFlights || [];
-        //航班集合
-        const flightViewMap = res.flightViewMap || {};
+            let mintime_flight_id = '';
+            let time_interval = -1;
 
-        let mintime_flight_id = '';
-        let time_interval = -1;
+            //遍历每个航班，并转化为表格数据
+            for(let index in departureClearanceFlightsArr ){
+                //获取航班id
+                const id = departureClearanceFlightsArr[index];
+                //获取航班对象
+                const flight = flightViewMap[id] || {};
+                //转化后的数据
+                const flightFieldViewMap = flight.flightFieldViewMap || {};
+                //获取航班对应的可操作权限
+                const flightAuthMap = flight.flightAuthMap || {};
+                const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
+                //将航班原数据补充到航班对象中
+                data.originalData = flight;
 
-        //遍历每个航班，并转化为表格数据
-        for(let index in departureClearanceFlightsArr ){
-            //获取航班id
-            const id = departureClearanceFlightsArr[index];
-            //获取航班对象
-            const flight = flightViewMap[id] || {};
-            //转化后的数据
-            const flightFieldViewMap = flight.flightFieldViewMap || {};
-            //获取航班对应的可操作权限
-            const flightAuthMap = flight.flightAuthMap || {};
-            const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
-            //将航班原数据补充到航班对象中
-            data.originalData = flight;
-
-            //根据是否是自动滚动，如果是：计算滚动的航班id
-            if( autoScroll ){
-                // 取自定义排序首个字段与当前时间最接近的航班id
-                //取排序字段，比较当前数据时间和字段绝对差值最小
-                const tempTargetTime = data[orderBy];
-                if (isValidVariable(tempTargetTime) && tempTargetTime.length == 12) {
-                    // 计算计划时间和当前时间的绝对差值 返回毫秒值
-                    var tempTime = Math.abs(calculateStringTimeDiff(tempTargetTime, generateTime));
-                    //如果时间间隔 小于记录的 赋值替换
-                    //tempTime  time_interval  取最小
-                    if (time_interval == -1 || tempTime < time_interval) {
-                        time_interval = tempTime;
-                        mintime_flight_id = data['ID'];
+                //根据是否是自动滚动，如果是：计算滚动的航班id
+                if( autoScroll ){
+                    // 取自定义排序首个字段与当前时间最接近的航班id
+                    //取排序字段，比较当前数据时间和字段绝对差值最小
+                    const tempTargetTime = data[orderBy];
+                    if (isValidVariable(tempTargetTime) && tempTargetTime.length == 12) {
+                        // 计算计划时间和当前时间的绝对差值 返回毫秒值
+                        var tempTime = Math.abs(calculateStringTimeDiff(tempTargetTime, generateTime));
+                        //如果时间间隔 小于记录的 赋值替换
+                        //tempTime  time_interval  取最小
+                        if (time_interval == -1 || tempTime < time_interval) {
+                            time_interval = tempTime;
+                            mintime_flight_id = data['ID'];
+                        }
                     }
                 }
+                // dataArr.push(data);
+                dataMap[id] = data;
             }
-            // dataArr.push(data);
-            dataMap[id] = data;
-        }
-        //保存航班数据
-        //更新数据生成时间
-        updateGenerateTime({time : generateTime});
-        //更新自动滚动航班id值
-        updateTableConditionScrollId( mintime_flight_id );
-        //表格数据进行排序，排序后再存储
-        const sortedDataArr = this.sortDataMap( dataMap );
-        //如果自动滚动开启，根据定位航班id获取在排序数据中index
-        if( autoScroll ){
-            let start;
-            let end;
-            for(let i = 0, len = sortedDataArr.length; i < len; i++){
-                const tableData = sortedDataArr[i];
-                if( isValidVariable(tableData["ID"]) && tableData["ID"] == mintime_flight_id ){
-                    start = ( i - 25 ) < 0 ? 0 : ( i - 25 );
-                    end = ( i + 25 ) > len ? len : ( i + 25 );
-                    break;
-                }
+            //保存航班数据
+            //更新数据生成时间
+            updateGenerateTime({time : generateTime});
+            //更新自动滚动航班id值
+            updateTableConditionScrollId( mintime_flight_id );
+            //表格数据进行排序，排序后再存储
+            const sortedDataArr = this.sortDataMap( dataMap );
+            //如果自动滚动开启，根据定位航班id获取在排序数据中index
+            if( autoScroll ){
+                let start;
+                let end;
+                for(let i = 0, len = sortedDataArr.length; i < len; i++){
+                    const tableData = sortedDataArr[i];
+                    if( isValidVariable(tableData["ID"]) && tableData["ID"] == mintime_flight_id ){
+                        start = ( i - 25 ) < 0 ? 0 : ( i - 25 );
+                        end = ( i + 25 ) > len ? len : ( i + 25 );
+                        break;
+                    }
+                };
+                updateTableConditionRange( start, end );
+                updateTableConditionScroll( false );
             };
-            updateTableConditionRange( start, end );
-            updateTableConditionScroll( false );
-        };
-        //更新表格航班数据
-        console.time("updateTableDatas----------");
-        updateTableDatas( dataMap );
-        console.timeEnd("updateTableDatas----------");
-        console.time("updateOtherTableDatas----------");
-        //更新统计数据
-        updateGenerateInfo(generateInfo);
+            //更新表格航班数据
+            console.time("updateTableDatas----------");
+            updateTableDatas( dataMap );
+            console.timeEnd("updateTableDatas----------");
+            console.time("updateOtherTableDatas----------");
+            //更新统计数据
+            updateGenerateInfo(generateInfo);
 
-        this.handleSubTableDatas(res, 'expired', this.convertExpiredData, generateTime);
-        this.handleSubTableDatas(res, 'pool', this.convertData, generateTime);
-        this.handleSubTableDatas(res, 'alarm', this.convertAlarmData, generateTime);
-        this.handleSubTableDatas(res, 'special', this.converSpecialtData, generateTime);
-        this.handleSubTableDatas(res, 'todo', this.convertTodoData, generateTime);
-        console.timeEnd("updateOtherTableDatas----------");
+            this.handleSubTableDatas(res, 'expired', this.convertExpiredData, generateTime);
+            this.handleSubTableDatas(res, 'pool', this.convertData, generateTime);
+            this.handleSubTableDatas(res, 'alarm', this.convertAlarmData, generateTime);
+            this.handleSubTableDatas(res, 'special', this.converSpecialtData, generateTime);
+            this.handleSubTableDatas(res, 'todo', this.convertTodoData, generateTime);
+            console.timeEnd("updateOtherTableDatas----------");
+        }
 
-
-        // const airportTimerId = setTimeout(() => {
-        //     //获取机场航班
-        //     const params = this.getAirportsParams();
-        //     requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
-        // }, 30*1000);
-        // this.setState({
-        //     airportTimerId
-        // });
+        const airportTimerId = setTimeout(() => {
+            //获取机场航班
+            const params = this.getAirportsParams();
+            requestGet( getAllAirportsUrl, params, this.refreshAirportsList );
+        }, 30*1000);
+        this.setState({
+            airportTimerId
+        });
 
     };
     //表格数据排序
@@ -459,11 +458,6 @@ class Table extends React.Component{
         }
         handleOverflow( $fixedLeft );
         handleOverflow( $fixedRight );
-
-
-
-
-
     }
 
     onListenTableScroll(){
@@ -570,8 +564,6 @@ class Table extends React.Component{
     }
 
     componentDidUpdate(){
-        // console.log("componentDidUpdate");
-        // console.timeEnd("componentUpdate");
         //表格滚动到当前的行
         this.scrollToRow();
         //根据定位航班id获取数据范围
@@ -583,7 +575,6 @@ class Table extends React.Component{
     }
 
     shouldComponentUpdate( nextProps, nextState ){
-        // console.log("shouldComponentUpdate");
         if( nextProps.tableColumns.length < 0 ){
             return false;
         }
@@ -595,14 +586,12 @@ class Table extends React.Component{
         const nextTableDatas = nextProps.tableDatas || [];
         const isDiff = shallowequal(thisTableDatas, nextTableDatas);
         if( !isDiff ){  //只有tableDatas改变了才重新render，目前是浅拷贝方式
-            // console.log("tableDatas改变了");
             return true;
         }else{
             return false;
         }
     }
     render(){
-        // console.log('table render~~');
         const { tableDatas, tableColumns, scrollX} = this.props;
         return(
             <Col span={24} className="main-table">

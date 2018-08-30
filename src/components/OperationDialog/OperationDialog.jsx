@@ -10,6 +10,7 @@ import { convertData, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } f
 import { OperationTypeForTimeColumn, OperationReason } from "utils/flightcoordination";
 import CreateLayer from "components/CreateLayer/CreateLayer";
 import CollaborateRecordsContainer from "components/OperationDialog/CollaborateRecordsContainer";
+import OutPoolByTOBT from "components/OperationDialog/OutPoolByTOBT";
 import './OperationDialog.less';
 
 message.config({
@@ -48,11 +49,15 @@ class OperationDialog extends React.Component{
         this.getTimeColumnsAuth = this.getTimeColumnsAuth.bind(this);
         this.requestCallback = this.requestCallback.bind(this);
         this.resetDialogPositon = this.resetDialogPositon.bind(this);
-        this.closeCollaborateRecordDialog = this.closeCollaborateRecordDialog.bind(this);
+        this.closeDialog = this.closeDialog.bind(this);
 
         this.state = {
             collaborateRecords: { //协调记录窗口显隐
                 show: false
+            },
+            outPoolByTOBT: {
+                show: false,
+                name: ""
             }
         }
     }
@@ -98,10 +103,10 @@ class OperationDialog extends React.Component{
         //更新数据，需要展开的协调窗口名称和位置
         updateOperationDatasShowNameAndPosition( "", 0, 0 );
     };
-    //关闭协调记录窗口
-    closeCollaborateRecordDialog() {
+    //关闭弹出模态框窗口
+    closeDialog( dialogKey ){
         this.setState({
-            collaborateRecords: { //协调记录窗口关闭
+            [dialogKey]: { //协调记录窗口关闭
                 show: false
             }
         });
@@ -128,17 +133,17 @@ class OperationDialog extends React.Component{
 
         }else{
             //提示失败
-            const message = error.message || "";
-            const showMes = mes + "失败," + message;
-            message.error( showMes, 0 );
-
+            const msg = error.message || "";
+            const res = OperationReason[msg] || msg;
+            const showMes = mes + "失败," + res;
+            message.error( showMes, 5 );
         }
 
     };
 
     //处理航班号id提交操作事件
     handleFlightIdClick( item, rowData ){
-        const { userId = "" } = this.props;
+        const { userId = "", generateTime } = this.props;
         //选中的操作名称
         const { en = "", cn = "", url = "" } = item;
         if( en == "COORDINATION_DETAIL" ){ // 查看协调记录
@@ -150,15 +155,11 @@ class OperationDialog extends React.Component{
             this.closeCollaborateDialog();
         }else{
             //航班ID
-            const id = rowData["ID"]*1 || null;
+            const id = rowData["ID"]*1 || 0;
             //备注输入的值
             const comment = this.refs.comment.textAreaRef.value || "";
             // 标记准备完毕 标记未准备完毕 标记豁免 取消豁免
-            let params = {
-                id,
-                userId,
-                comment
-            };
+            let params = { id, userId, comment };
             if( en == "ASSIGNSLOT_MARK"  ){ //退出时隙分配
                 params["assignSlotStatus"] = 3;
             }else if( en == "ASSIGNSLOT_UN_MARK" ){ //参加时隙分配
@@ -173,6 +174,21 @@ class OperationDialog extends React.Component{
                 params["type"] = 0;
             }else if( en == "INPOOL_UPDATE" ){ //移入等待池 0
                 params["status"] = 2;
+            }else if( en == "OUTPOOL_APPLY" || en == "OUTPOOL_APPROVE" ){ //申请移出等待池 批复移出等待池
+                //比较当前时间和TOBT
+                const tobt = rowData["TOBT"];
+                if( tobt*1 < generateTime*1 ){
+                    this.setState({
+                        outPoolByTOBT: {
+                            show: true,
+                            name: en
+                        }
+                    });
+                    this.closeCollaborateDialog();
+                    return;
+                }else{
+                    params["tobt"] = tobt;
+                }
             }else if( en == "CANCEL_MARK" ){ //标记航班取消 3
                 params["status"] = 3;
             }else if( en == "CANCEL_UN_MARK" ){ //标记航班恢复 0
@@ -338,7 +354,7 @@ class OperationDialog extends React.Component{
     };
 
     render(){
-        const { userId, deiceGroupName, deicePositionArray } = this.props;
+        const { userId, deiceGroupName, deicePositionArray, generateTime } = this.props;
         const { showName = "", auth, rowData = {}, x = 0, y = 0 } = this.props.operationDatas;
 
         //时间列显示权限
@@ -353,7 +369,7 @@ class OperationDialog extends React.Component{
             <div className="collaborate-canvas" style={ dialogStyle }>
                 {
                     (showName == "FLIGHTID") ?
-                        <div className="collaborate-dialog">
+                        <div className="collaborate-dialog dialog-container">
                             <div className="popover-arrow left top"></div>
                             <div className="title">
                                 <span>{ rowData["FLIGHTID"] }</span>
@@ -395,7 +411,7 @@ class OperationDialog extends React.Component{
                         ) ?
                             (
                                 (isValidVariable(timeAuth) && timeAuth.show)
-                                    ? <div className="collaborate-dialog">
+                                    ? <div className="collaborate-dialog dialog-container">
                                         <div className="popover-arrow left top"></div>
                                         <div className="title">
                                             <span>{timeAuth.cn}</span>
@@ -435,7 +451,34 @@ class OperationDialog extends React.Component{
                             <CollaborateRecordsContainer
                                 flightid = { rowData["FLIGHTID"] }
                                 id = { rowData["ID"]  }
-                                clickCloseBtn = { this.closeCollaborateRecordDialog }
+                                clickCloseBtn = { () => {
+                                    this.closeDialog("collaborateRecords");
+                                } }
+                            />
+
+                        </CreateLayer>
+                    ) : ""
+                }
+                {
+                    this.state.outPoolByTOBT.show ? (
+                        <CreateLayer
+                            className="outpool-by-tobt-layer"
+                            style = {{
+                                top: "35rem",
+                                left: "28rem"
+                            }}
+                        >
+                            <OutPoolByTOBT
+                                userId = { userId }
+                                id = { rowData["ID"] }
+                                flightid = { rowData["FLIGHTID"] }
+                                tobt = { rowData["TOBT"] }
+                                generateTime = { generateTime }
+                                requestCallback = { this.requestCallback }
+                                name =  { this.state.outPoolByTOBT.name }
+                                clickCloseBtn = { () => {
+                                    this.closeDialog("outPoolByTOBT");
+                                } }
                             />
 
                         </CreateLayer>

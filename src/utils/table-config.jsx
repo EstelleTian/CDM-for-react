@@ -138,7 +138,6 @@ const handleColumnRender = (value, row, index, colunmName) => {
     }
     resStyleObj['fontSize'] = styleObj['fontSize'] || "";
 
-
     return {
         children: value,
         props:{

@@ -42,6 +42,7 @@ const detailModalDatas = ( state = initData, action) => {
                 };
                 return res
             }
+            return state;
         }
         case UPDATE_DETAIL_MODAL_DATAS_BY_NAME: {
             const { name = "", data = {} } = action;
@@ -55,6 +56,7 @@ const detailModalDatas = ( state = initData, action) => {
                 };
                 return res
             }
+            return state;
         }
         default:
             return state;

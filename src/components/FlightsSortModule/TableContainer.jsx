@@ -14,8 +14,6 @@ const sortTableDatas = ( tableDatasMap, quicklyFilters, scopeFilter, statusFilte
      if( !isValidObject(tableDatasMap) ){
          return [];
      }
-     // console.log("sortTableDatas!!!!");
-
     //高级过滤 scopeFilter  时间过滤 30 45 60min
     if( scopeFilter != "all" ){
 
