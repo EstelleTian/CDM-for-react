@@ -12,11 +12,12 @@ class FlowcontrolDialog extends React.Component{
     }
 
     render(){
-        const { titleName, clickCloseBtn, width = 1000, dialogName, x = 0, loginUserInfo, systemConfig, generateTime} = this.props;
+        const { titleName, clickCloseBtn, width = 1000, dialogName, x, y, loginUserInfo, systemConfig, generateTime} = this.props;
         return (
             <DraggableModule
                 bounds = ".root"
                 x = {x}
+                y = {y}
             >
                 <div className="box center no-cursor" style={{ width: width }}>
                     <div className="dialog">

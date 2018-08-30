@@ -11,7 +11,8 @@ const mapStateToProps = ( state, nextProps ) =>({
     dialogName: nextProps.type,
     clickCloseBtn: nextProps.clickCloseBtn,
     width: nextProps.width,
-    x: nextProps.x
+    x: nextProps.x || 0,
+    y: nextProps.y || 0,
 
 });
 

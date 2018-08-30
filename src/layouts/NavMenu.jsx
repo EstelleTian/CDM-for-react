@@ -308,15 +308,13 @@ class NavMenu extends React.Component{
                     (apPublish.show) ?
                         <CreateLayer
                             className="flowcontol-layer"
-                            style = {{
-                                top: "5rem",
-                                left: "25rem"
-                            }}
                         >
                             <FlowcontrolDialogContainer
                                 titleName="发布机场受限"
                                 type="apPublish"
                                 clickCloseBtn={ this.onCloseBtn }
+                                x = { 300 }
+                                y = { 60 }
                             />
                         </CreateLayer>
 
