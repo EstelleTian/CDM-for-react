@@ -317,7 +317,7 @@ class FlowcontrolDetail extends React.Component {
            }else if(type == 'UPDATE'){ // 修改
                res = originalValue
            }else if(type == 'RESERVE_SLOT'){ // 预留时隙
-               res = this.batchFormattingTime(reserveSlots);
+               res = this.batchFormattingTime(originalValue);
            }else if(type == 'TIME_SEGMENT'){ // 二类放行
                res = this.batchFormattingTime(originalValue);
            }else if(originalValue == 'PUBLISH'){ //
@@ -356,7 +356,7 @@ class FlowcontrolDetail extends React.Component {
            }else if(type == 'PUBLISH' || type == 'UPDATE'){ // 发布或修改
                res = value
            }else if(type == 'RESERVE_SLOT'){ // 预留时隙
-               res = this.batchFormattingTime(reserveSlots);
+               res = this.batchFormattingTime(value);
            }else if(type == 'TIME_SEGMENT'){ // 二类放行
                res = this.batchFormattingTime(value);
            }else if(value == 'STOP'){ //
