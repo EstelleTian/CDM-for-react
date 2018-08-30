@@ -33,6 +33,8 @@ const publishFlowcontrolUrl = `${flowcontrolHost}/flow/publish.action`;
 
 // 获取通告信息
 const getNoticeUrl = `${host}/retrieveNoticeInformation.bo`;
+// 通告详情
+const getNoticeDetailUrl = `${host}/retrieveNoticeInformationById.bo`;
 // 获取除冰限制信息
 const getRestrictionUrl = `${host}/retrieveRestriction.bo`;
 
@@ -45,5 +47,5 @@ export {
     getFlowcontrolUrl, getNoticeUrl,
     getPointByAirportUrl, getRestrictionUrl,
     publishFlowcontrolUrl, getFlowcontrolTemplateUrl, getFlowcontrolByIdUrl,
-    getFlowcontrolDetailUrl,
+    getFlowcontrolDetailUrl, getNoticeDetailUrl,
 };
