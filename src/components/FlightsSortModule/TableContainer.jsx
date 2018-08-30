@@ -11,12 +11,9 @@ import Table from './Table';
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
 const sortTableDatas = ( tableDatasMap, quicklyFilters, scopeFilter, statusFilter, start, end, scrollId, scroll ) => {
-    console.log("过滤条件是：",quicklyFilters);
      if( !isValidObject(tableDatasMap) ){
          return [];
      }
-     // console.log("sortTableDatas!!!!");
-
     //高级过滤 scopeFilter  时间过滤 30 45 60min
     if( scopeFilter != "all" ){
 

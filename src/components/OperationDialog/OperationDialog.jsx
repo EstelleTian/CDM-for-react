@@ -369,7 +369,7 @@ class OperationDialog extends React.Component{
             <div className="collaborate-canvas" style={ dialogStyle }>
                 {
                     (showName == "FLIGHTID") ?
-                        <div className="collaborate-dialog">
+                        <div className="collaborate-dialog dialog-container">
                             <div className="popover-arrow left top"></div>
                             <div className="title">
                                 <span>{ rowData["FLIGHTID"] }</span>
@@ -411,7 +411,7 @@ class OperationDialog extends React.Component{
                         ) ?
                             (
                                 (isValidVariable(timeAuth) && timeAuth.show)
-                                    ? <div className="collaborate-dialog">
+                                    ? <div className="collaborate-dialog dialog-container">
                                         <div className="popover-arrow left top"></div>
                                         <div className="title">
                                             <span>{timeAuth.cn}</span>
