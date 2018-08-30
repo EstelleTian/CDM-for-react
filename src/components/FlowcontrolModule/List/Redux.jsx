@@ -90,6 +90,7 @@ const flowcontrolCondition = (state = initFlowcontrolCondition, action) => {
                     shieldLong: action.flag
                 }
             }
+            return state;
         }
         case UPDATE_FLOWCONTROL_CONDITION_SCOPE: {
             if( state.scope != action.scope ){
@@ -98,6 +99,7 @@ const flowcontrolCondition = (state = initFlowcontrolCondition, action) => {
                     scope: action.scope
                 }
             }
+            return state;
         }
         case UPDATE_FLOWCONTROL_CONDITION_PLACE_TYPE: {
             if( state.placeType != action.placeType ){
@@ -114,6 +116,7 @@ const flowcontrolCondition = (state = initFlowcontrolCondition, action) => {
                     orderBy: action.data
                 }
             }
+            return state;
         }
         case UPDATE_FLOWCONTROL_CONDITION_QUICKLY_FILTERS: {
             return {

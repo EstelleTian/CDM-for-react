@@ -66,16 +66,15 @@ class Table extends React.Component{
     };
     //更新航班数据
     refreshAirportsList( res ){
-        // console.log("refreshAirportsList");
         const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateTableConditionRange, updateTableConditionScroll } = this.props;
+        //TODO 如果协调窗口开启，不更新
+
         //表格数据
-        // let dataArr = [];
         let dataMap = {};
         //数据生成时间
         const generateTime = res.generateTime;
         //生成信息
         const generateInfo = res.generateInfo;
-
         //获取放行管理的航班id集合
         const departureClearanceFlightsArr = res.departureClearanceFlights || [];
         //航班集合
@@ -459,11 +458,6 @@ class Table extends React.Component{
         }
         handleOverflow( $fixedLeft );
         handleOverflow( $fixedRight );
-
-
-
-
-
     }
 
     onListenTableScroll(){
@@ -570,8 +564,6 @@ class Table extends React.Component{
     }
 
     componentDidUpdate(){
-        // console.log("componentDidUpdate");
-        // console.timeEnd("componentUpdate");
         //表格滚动到当前的行
         this.scrollToRow();
         //根据定位航班id获取数据范围
@@ -583,7 +575,6 @@ class Table extends React.Component{
     }
 
     shouldComponentUpdate( nextProps, nextState ){
-        // console.log("shouldComponentUpdate");
         if( nextProps.tableColumns.length < 0 ){
             return false;
         }
@@ -595,14 +586,12 @@ class Table extends React.Component{
         const nextTableDatas = nextProps.tableDatas || [];
         const isDiff = shallowequal(thisTableDatas, nextTableDatas);
         if( !isDiff ){  //只有tableDatas改变了才重新render，目前是浅拷贝方式
-            // console.log("tableDatas改变了");
             return true;
         }else{
             return false;
         }
     }
     render(){
-        // console.log('table render~~');
         const { tableDatas, tableColumns, scrollX} = this.props;
         return(
             <Col span={24} className="main-table">

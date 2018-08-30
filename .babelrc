@@ -6,6 +6,9 @@
   "env": {
     "build": {
       "optional": ["optimisation", "minification"]
+    },
+    "development" : {
+      "plugins" : ["dynamic-import-node"]
     }
   }
 }
