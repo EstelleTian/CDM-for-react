@@ -443,14 +443,12 @@ class OperationDialog extends React.Component{
                     this.state.collaborateRecords.show ? (
                         <CreateLayer
                             className="collaborate-records-layer"
-                            style = {{
-                                top: "20rem",
-                                left: "25rem"
-                            }}
                         >
                             <CollaborateRecordsContainer
                                 flightid = { rowData["FLIGHTID"] }
                                 id = { rowData["ID"]  }
+                                x = { 300 }
+                                y = { 240 }
                                 clickCloseBtn = { () => {
                                     this.closeDialog("collaborateRecords");
                                 } }

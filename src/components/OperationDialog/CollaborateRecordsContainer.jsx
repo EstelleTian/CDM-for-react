@@ -8,6 +8,8 @@ const mapStateToProps = (state, nextProps) => ({
     clickCloseBtn: nextProps.clickCloseBtn, //关闭按钮事件 Function
     flightid: nextProps.flightid || "", //航班号
     id: nextProps.id || "", //航班id
+    x: nextProps.x || 0,
+    y: nextProps.y || 0
 });
 
 const mapDispatchToProps = {

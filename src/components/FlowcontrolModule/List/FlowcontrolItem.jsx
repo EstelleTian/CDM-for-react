@@ -103,15 +103,13 @@ class FlowcontrolItem extends React.Component{
                     detail.show ?
                         <CreateLayer
                             className="flowcontol-layer"
-                            style={{
-                                top: "5rem",
-                                left: "25rem"
-                            }}
                         >
                             <FlowcontrolDetailContainer
                                 titleName="流控信息详情"
                                 type="detail"
                                 id = {id}
+                                x = { 300 }
+                                y = { 60 }
                                 placeType = { data.placeType }
                                 clickCloseBtn={ this.onCloseBtn }
                             />

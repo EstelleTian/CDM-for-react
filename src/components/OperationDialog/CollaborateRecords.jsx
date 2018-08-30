@@ -57,11 +57,13 @@ class CollaborateRecords extends React.Component{
     };
 
     render(){
-        const { width = 1000, flightid, clickCloseBtn } = this.props;
+        const { width = 1000, flightid, clickCloseBtn, x, y } = this.props;
         const { records = {} } = this.state;
         return (
             <DraggableModule
                 bounds = ".root"
+                x = {x}
+                y = {y}
             >
                 <div className="box center no-cursor" style={{ width: width }}>
                     <div className="dialog">

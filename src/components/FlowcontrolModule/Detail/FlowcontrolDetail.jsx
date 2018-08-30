@@ -510,7 +510,7 @@ class FlowcontrolDetail extends React.Component {
     }
 
     render() {
-        const {titleName, clickCloseBtn, width = 1000, dialogName, x = 0,} = this.props;
+        const {titleName, clickCloseBtn, width = 1000, dialogName, x, y } = this.props;
         const {
             name, effectiveTime, flowStatus, nameComplex, flowStatusClassName, source, flowcontrolType, publishUser, originalPublishUnit,
             type, value, reason, controlPoints, flowcontrolDirection, controlDepDirection,controlDirection,
@@ -524,7 +524,8 @@ class FlowcontrolDetail extends React.Component {
         return (
             <DraggableModule
                 bounds=".root"
-                x={x}
+                x = {x}
+                y = {y}
             >
                 <div className="box center no-cursor" style={{width: width}}>
                     <div className="dialog">
