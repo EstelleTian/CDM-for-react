@@ -1087,12 +1087,14 @@ class APContent extends React.Component{
             className: 'row-title'
         };
         const Layout24 = { span: 24 };
-        const Layout20 = { span: 20 };
-        const Layout12 = { span: 12 };
+        const Layout21 = { span: 21 };
         const Layout10 = { span: 10 };
+        const Layout9 = { span: 9 };
         const Layout8 = { span: 8 };
         const Layout6 = { span: 6 };
+        const Layout5 = { span: 5 };
         const Layout4 = { span: 4 };
+        const Layout3 = { span: 3 };
         const { flowcontrolPointsList,  checkedControlPoints, levelOptions, templateOptions} = this.state;
 
         const { clickCloseBtn, dialogName, generateTime} = this.props;
@@ -1271,8 +1273,8 @@ class APContent extends React.Component{
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
-                                <Col {...Layout4}>
-                                    <div className="label">流控名称</div>
+                                <Col {...Layout3}>
+                                    <div className="label"><i className="iconfont icon-star-sm"></i>流控名称</div>
                                 </Col>
                                 <Col {...Layout10}>
                                     <FormItem>
@@ -1289,7 +1291,7 @@ class APContent extends React.Component{
                                         }
                                     </FormItem>
                                 </Col>
-                                <Col {...Layout8}>
+                                <Col {...Layout4} offset={2}>
                                     <FormItem>
                                         {
                                             rulesGenerate.flowcontrolType(
@@ -1304,11 +1306,11 @@ class APContent extends React.Component{
                                 </Col>
                             </Row>
                             <Row>
-                                <Col {...Layout4}>
+                                <Col {...Layout3}>
                                     <div className="label">发布用户</div>
 
                                 </Col>
-                                <Col {...Layout8}>
+                                <Col {...Layout9}>
                                     {
                                         rulesGenerate.publishUserZh(
                                             <Input placeholder="请输入发布者"  disabled ={true} />
@@ -1320,7 +1322,7 @@ class APContent extends React.Component{
                                     <div className="label">原发布者</div>
 
                                 </Col>
-                                <Col {...Layout8}>
+                                <Col {...Layout5}>
                                     {
                                         rulesGenerate.originalPublishUnit(
                                             <Select
@@ -1356,8 +1358,8 @@ class APContent extends React.Component{
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
-                                <Col {...Layout4}>
-                                    <div className="label">起始时间</div>
+                                <Col {...Layout3}>
+                                    <div className="label"><i className="iconfont icon-star-sm"></i>起始时间</div>
 
                                 </Col>
                                 <Col {...Layout4}>
@@ -1399,7 +1401,7 @@ class APContent extends React.Component{
                                         }
                                     </FormItem>
                                 </Col>
-                                <Col {...Layout4} className="text-center">
+                                <Col {...Layout4} offset={1} className="text-center">
                                     <div className="label">截止时间</div>
 
                                 </Col>
@@ -1456,11 +1458,11 @@ class APContent extends React.Component{
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
-                                <Col {...Layout4}>
-                                    <div className="label">类型</div>
+                                <Col {...Layout3}>
+                                    <div className="label"><i className="iconfont icon-star-sm"></i>类型</div>
 
                                 </Col>
-                                <Col {...Layout8}>
+                                <Col {...Layout9}>
                                     {
                                         rulesGenerate.type(
                                             <RadioGroup
@@ -1513,18 +1515,16 @@ class APContent extends React.Component{
                     </Col>
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
-
                             <div className="row-title">
                                 限制原因
                             </div>
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
-                                <Col {...Layout4}>
-                                    <div className="label">原因</div>
-
+                                <Col {...Layout3}>
+                                    <div className="label"><i className="iconfont icon-star-sm"></i>原因</div>
                                 </Col>
-                                <Col {...Layout20}>
+                                <Col {...Layout21}>
                                     <FormItem>
                                     {
                                         rulesGenerate.reason(
@@ -1554,11 +1554,11 @@ class APContent extends React.Component{
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
-                                <Col {...Layout4}>
+                                <Col {...Layout3}>
                                     <div className="label">模板</div>
 
                                 </Col>
-                                <Col {...Layout20}>
+                                <Col {...Layout10}>
                                     <Select
                                         allowClear = {true}
                                         placeholder="请选择模板"
@@ -1572,12 +1572,12 @@ class APContent extends React.Component{
                                 flowcontrolPointsList.map((item) =>{
                                     return (
                                         <Row key= {item.id}>
-                                            <Col {...Layout4}>
+                                            <Col {...Layout3}>
                                                 <div className="label">
                                                 { item.description }
                                                 </div>
                                             </Col>
-                                            <Col {...Layout20}>
+                                            <Col {...Layout21}>
                                                 {
                                                     item.points.map((it,ind) =>{
                                                         return (
@@ -1598,11 +1598,11 @@ class APContent extends React.Component{
                                 })
                             }
                             <Row>
-                                <Col {...Layout4}>
+                                <Col {...Layout3}>
                                     <div className="label">受控起飞机场</div>
 
                                 </Col>
-                                <Col {...Layout8}>
+                                <Col {...Layout9}>
                                     {
                                         rulesGenerate.controlDepDirection(
                                             <Input
@@ -1632,11 +1632,11 @@ class APContent extends React.Component{
                                 </Col>
                             </Row>
                             <Row>
-                                <Col {...Layout4} >
+                                <Col {...Layout3} >
                                     <div className="label">豁免起飞机场</div>
 
                                 </Col>
-                                <Col {...Layout8}>
+                                <Col {...Layout9}>
                                     {
                                         rulesGenerate.exemptDepDirection(
                                             <Input placeholder="" disabled ={true} />
@@ -1666,20 +1666,19 @@ class APContent extends React.Component{
                     </Col>
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
-
                             <div className="row-title">
                                 限制高度
                             </div>
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
-                                <Col {...Layout4}>
+                                <Col {...Layout3}>
                                     <div className="label">
                                         高度
                                     </div>
 
                                 </Col>
-                                <Col {...Layout20}>
+                                <Col {...Layout21}>
                                     {
                                         rulesGenerate.controlLevel(
                                             <Select
@@ -1706,13 +1705,13 @@ class APContent extends React.Component{
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
-                                <Col {...Layout4}>
+                                <Col {...Layout3}>
                                     <div className="label">
                                         时隙
                                     </div>
 
                                 </Col>
-                                <Col {...Layout20}>
+                                <Col {...Layout21}>
                                     <FormItem>
                                     {
                                         rulesGenerate.reserveSlots(
@@ -1740,16 +1739,16 @@ class APContent extends React.Component{
                         </Col>
                         <Col {...ContentLayout} >
                             <Row>
-                                <Col {...Layout4}>
+                                <Col {...Layout3}>
                                     <div className="label">
                                         备注
                                     </div>
 
                                 </Col>
-                                <Col {...Layout20}>
+                                <Col {...Layout21}>
                                     {
                                         rulesGenerate.comments(
-                                            <textarea placeholder="请输入备注" rows="4"  className="comments"></textarea>
+                                            <textarea rows="4"  className="comments"></textarea>
                                         )
                                     }
                                 </Col>

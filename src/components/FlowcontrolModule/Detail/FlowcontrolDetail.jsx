@@ -510,16 +510,20 @@ class FlowcontrolDetail extends React.Component {
     }
 
     render() {
-        const {titleName, clickCloseBtn, width = 1000, dialogName, x, y } = this.props;
+        const {titleName, clickCloseBtn, width = 800, dialogName, x, y } = this.props;
         const {
             name, effectiveTime, flowStatus, nameComplex, flowStatusClassName, source, flowcontrolType, publishUser, originalPublishUnit,
             type, value, reason, controlPoints, flowcontrolDirection, controlDepDirection,controlDirection,
             exemptDepDirection, exemptDirection, controlLevel, reserveSlots, startTime, endTime, generateTime,
             lastModifyTime, startFlowCasaTime, compressAtStartStrategy, compressAtStartWinStart, compressAtEndWinEnd,
             comments, flowRecords} = this.state;
-        const Layout24 = {span: 24};
-        const Layout12 = {span: 12};
+        const Layout2 = {span: 2};
+        const Layout4 = {span: 4};
         const Layout6 = {span: 6};
+        const Layout8 = {span: 8};
+        const Layout12 = {span: 12};
+        const Layout18 = {span: 18};
+        const Layout24 = {span: 24};
         const columns = this.getColums();
         return (
             <DraggableModule
@@ -552,199 +556,240 @@ class FlowcontrolDetail extends React.Component {
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
                                             <Col className="description">基本信息</Col>
                                         </Row>
-                                        <Row>
-                                            <Col {...Layout12}>
-                                                <div className="trem">流控名称</div>
-                                                <div className="detail">{ nameComplex }</div>
+                                        <Row className="sub-content">
+                                            <Col {...Layout24}>
+                                                <Col {...Layout4}>
+                                                    <div className="trem">流控名称</div>
+                                                </Col>
+                                                <Col {...Layout8}>
+                                                    <div className="detail">{ nameComplex }</div>
+                                                </Col>
+                                                <Col {...Layout4}>
+                                                    <div className="trem">来源</div>
+                                                </Col>
+                                                <Col {...Layout4}>
+                                                    <div className="detail">{source}</div>
+                                                </Col>
+                                                <Col {...Layout2}>
+                                                    <div className="trem">类型</div>
+                                                </Col>
+                                                <Col {...Layout2}>
+                                                    <div className="detail">{flowcontrolType}</div>
+                                                </Col>
                                             </Col>
-                                            <Col {...Layout6}>
-                                                <div className="trem">来源</div>
-                                                <div className="detail">{source}</div>
-                                            </Col>
-                                            <Col {...Layout6}>
-                                                <div className="trem">类型</div>
-                                                <div className="detail">{flowcontrolType}</div>
-
-                                            </Col>
-                                            <Col {...Layout12}>
-                                                <div className="trem">发布用户</div>
-                                                <div className="detail">{ publishUser }</div>
-                                            </Col>
-                                            <Col {...Layout12}>
-                                                <div className="trem">原发布单位</div>
-                                                <div className="detail">{ originalPublishUnit }</div>
+                                            <Col {...Layout24}>
+                                                <Col {...Layout4}>
+                                                    <div className="trem">发布用户</div>
+                                                </Col>
+                                                <Col {...Layout8}>
+                                                    <div className="detail">{ publishUser }</div>
+                                                </Col>
+                                                <Col {...Layout4}>
+                                                    <div className="trem">原发布单位</div>
+                                                </Col>
+                                                <Col {...Layout8}>
+                                                    <div className="detail">{ originalPublishUnit }</div>
+                                                </Col>
                                             </Col>
                                         </Row>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
                                             <Col className="description">限制时间 </Col>
                                         </Row>
-                                        <Row type="flex" justify="start">
-                                            <Col {...Layout12}>
+                                        <Row type="flex" justify="start" className="sub-content">
+                                            <Col {...Layout4}>
                                                 <div className="trem">开始时间</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ startTime }</div>
                                             </Col>
-
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">结束时间</div>
-                                                <div className="detail">{endTime}</div>
                                             </Col>
-                                            <Col {...Layout12}>
+                                            <Col {...Layout8}>
+                                                <div className="detail">{ endTime }</div>
+                                            </Col>
+                                            <Col {...Layout4}>
                                                 <div className="trem">创建时间</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ generateTime }</div>
                                             </Col>
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">修改时间</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ lastModifyTime }</div>
                                             </Col>
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">纳入计算时间</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ startFlowCasaTime }</div>
                                             </Col>
                                         </Row>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
                                             <Col className="description">限制类型 </Col>
                                         </Row>
-                                        <Row type="flex" justify="start">
-                                            <Col {...Layout12}>
+                                        <Row type="flex" justify="start" className="sub-content">
+                                            <Col {...Layout4}>
                                                 <div className="trem">限制类型</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ type }</div>
                                             </Col>
-
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">限制数值</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ value }</div>
                                             </Col>
                                         </Row>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
-                                            <Col className="description">限制方向 </Col>
+                                            <Col className="description">限制方向</Col>
                                         </Row>
-
-                                        <Row type="flex" justify="start">
-                                            <Col {...Layout12}>
+                                        <Row type="flex" justify="start" className="sub-content">
+                                            <Col {...Layout4}>
                                                 <div className="trem">受控航路点</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ controlPoints }</div>
                                             </Col>
-
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">受控方向</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ flowcontrolDirection }</div>
                                             </Col>
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">受控起飞机场</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ controlDepDirection }</div>
                                             </Col>
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">豁免起飞机场</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ exemptDepDirection }</div>
                                             </Col>
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">受控降落机场</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ controlDirection }</div>
                                             </Col>
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">豁免降落机场</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ exemptDirection }</div>
                                             </Col>
                                         </Row>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
                                             <Col className="description">限制高度 </Col>
                                         </Row>
-
-                                        <Row type="flex" justify="start">
-                                            <Col {...Layout12}>
+                                        <Row type="flex" justify="start" className="sub-content">
+                                            <Col {...Layout4}>
                                                 <div className="trem">限制高度</div>
+                                            </Col>
+                                            <Col {...Layout18}>
                                                 <div className="detail">{ controlLevel }</div>
                                             </Col>
                                         </Row>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
                                             <Col className="description">限制原因 </Col>
                                         </Row>
-
-                                        <Row type="flex" justify="start">
-                                            <Col {...Layout12}>
+                                        <Row type="flex" justify="start" className="sub-content">
+                                            <Col {...Layout4}>
                                                 <div className="trem">限制原因</div>
+                                            </Col>
+                                            <Col {...Layout18}>
                                                 <div className="detail">{ reason }</div>
                                             </Col>
                                         </Row>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
                                             <Col className="description">预留时隙 </Col>
                                         </Row>
-
-                                        <Row type="flex" justify="start">
-                                            <Col {...Layout12}>
+                                        <Row type="flex" justify="start" className="sub-content">
+                                            <Col {...Layout4}>
                                                 <div className="trem">时隙时间</div>
+                                            </Col>
+                                            <Col {...Layout18}>
                                                 <div className="detail">{ reserveSlots }</div>
                                             </Col>
                                         </Row>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
                                             <Col className="description">预锁航班时隙变更策略 </Col>
                                         </Row>
-
-                                        <Row type="flex" justify="start">
-                                            <Col {...Layout12}>
+                                        <Row type="flex" justify="start" className="sub-content">
+                                            <Col {...Layout4}>
                                                 <div className="trem">变更策略</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ compressAtStartStrategy }</div>
                                             </Col>
-                                            <Col {...Layout12}>
+                                            <Col {...Layout4}>
                                                 <div className="trem">压缩时间范围</div>
+                                            </Col>
+                                            <Col {...Layout8}>
                                                 <div className="detail">{ compressAtStartWinStart ? `${compressAtStartWinStart} ~ ${compressAtEndWinEnd}` : '' }</div>
                                             </Col>
                                         </Row>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
                                             <Col className="description">备注信息 </Col>
                                         </Row>
-
-                                        <Row type="flex" justify="start">
-                                            <Col {...Layout24}>
+                                        <Row type="flex" justify="start" className="sub-content">
+                                            <Col {...Layout4}>
                                                 <div className="trem">备注</div>
+                                            </Col>
+                                            <Col {...Layout18}>
                                                 <div className="detail">{ comments }</div>
                                             </Col>
                                         </Row>
                                     </Col>
                                 </Row>
                                 <Row>
-                                    <Col {...Layout24} className="detail-list">
+                                    <Col {...Layout24} >
                                         <Row>
                                             <Col className="description">协调记录 </Col>
                                         </Row>
-
-                                        <Row type="flex" justify="start">
+                                        <Row type="flex" justify="start" className="sub-content">
                                             <Col {...Layout24}>
                                                 <Table
                                                     columns={ columns }

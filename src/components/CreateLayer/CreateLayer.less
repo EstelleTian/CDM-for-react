@@ -3,20 +3,21 @@
 .portal-layer {
   position: absolute;
   top: 0;
-  //left:50%;
   width: 0;
 
   .content {
     max-height: 60rem;
     overflow: auto;
-    padding: 1rem;
+    padding: 0.5rem 1rem;
   }
 }
 .portal-layer{
   .title {
     padding: 0.75rem .5rem;
     border-bottom: 1px solid @c-white-50;
-    font-size: 1.25rem;
+    >span{
+      font-size: 1.5rem;
+    }
     .close-target {
       display: inline-block;
       float: right;

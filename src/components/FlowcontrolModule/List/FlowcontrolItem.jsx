@@ -108,7 +108,7 @@ class FlowcontrolItem extends React.Component{
                                 titleName="流控信息详情"
                                 type="detail"
                                 id = {id}
-                                x = { 300 }
+                                x = { 360 }
                                 y = { 60 }
                                 placeType = { data.placeType }
                                 clickCloseBtn={ this.onCloseBtn }

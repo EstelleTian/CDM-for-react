@@ -1,4 +1,5 @@
 @import '../../../style/theme-color';
+@import '../../../style/theme-color';
 
 .flowcontol-detail {
   .head {
@@ -7,7 +8,6 @@
       font-size: 1.5rem;
       margin-bottom: 0.5rem;
     }
-    //
     .status.running {
       color: #38b48b ;
     }
@@ -25,11 +25,11 @@
     }
   }
   .trem {
-    padding-bottom: 0.5rem;
-    margin-right: 8px;
+    padding-bottom: 1rem;
     white-space: nowrap;
     display: table-cell;
-    font-size: 1.15rem;
+    font-size: 1.25rem;
+    color: #ccc;
     &:after {
       content: ":";
       margin: 0 8px 0 2px;
@@ -51,9 +51,14 @@
   }
   .description {
     font-size: 1.35rem;
+    font-weight: bold;
     padding:  1rem 0;
     margin-bottom: 0.5rem;
-    border-bottom: 1px solid #d3d3d3 ;
+    border-bottom: 1px solid #d3d3d3;
+    color: #ccc;
+  }
+  .sub-content{
+    margin: 0 1rem;
   }
 }
 
