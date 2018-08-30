@@ -301,7 +301,7 @@ class FlowcontrolDetail extends React.Component {
         };
        // 转换协调前数值
        const setPrevious =(record) => {
-           const { type, originalValue, reserveSlots } = record;
+           const { type, originalValue, originalId } = record;
            let res = '';
            if(type == 'COMPRESS_STRATEGY' ){ // 压缩窗口
                 if(originalValue){
@@ -315,7 +315,7 @@ class FlowcontrolDetail extends React.Component {
                     }
                 }
            }else if(type == 'UPDATE'){ // 修改
-               res = originalValue
+               res = `${originalValue}(${originalId})`
            }else if(type == 'RESERVE_SLOT'){ // 预留时隙
                res = this.batchFormattingTime(originalValue);
            }else if(type == 'TIME_SEGMENT'){ // 二类放行
@@ -333,14 +333,14 @@ class FlowcontrolDetail extends React.Component {
            }else if(originalValue == 'PRE_TERMINATED'){
                res = '窗口期预终止'
            }else if(type == 'ADJUST_SYSTEM_STATUS'){ // 系统维护
-               res = originalValue
+               res = `${originalValue}(${originalId})`
            }
            return res;
        };
 
        // 转换协调后数值
        const setCoordinated = (record) => {
-           const { type, value, reserveSlots } = record;
+           const { type, value, imitativeId } = record;
            let res = '';
            if(type == 'COMPRESS_STRATEGY' ){ // 压缩窗口
                if(value){
@@ -354,7 +354,7 @@ class FlowcontrolDetail extends React.Component {
                    }
                }
            }else if(type == 'PUBLISH' || type == 'UPDATE'){ // 发布或修改
-               res = value
+               res =  `${value}(${imitativeId})`
            }else if(type == 'RESERVE_SLOT'){ // 预留时隙
                res = this.batchFormattingTime(value);
            }else if(type == 'TIME_SEGMENT'){ // 二类放行
@@ -380,7 +380,7 @@ class FlowcontrolDetail extends React.Component {
            }else if(value == 'DISCARD'){
                res = '已废弃'
            }else if(type == 'ADJUST_SYSTEM_STATUS'){ // 系统维护
-               res = value
+               res =  `${value}(${imitativeId})`
            }
            return res;
        };
