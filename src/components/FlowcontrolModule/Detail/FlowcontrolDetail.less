@@ -1,0 +1,62 @@
+@import '../../../style/theme-color';
+
+.flowcontol-detail {
+  .head {
+    text-align: center;
+    .name, .effective-time, .status {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+    }
+    //
+    .status.running {
+      color: #38b48b ;
+    }
+    .status.future {
+      color: #2ca9e1;
+    }
+    .status.terminated {
+      color: #d69090;
+    }
+    .status.cancel {
+      color: #a59aca;
+    }
+    .status.finished {
+      color: #afafb0;
+    }
+  }
+  .trem {
+    padding-bottom: 0.5rem;
+    margin-right: 8px;
+    white-space: nowrap;
+    display: table-cell;
+    font-size: 1.15rem;
+    &:after {
+      content: ":";
+      margin: 0 8px 0 2px;
+      position: relative;
+      top: -.5px;
+    }
+  }
+  .detail {
+    line-height: 1.5rem;
+    width: 100%;
+    padding-bottom: 0.5rem;
+    display: table-cell;
+    &:after {
+      content: "";
+      margin: 0 ;
+      position: relative;
+      top: -.5px;
+    }
+  }
+  .description {
+    font-size: 1.35rem;
+    padding:  1rem 0;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid #d3d3d3 ;
+  }
+}
+
+
+
+

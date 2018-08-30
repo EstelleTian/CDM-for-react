@@ -19,9 +19,14 @@ const getSingleCollaborateRecordUrl = `${host}/retrieveRecordById.bo`;
 const flowcontrolHost = "http://192.168.243.120:38181";
 //获取全部流控信息
 const getFlowcontrolUrl = `${flowcontrolHost}/flow/retrieveFlowcontrols.action`;
-//依据机场获取流控点(受控点)数据
-const getFlowcontrolTemplateUrl = `${flowcontrolHost}/flowTemplate/retrieveByUsername`;
+// 根据流控ID获取流控信息
+const getFlowcontrolByIdUrl = `${flowcontrolHost}/flow/retrieveFlowcontrolById.action`;
+// 获取流控信息详情
+const getFlowcontrolDetailUrl = `${flowcontrolHost}/flow/retrieveflowcontrolDetail.action`;
 //依据用户名获取流控模板
+const getFlowcontrolTemplateUrl = `${flowcontrolHost}/flowTemplate/retrieveByUsername`;
+
+//依据机场获取流控点(受控点)数据
 const getPointByAirportUrl = `${flowcontrolHost}/flowcontrolPoints/retrievePointsByAirport.action`;
 // 发布流控
 const publishFlowcontrolUrl = `${flowcontrolHost}/flow/publish.action`;
@@ -39,5 +44,6 @@ export {
     getAllAirportsUrl, getSingleAirportUrl, getSingleCollaborateRecordUrl,
     getFlowcontrolUrl, getNoticeUrl,
     getPointByAirportUrl, getRestrictionUrl,
-    publishFlowcontrolUrl, getFlowcontrolTemplateUrl,
+    publishFlowcontrolUrl, getFlowcontrolTemplateUrl, getFlowcontrolByIdUrl,
+    getFlowcontrolDetailUrl,
 };

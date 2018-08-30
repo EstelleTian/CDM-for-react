@@ -4,13 +4,38 @@ import React from 'react';
 import { Row, Col, Icon } from 'antd';
 import './FlowcontrolItem.less';
 import { convertFlowcontrolData } from 'utils/flowcontrol-data-util';
+import CreateLayer from "components/CreateLayer/CreateLayer";
+import FlowcontrolDetailContainer from "components/FlowcontrolModule/Detail/FlowcontrolDetailContainer";
 
 class FlowcontrolItem extends React.Component{
     constructor( props ){
         super(props);
 
-    }
+        this.onCloseBtn = this.onCloseBtn.bind(this);
+        this.openDetail = this.openDetail.bind(this);
+        this.state = {
+            detail: {
+                show: false,
+            },
 
+        }
+    }
+    // 打开详情
+    openDetail(){
+        this.setState({
+            detail: {
+                show: true
+            }
+        });
+    }
+    //当点击关闭按钮时，type: 类型
+    onCloseBtn( type ){
+        this.setState({
+            [type]: {
+                show: false
+            }
+        });
+    }
 
     render(){
         const { data, generateTime } = this.props;
@@ -20,6 +45,8 @@ class FlowcontrolItem extends React.Component{
             status, statusClassName, controlPoints, type, value, controlDirection,
             effectiveTime, effectiveDate, casaStatus,
         } = formatData;
+
+        const { detail } = this.state;
         return (
             <Col span={24} className="flow-item">
                 <Row className="title">
@@ -65,13 +92,31 @@ class FlowcontrolItem extends React.Component{
 
                     </Col>
                     <Col className="operator" span={14}>
-                        <i className="iconfont icon-detail" title="详情"/>
+                        <i className="iconfont icon-detail" title="详情" onClick={this.openDetail} />
                         <i className="iconfont icon-effect" title="影响"/>
                         <i className="iconfont icon-edit" title="修改"/>
                         <i className="iconfont icon-stop" title="终止"/>
                     </Col>
 
                 </Row>
+                {
+                    detail.show ?
+                        <CreateLayer
+                            className="flowcontol-layer"
+                            style={{
+                                top: "5rem",
+                                left: "25rem"
+                            }}
+                        >
+                            <FlowcontrolDetailContainer
+                                titleName="流控信息详情"
+                                type="detail"
+                                id = {id}
+                                placeType = { data.placeType }
+                                clickCloseBtn={ this.onCloseBtn }
+                            />
+                        </CreateLayer> : ''
+                }
             </Col>
 
 
