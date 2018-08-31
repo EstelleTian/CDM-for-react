@@ -6,6 +6,17 @@ html{
 }
 .root{
   height: 100%;
-  overflow: hidden;
+  min-width: 105rem;
+}
+@media(min-width: 105rem){
+  body{
+    overflow: hidden;
+  }
+}
+@media(max-width: 105rem){
+  body{
+    overflow-y: hidden;
+    overflow-x: auto;
+  }
 }
 
