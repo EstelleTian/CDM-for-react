@@ -88,8 +88,8 @@ class RestrictionItem extends React.Component{
                                 titleName="限制信息详情"
                                 type="detail"
                                 id = {id}
-                                x = { 360 }
-                                y = { 60 }
+                                x = { 500 }
+                                y = { 200 }
                                 placeType = { data.placeType }
                                 clickCloseBtn={ this.onCloseBtn }
                             />
