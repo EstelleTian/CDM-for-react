@@ -26,9 +26,7 @@ class HomePage extends React.Component{
                         <Row className="no-margin" gutter={16}>
                             <Col
                                 className="card all-flights-card bc-1"
-                                xs={24} sm={24} md={24} lg={24}
-                                xl={ show ? 18 : 24}
-                                xxl={ show ? 18 : 24}
+                                span={ show ? 18 : 24}
                             >
                                 <FlightsSortModule/>
                                 <DetailModuleContainer

@@ -16,7 +16,7 @@ class Sidebar extends React.Component{
         const { key = '' } = sidebarConfig;
 
         return (
-            <Col className="card sidebar bc-1" xs={0} sm={0} md={0} lg={0} xl={6} xxl={6}>
+            <Col className="card sidebar bc-1" span={6}>
                 {
                     ( key == 'flowcontrol-info' ) ? <FlowcontrolModule/> : ''
                 }

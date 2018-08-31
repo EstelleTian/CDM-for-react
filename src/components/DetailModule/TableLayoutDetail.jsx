@@ -315,6 +315,7 @@ class TableLayoutDetail extends React.Component{
                     resDatas.push(data);
                 }
             }
+            resDatas = resDatas.reverse();
         }
         return resDatas;
     };
