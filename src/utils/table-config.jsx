@@ -129,10 +129,15 @@ const handleColumnRender = (value, row, index, colunmName) => {
                 value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
             }
         }else if( colunmName == "HOBT" ){ //增加失效航班样式
-            value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}>{value}</span>);
+            if( isValidVariable(backgroundColor) ){
+                value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
+            }else{
+                value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}>{value}</span>);
+
+            }
         }else if( colunmName == "FLIGHTID" ){ //字体样式为背景色
             value = (<span style={{fontSize: fontSize, color: backgroundColor}}>{value}</span>);
-        }else if( isValidVariable(backgroundColor) && backgroundColor != "transparent"){ //其余有背景色的，均改为圆点风格样式
+        }else if( isValidVariable(backgroundColor) && backgroundColor != "transparent" && backgroundColor != "rgb(255, 255, 255)" && backgroundColor != "#FFFFFF"){ //其余有背景色的，均改为圆点风格样式
             value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
         }
     }

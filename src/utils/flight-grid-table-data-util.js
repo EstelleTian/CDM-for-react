@@ -454,34 +454,32 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         let wfStatus = obj.wfStatus || '';
         let style = '';
         let processmap = obj.processmap||'';
-        if(source == "TOBT_FPL"){
+        if(source == "TOBT_EOBT"){
             // 报文
             titlestr = convertToTableStandardDate(value)+ '\n'
                 + this.getDisplayStyleZh('TOBT_EOBT');
             style = this.getDisplayStyle('TOBT_EOBT');
-        }else if(source == "TOBT_PREDICT"){
+        }else if(source == "TOBT_SYSTEM"){
             // 系统
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('TOBT_SYSTEM');
             style = this.getDisplayStyle('TOBT_SYSTEM');
-        }
-        //人工操作
-        if(wfStatus == FlightCoordinationRecord.STATUS_APPLY){
+        }else if(source == "TOBT_APPLY"){//人工操作
             //申请
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('TOBT_APPLY');
             style = this.getDisplayStyle('TOBT_APPLY');
-        }else if(wfStatus == FlightCoordinationRecord.STATUS_APPROVE){
+        }else if(source == "TOBT_APPROVE"){
             //批复
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('TOBT_APPROVE');
             style = this.getDisplayStyle('TOBT_APPROVE');
-        }else if(wfStatus == FlightCoordinationRecord.STATUS_REFUSE){
+        }else if(source == "TOBT_REFUSE"){
             //拒绝
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('TOBT_REFUSE');
             style = this.getDisplayStyle('TOBT_REFUSE');
-        }else if(wfStatus == FlightCoordinationRecord.STATUS_MODIFY){
+        }else if(source == "TOBT_IMPROVE"){
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('TOBT_IMPROVE');
             style = this.getDisplayStyle('TOBT_IMPROVE');
@@ -513,24 +511,43 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         if(isValidVariable(value) && isValidVariable(source)){
             if(source == "DEFAULT"){
                 titlestr =  convertToTableStandardDate(value)+ '\n';
-            }else if(source == "HOBT_MANUAL"){
-                if(wfStatus == FlightCoordinationRecord.STATUS_APPLY){
-                    //申请
-                    titlestr = convertToTableStandardDate(value) + '\n'
-                        + this.getDisplayStyleZh('HOBT_APPLY');
-                    stylestr = this.getDisplayStyle('HOBT_APPLY');
-                }else if(wfStatus == FlightCoordinationRecord.STATUS_APPROVE){
-                    //批复
-                    titlestr = convertToTableStandardDate(value) + '\n'
-                        + this.getDisplayStyleZh('HOBT_APPROVE');
-                    stylestr = this.getDisplayStyle('HOBT_APPROVE');
-                }else if(wfStatus == FlightCoordinationRecord.STATUS_REFUSE){
-                    //拒绝
-                    titlestr = convertToTableStandardDate(value) + '\n'
-                        + this.getDisplayStyleZh('HOBT_REFUSE');
-                    stylestr = this.getDisplayStyle('HOBT_REFUSE');
-                }
+            }else if(source == "HOBT_APPLY"){
+                //申请
+                titlestr = convertToTableStandardDate(value) + '\n'
+                    + this.getDisplayStyleZh('HOBT_APPLY');
+                stylestr = this.getDisplayStyle('HOBT_APPLY');
+            }else if(source == "HOBT_APPROVE"){
+                //批复
+                titlestr = convertToTableStandardDate(value) + '\n'
+                    + this.getDisplayStyleZh('HOBT_APPROVE');
+                stylestr = this.getDisplayStyle('HOBT_APPROVE');
+            }else if(source == "HOBT_REFUSE"){
+                //拒绝
+                titlestr = convertToTableStandardDate(value) + '\n'
+                    + this.getDisplayStyleZh('HOBT_REFUSE');
+                stylestr = this.getDisplayStyle('HOBT_REFUSE');
             }
+
+
+
+            // else if(source == "HOBT_MANUAL"){
+            //     if(wfStatus == FlightCoordinationRecord.STATUS_APPLY){
+            //         //申请
+            //         titlestr = convertToTableStandardDate(value) + '\n'
+            //             + this.getDisplayStyleZh('HOBT_APPLY');
+            //         stylestr = this.getDisplayStyle('HOBT_APPLY');
+            //     }else if(wfStatus == FlightCoordinationRecord.STATUS_APPROVE){
+            //         //批复
+            //         titlestr = convertToTableStandardDate(value) + '\n'
+            //             + this.getDisplayStyleZh('HOBT_APPROVE');
+            //         stylestr = this.getDisplayStyle('HOBT_APPROVE');
+            //     }else if(wfStatus == FlightCoordinationRecord.STATUS_REFUSE){
+            //         //拒绝
+            //         titlestr = convertToTableStandardDate(value) + '\n'
+            //             + this.getDisplayStyleZh('HOBT_REFUSE');
+            //         stylestr = this.getDisplayStyle('HOBT_REFUSE');
+            //     }
+            // }
             if(ifDep(obj)){
                 stylestr = this.getDisplayStyle('OUT_OR_DEP');
             }
@@ -561,7 +578,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('COBT_LOCK');
             stylestr = this.getDisplayStyle('COBT_LOCK');
-        }else if(source == "COBT_LOCK"){
+        }else if(source == "COBT"){
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('COBT');
             stylestr = this.getDisplayStyle('COBT');
@@ -598,7 +615,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('CTOT_LOCK');
             stylestr = this.getDisplayStyle('CTOT_LOCK');
-        }else if(source == "CTOT_LOCK"){
+        }else if(source == "CTOT"){
             titlestr = convertToTableStandardDate(value) + '\n'
                 + this.getDisplayStyleZh('CTOT');
             stylestr = this.getDisplayStyle('CTOT');
@@ -1084,7 +1101,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
                     titlestr = titlestr + '\n' + '录入时间: '
                         + convertToTableStandardDate(timestamp);
                 }
-            }else if(source == 'RUNWAY_IMPORT'){
+            }else if(source == 'RUNWAY_SLOT'){
                 // 系统（时隙分配程序录入）
                 titlestr = value + '\n'
                     + this.getDisplayStyleZh('RUNWAY_SLOT');

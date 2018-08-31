@@ -6,7 +6,7 @@ import TableMenu from './TableMenu';
 
 // 计算未起飞航班数据
 const calculateGroundNumber = (generateInfo) => {
-    const { SCH_NUM = '', FPL_NUM = ''  } = generateInfo;
+    const { SCH_NUM = 0, FPL_NUM = 0  } = generateInfo;
     const GROUND_NUM = (SCH_NUM *1 + FPL_NUM * 1 ) || '';
     return {
         ...generateInfo,
