@@ -16,8 +16,65 @@ const RestrictionConstant = {
     RESTRICTION_TYPE_DEICE : "DEICE"
 };
 
+
+const RestrictionUtil = {
+    /**
+     * 限制状态
+     * @param data 数据对象
+     *
+     * */
+    setStatus: (data) => {
+        // 取数据状态值
+        let {status} = data;
+
+        // 转换后的结果
+        let res = '';
+        if (status == RestrictionConstant.RESTRICTION_STATUS_RUNNING) {
+            res = '正在执行';
+        } else if (status == RestrictionConstant.RESTRICTION_STATUS_FUTURE) {
+            res = '将要执行';
+        } else if (status == RestrictionConstant.RESTRICTION_STATUS_FINISHED) {
+            res = '已结束';
+        } else if (status == RestrictionConstant.RESTRICTION_STATUS_TERMINATED
+            || status == RestrictionConstant.RESTRICTION_STATUS_STOP
+        ) {
+            res = '已终止';
+        } else if (!isValidVariable(status)) {
+            res = '已取消';
+        }
+        return res;
+    },
+
+    /**
+     * 限制状态对应的class名称
+     * @param data 数据对象
+     *
+     * */
+    setstatusClassName: (data) => {
+        // 取数据状态值
+        let {status} = data;
+
+        // 转换后的结果
+        let res = '';
+        if (status == RestrictionConstant.RESTRICTION_STATUS_RUNNING) { // 正在执行
+            res = 'running';
+        } else if (status == RestrictionConstant.RESTRICTION_STATUS_FUTURE) { // 将要执行
+            res = 'future';
+        } else if (status == RestrictionConstant.RESTRICTION_STATUS_FINISHED) { // 正常结束
+            res = 'finished';
+        } else if (status == RestrictionConstant.RESTRICTION_STATUS_TERMINATED
+            || status == RestrictionConstant.RESTRICTION_STATUS_STOP
+        ) { // 已终止
+            res = 'terminated';
+        } else if (!isValidVariable(status)) { // 已取消
+            res = 'cancel';
+        }
+        return res;
+    }
+}
+
 // 限制数据转换
-const convertRestrictionData =(data, generateTime) => {
+const convertRestrictionData =(data) => {
     // 校验数据
     if(!isValidObject(data)){
         return {};
@@ -99,59 +156,7 @@ const convertRestrictionData =(data, generateTime) => {
     }
 
 
-    /**
-     * 限制状态
-     * @param data 数据对象
-     *
-     * */
-    const setStatus= (data) => {
-        // 取数据状态值
-        let { status} = data;
 
-        // 转换后的结果
-        let res = '';
-        if (status == RestrictionConstant.RESTRICTION_STATUS_RUNNING) {
-            res = '正在执行';
-        } else if (status == RestrictionConstant.RESTRICTION_STATUS_FUTURE) {
-            res = '将要执行';
-        } else if (status == RestrictionConstant.RESTRICTION_STATUS_FINISHED) {
-            res = '已结束';
-        } else if (status == RestrictionConstant.RESTRICTION_STATUS_TERMINATED
-            || status == RestrictionConstant.RESTRICTION_STATUS_STOP
-        ) {
-            res = '已终止';
-        }  else if( !isValidVariable(status)){
-            res = '已取消';
-        }
-        return res;
-    };
-
-    /**
-     * 限制状态对应的class名称
-     * @param data 数据对象
-     *
-     * */
-    const setstatusClassName= (data) => {
-        // 取数据状态值
-        let { status} = data;
-
-        // 转换后的结果
-        let res = '';
-        if (status == RestrictionConstant.RESTRICTION_STATUS_RUNNING) { // 正在执行
-            res = 'running';
-        } else if (status == RestrictionConstant.RESTRICTION_STATUS_FUTURE) { // 将要执行
-            res = 'future';
-        } else if (status == RestrictionConstant.RESTRICTION_STATUS_FINISHED) { // 正常结束
-            res = 'finished';
-        } else if (status == RestrictionConstant.RESTRICTION_STATUS_TERMINATED
-            || status == RestrictionConstant.RESTRICTION_STATUS_STOP
-        ) { // 已终止
-            res = 'terminated';
-        }  else if( !isValidVariable(status)){ // 已取消
-            res = 'cancel';
-        }
-        return res;
-    };
 
 
     /**
@@ -198,9 +203,9 @@ const convertRestrictionData =(data, generateTime) => {
     // 限制生效日期
     result.effectiveDate = `${result.dataTime.startDate}/${result.dataTime.endDate}`;
     // 限制状态
-    result.status = setStatus(data);
+    result.status = RestrictionUtil.setStatus(data);
     // 状态对应的样式名称
-    result.statusClassName = setstatusClassName(data, generateTime);
+    result.statusClassName = RestrictionUtil.setstatusClassName(data);
     // 限制数值
     result.value = setValue(data);
 
@@ -228,4 +233,4 @@ const isEffective = (data) => {
     return flag;
 }
 
-export { RestrictionConstant, convertRestrictionData, isEffective };
+export { RestrictionConstant, RestrictionUtil, convertRestrictionData, isEffective };
