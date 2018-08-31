@@ -1,7 +1,7 @@
 //航班详情----其他详情信息--涉及表格布局的模块
 import React from 'react';
 import { Table } from 'antd';
-import {getDayTimeFromString, isValidObject} from "utils/basic-verify";
+import {getDayTimeFromString, isValidObject, isValidVariable} from "utils/basic-verify";
 import "./TableLayoutDetail.less";
 import FlowcontrolUtils from "utils/flowcontrol-utils";
 import FlightCoordinationRecordGridTableDataUtil from "utils/flight-coordination-record-data-util";
@@ -26,6 +26,21 @@ class TableLayoutDetail extends React.Component{
 
             return {
                 children: formatValue,
+                props:{
+                    title: title
+                }
+            }
+        };
+        //时间格式化
+        const columnsTimeFormat2 = (value, row, index) => {
+            //格式化后的value值
+            const sub = value.substring(14,18);
+            const formatValue = getDayTimeFromString( value.substring(0,12) ) || "——";
+            //title值
+            const title = value || "";
+
+            return {
+                children: formatValue + sub,
                 props:{
                     title: title
                 }
@@ -77,31 +92,31 @@ class TableLayoutDetail extends React.Component{
             columns = [
                 {
                     title: "",
-                    dataIndex: "traID",
+                    dataIndex: "ID",
                     align: 'center',
-                    key: "traID",
+                    key: "ID",
                     width: 80
                 },{
                     title: "预计(P)",
-                    dataIndex: "traP",
+                    dataIndex: "PREDICT",
                     align: 'center',
-                    key: "traP",
+                    key: "PREDICT",
                     render: columnsTimeFormat,
                     width: 100
                 },{
                     title: "计算(C)",
-                    dataIndex: "traC",
+                    dataIndex: "CALCULATE",
                     align: 'center',
-                    key: "traC",
+                    key: "CALCULATE",
                     render: columnsTimeFormat,
                     width: 100
                 },
                 {
-                    title: "实际/修正(E)",
-                    dataIndex: "traE",
+                    title: "实际(A)/修正(E)",
+                    dataIndex: "CHANGEDVALUE",
                     align: 'center',
-                    key: "traE",
-                    render: columnsTimeFormat,
+                    key: "CHANGEDVALUE",
+                    render: columnsTimeFormat2,
                     width: 130
                 }
             ];
@@ -298,9 +313,22 @@ class TableLayoutDetail extends React.Component{
                     ACCFIX: isValidObject(accFixMap["FIX_REALITY"]) ? accFixMap["FIX_REALITY"].value : "——"
                 }
             ];
-        }else if( name == "flightTrajectorMap" ){//航班协调信息
-            const { MONITORPOINTINFO = [] } = orgMap;
-            resDatas = MONITORPOINTINFO;
+        }else if( name == "flightTrajectorMap" ){//航班航迹信息
+            const { MONITORPOINTINFO = {} } = orgMap;
+            for(let id in MONITORPOINTINFO) {
+                const trajectMap = MONITORPOINTINFO[id];
+                let obj = {};
+                obj["ID"] = trajectMap["ID"].value || "";
+                obj["CALCULATE"] = trajectMap["CALCULATE"].value || ""; //计算
+                obj["PREDICT"] = trajectMap["PREDICT"].value || ""; //预计
+                const realSource = trajectMap["CHANGEDVALUE"].source || "";
+                let realValue = trajectMap["CHANGEDVALUE"].value || "";
+                if( isValidVariable(realSource) && isValidVariable(realValue) ){
+                    realValue += "(" + realSource +")"
+                }
+                obj["CHANGEDVALUE"] = realValue; //实际
+                resDatas.push(obj);
+            }
         }else if( name == "flowcontrolMap" ){//受控信息
             const { Flowcontrol = {} } = orgMap;
             resDatas = Object.values( Flowcontrol );

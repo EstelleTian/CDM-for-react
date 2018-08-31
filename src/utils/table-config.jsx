@@ -55,7 +55,7 @@ const handleStyleFunc = ( style ) => {
 
 //处理单元格日期类数据格式化
 const handleDateFormat = ( value ) => {
-    if( isValidVariable( value ) && value.length == 12){
+    if( isValidVariable( value ) && ( value.length == 12 || value.length == 14 )){
         return value.substring(8, 12)
     }
     return "";
