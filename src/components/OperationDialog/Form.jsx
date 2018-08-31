@@ -185,7 +185,6 @@ class FormDialog extends React.Component{
     //单选按钮赋值
     onRadioChange(e, name){
         this.setState({
-            ...this.state,
             [name]: e.target.value
         });
     };
@@ -312,6 +311,8 @@ class FormDialog extends React.Component{
                 params["position"] = gatePositionValue;
             }else if( showName == "RUNWAY" ) {//跑道
                 params["runway"] = this.state.runway;
+            }else if( showName == "DELAY_REASON" ) {//延误原因
+                params["delayReason"] = this.state.delay;
             }
             console.log(params, url);
             if( isValidVariable(url) ){
@@ -871,16 +872,12 @@ class FormDialog extends React.Component{
                                     }
                                 </RadioGroup>
                             </FormItem>
-                            {
-                                this.state.delay == "OTHER" ?
-                                    <FormItem
-                                        span={ 24 }
-                                        label=""
-                                    >
-                                        <TextArea ref="comment" placeholder="备注(最多100个字符)"/>
-                                    </FormItem>
-                                : ""
-                            }
+                            <FormItem
+                                span={ 24 }
+                                label=""
+                            >
+                                <TextArea ref="comment" placeholder="备注(最多100个字符)"/>
+                            </FormItem>
                             <FormItem
                                 wrapperCol = {{span: 24}}
                                 label=""

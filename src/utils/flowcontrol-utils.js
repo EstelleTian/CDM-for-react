@@ -43,6 +43,8 @@ const FlowcontrolUtils = {
     REASON_EQUIPMENT:'EQUIPMENT',//设备
     REASON_MILITARY:'MILITARY',//其他空域用户
     REASON_OTHERS:'OTHERS',//其他
+    REASON_FORMER: 'FORMER',
+    REASON_AOC: 'AOC',
 
 //=============================================================================
 
@@ -149,6 +151,12 @@ const FlowcontrolUtils = {
          	break;
          case this.REASON_AIRPORT:
              zh = '机场';
+             break;
+         case this.REASON_FORMER:
+             zh = '前序';
+             break;
+         case this.REASON_AOC:
+             zh = '公司';
              break;
          default:
              zh = '其他';

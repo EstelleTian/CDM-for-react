@@ -102,8 +102,8 @@ class NoticeItem extends React.Component{
                                 titleName="通告信息详情"
                                 type="detail"
                                 id = {id}
-                                x = { 300 }
-                                y = { 60 }
+                                x = { 550 }
+                                y = { 200 }
                                 clickCloseBtn={ this.onCloseBtn }
                             />
                         </CreateLayer> : ''

@@ -66,7 +66,7 @@ class NoticeDetail extends React.Component {
     }
 
     render() {
-        const {titleName, clickCloseBtn, width = 800, dialogName, x = 300, y} = this.props;
+        const {titleName, clickCloseBtn, width = 420, dialogName, x = 300, y} = this.props;
         const {id, title, text, publishUser, lastModifyTime} = this.state;
         const Layout24 = {span: 24};
 
