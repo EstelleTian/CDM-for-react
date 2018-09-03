@@ -318,11 +318,12 @@ class TableLayoutDetail extends React.Component{
             for(let id in MONITORPOINTINFO) {
                 const trajectMap = MONITORPOINTINFO[id];
                 let obj = {};
-                obj["ID"] = trajectMap["ID"].value || "";
-                obj["CALCULATE"] = trajectMap["CALCULATE"].value || ""; //计算
-                obj["PREDICT"] = trajectMap["PREDICT"].value || ""; //预计
-                const realSource = trajectMap["CHANGEDVALUE"].source || "";
-                let realValue = trajectMap["CHANGEDVALUE"].value || "";
+                const { ID = {}, CALCULATE = {}, PREDICT = {}, CHANGEDVALUE = {}, } = trajectMap;
+                obj["ID"] = ID.value || "";
+                obj["CALCULATE"] = CALCULATE.value || ""; //计算
+                obj["PREDICT"] = PREDICT.value || ""; //预计
+                const realSource = CHANGEDVALUE.source || "";
+                let realValue = CHANGEDVALUE.value || "";
                 if( isValidVariable(realSource) && isValidVariable(realValue) ){
                     realValue += "(" + realSource +")"
                 }

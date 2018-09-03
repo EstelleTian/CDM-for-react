@@ -52,8 +52,7 @@ class AdditionalDetail extends React.Component{
         this.setState({
             active: newActive
         })
-    }
-
+    };
 
     render(){
         const Layout = {
@@ -66,8 +65,11 @@ class AdditionalDetail extends React.Component{
         const colLayout = {
             span: 12
         };
-        const { active } = this.state;
-        const { flightDetailView = {} } = this.props;
+        let { active } = this.state;
+        const { flightDetailView = {}, unfoldAll } = this.props;
+        if( unfoldAll ){
+            active = Object.values(NameList);
+        }
 
         const {
             flightDelayMap = {}, positionAndRunwayAndDeiceMap = {}, obtAndTotMap = {}, priorityAndPoolMap = {},
@@ -189,7 +191,7 @@ class AdditionalDetail extends React.Component{
                         <div className="title" onClick={()=>{
                             this.toggleList(NameList.RUNWAY);
                         }}>机位&跑道&除冰信息</div>
-                        <div className="container">
+                        <div className="container runway">
                             {
                                 ((active.indexOf(NameList.RUNWAY) > -1) ?
                                     <div className="content">
@@ -228,28 +230,11 @@ class AdditionalDetail extends React.Component{
                             }
                         </div>
                     </li>
-                    <li className={ (active.indexOf(NameList.COORDINATION) > -1)  ? "active": ""}>
-                        <div className="title" onClick={()=>{
-                            this.toggleList(NameList.COORDINATION);
-                        }}>协调信息</div>
-                        <div className="container coordination">
-                            {
-                                ((active.indexOf(NameList.COORDINATION) > -1) ?
-                                    <div className="content">
-                                        <TableLayoutDetail
-                                            name = "obtAndTotMap"
-                                            orgMap = { obtAndTotMap }
-                                        />
-                                    </div>
-                                : "" )
-                            }
-                        </div>
-                    </li>
                     <li className={ (active.indexOf(NameList.PRIORITY) > -1)  ? "active": ""}>
                         <div className="title" onClick={()=>{
                             this.toggleList(NameList.PRIORITY);
                         }}>航班协调信息</div>
-                        <div className="container">
+                        <div className="container priority">
                             {
                                 ((active.indexOf(NameList.PRIORITY) > -1) ?
                                     <div className="content">
@@ -285,6 +270,23 @@ class AdditionalDetail extends React.Component{
                                         </Row>
                                     </div>
                                     : "" )
+                            }
+                        </div>
+                    </li>
+                    <li className={ (active.indexOf(NameList.COORDINATION) > -1)  ? "active": ""}>
+                        <div className="title" onClick={()=>{
+                            this.toggleList(NameList.COORDINATION);
+                        }}>协调信息</div>
+                        <div className="container coordination">
+                            {
+                                ((active.indexOf(NameList.COORDINATION) > -1) ?
+                                    <div className="content">
+                                        <TableLayoutDetail
+                                            name = "obtAndTotMap"
+                                            orgMap = { obtAndTotMap }
+                                        />
+                                    </div>
+                                : "" )
                             }
                         </div>
                     </li>
@@ -400,7 +402,6 @@ class AdditionalDetail extends React.Component{
             </Col>
         )
     }
-
 };
 
 export default AdditionalDetail;
