@@ -68,7 +68,7 @@ class Table extends React.Component{
     refreshAirportsList( res ){
         //如果协调窗口开启，不更新
         if( $(".dialog-container").length <= 0 ){
-            const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateTableConditionRange, updateTableConditionScroll } = this.props;
+            const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateTableConditionRange, updateTableConditionScroll, dataRange } = this.props;
                     //表格数据
             let dataMap = {};
             //数据生成时间
@@ -130,8 +130,9 @@ class Table extends React.Component{
                 for(let i = 0, len = sortedDataArr.length; i < len; i++){
                     const tableData = sortedDataArr[i];
                     if( isValidVariable(tableData["ID"]) && tableData["ID"] == mintime_flight_id ){
-                        start = ( i - 25 ) < 0 ? 0 : ( i - 25 );
-                        end = ( i + 25 ) > len ? len : ( i + 25 );
+                        const range = Math.floor(dataRange/2);
+                        start = ( i - range ) < 0 ? 0 : ( i - range );
+                        end = ( i + range ) > len ? len : ( i + range );
                         break;
                     }
                 };
@@ -473,7 +474,6 @@ class Table extends React.Component{
                 const clientHeight = $scrollDom.height();
                 //滚动的高度
                 let scrollHeight = $scrollDom[0].scrollTop;
-                // console.log(scrollHeight, clientHeight, maxHeight);
                 const diff = 30;
                 let t1 = scrollHeight;
                 let t2 = 0;
@@ -481,17 +481,14 @@ class Table extends React.Component{
                 scrollTimer = setTimeout(function(){
                     t2 = $scrollDom[0].scrollTop;
                     scrollHeight = t2;
-                    // console.log("进入timer");
                     if( t2 - t1 > diff || t1 - t2 > diff){
                         //maxHeight = clientHeight + scrollHeight 差距30，当小于30 或者 scrollHeight<30时候，加载上页或者下一页
                         // scrollHeight < diff时候 加载上一页
                         if( scrollHeight <= diff ){
                             //加载上一页
-                            // console.log("加载上一页");
                             updateTableConditionRangeByKey( -1 );
                         }else if( clientHeight + scrollHeight + diff > maxHeight ){
                             //加载下一页
-                            // console.log("加载下一页");
                             updateTableConditionRangeByKey( 1 );
                         }
                     }

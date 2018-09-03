@@ -197,7 +197,8 @@ const initTableCondition = {
     orderBy: 'ATOT', //表格排序字段
     quicklyFilters: '', //表格快速过滤数值
     start: 0,
-    end: 50
+    end: 100,
+    dataRange: 100, //显示行数
 };
 //store table data 表格数据-- 数据生成时间、统计各个数值
 const tableCondition = (state = initTableCondition, action) => {
@@ -236,18 +237,19 @@ const tableCondition = (state = initTableCondition, action) => {
             }
         }
         case UPDATE_TABLE_CONDITION_RANGE_BY_KEY: {
-            let { start, end } = state;
+            let { start, end, dataRange } = state;
             const key = action.key * 1;
+            const range = Math.floor(dataRange/2);
             //下一页
             if( key == 1 ){
-                start += 25;
-                end += 25;
+                start += range;
+                end += range;
             }else if( key == -1 ){ //上一页
-                start -= 25;
-                end -= 25;
+                start -= range;
+                end -= range;
                 if( start < 0 ){
                     start = 0;
-                    end = 50;
+                    end = initTableCondition.end;
                 }
             }
             return {
