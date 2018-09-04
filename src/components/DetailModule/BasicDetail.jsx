@@ -5,7 +5,6 @@ import { FlightCoordination } from "utils/flightcoordination";
 import { getDayTimeFromString } from "utils/basic-verify";
 import "./BasicDetail.less";
 
-
 class BasicDetail extends React.Component{
     constructor( props ){
         super( props );
@@ -259,15 +258,15 @@ class BasicDetail extends React.Component{
                         </Col>
                     </Row>
                     <Row className="info">
-                        <Col span={ 8 } className="cell">
+                        <Col span={ 6 } className="cell">
                             <div className="cell-title">计划航路</div>
                             <span className="route">{ FORMER_SROUTE.value || "——" }</span>
                         </Col>
-                        <Col span={ 8 } className="cell">
+                        <Col span={ 12 } className="cell">
                             <div className="cell-title">FPL航路</div>
                             <span className="route">{ FORMER_PROUTE.value || "——" }</span>
                         </Col>
-                        <Col span={ 8 } className="cell">
+                        <Col span={ 6 } className="cell">
                             <div className="cell-title">CPL信息</div>
                             <span className="route">{ FORMER_CPLINFO.value || "——" }</span>
                         </Col>

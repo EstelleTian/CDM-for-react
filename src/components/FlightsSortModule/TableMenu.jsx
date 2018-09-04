@@ -49,7 +49,7 @@ class TableMenu extends React.Component{
     render(){
         const { generateInfo } = this.props;
         const { autoScroll } = this.state;
-        const { ALL_NUM ='-', ARR_NUM='-', DEP_NUM='-', GROUND_NUM = '-', CNL_NUM = '-' } = generateInfo;
+        const { ALL_NUM, ARR_NUM, DEP_NUM, GROUND_NUM, CNL_NUM } = generateInfo;
         return (
             <Col span={24} className="operation">
                 <Col span={11} className="tools">
@@ -67,24 +67,24 @@ class TableMenu extends React.Component{
                 </Col>
                 <Col span={13} className="total">
                     <span>
-                        <label> { GROUND_NUM }</label>
+                        <label> { GROUND_NUM || "0" }</label>
                         <span>未起飞</span>
                     </span>
                     <span>
-                        <label> { DEP_NUM }</label>
+                        <label> { DEP_NUM || "0" }</label>
                         <span>已起飞</span>
                     </span>
                     <span>
-                        <label> { ARR_NUM }</label>
+                        <label> { ARR_NUM || "0" }</label>
                         <span>已落地</span>
                     </span>
                     <span>
-                        <label> { CNL_NUM }</label>
+                        <label> { CNL_NUM || "0" }</label>
                         <span>已取消</span>
                     </span>
 
                     <span>
-                        <label> { ALL_NUM }</label>
+                        <label> { ALL_NUM || "0" }</label>
                         <span>总计</span>
                     </span>
                 </Col>

@@ -55,7 +55,7 @@ const handleStyleFunc = ( style ) => {
 
 //处理单元格日期类数据格式化
 const handleDateFormat = ( value ) => {
-    if( isValidVariable( value ) && value.length == 12){
+    if( isValidVariable( value ) && ( value.length == 12 || value.length == 14 )){
         return value.substring(8, 12)
     }
     return "";
@@ -80,11 +80,11 @@ const handleColumnSort = (d1, d2, colunmName) => {
 };
 //处理单元格样式，用于增加单元格字体大小，背景色，字体颜色
 const handleColumnRender = (value, row, index, colunmName) => {
-    if( colunmName == "ID" ){
-        return {
-            children: index*1+1
-        }
-    };
+    // if( colunmName == "ID" ){
+    //     return {
+    //         children: index*1+1
+    //     }
+    // };
     //获取标题
     const title = row[colunmName + "_title"] || "";
     //若是多选操作，转换为dom
@@ -129,10 +129,15 @@ const handleColumnRender = (value, row, index, colunmName) => {
                 value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
             }
         }else if( colunmName == "HOBT" ){ //增加失效航班样式
-            value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}>{value}</span>);
+            if( isValidVariable(backgroundColor) ){
+                value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
+            }else{
+                value = (<span style={{fontSize: fontSize, textDecoration: textDecoration, fontStyle: fontStyle }}>{value}</span>);
+
+            }
         }else if( colunmName == "FLIGHTID" ){ //字体样式为背景色
             value = (<span style={{fontSize: fontSize, color: backgroundColor}}>{value}</span>);
-        }else if( isValidVariable(backgroundColor) && backgroundColor != "transparent"){ //其余有背景色的，均改为圆点风格样式
+        }else if( isValidVariable(backgroundColor) && backgroundColor != "transparent" && backgroundColor != "rgb(255, 255, 255)" && backgroundColor != "#FFFFFF"){ //其余有背景色的，均改为圆点风格样式
             value = (<span style={{fontSize: fontSize}}><i className="iconfont icon-circle-m" style={{color: backgroundColor}}></i>{value}</span>);
         }
     }
@@ -248,30 +253,6 @@ const handleRightClickFunc = function( thisProxy, colunmName, record, x, y){
     }
 
 };
-//处理每列航班协调操作按钮
-const handleOperationColumn = function (value, row, index) {
-    let optval = "";
-    const len = value.length;
-    if( len > 0 ){
-        optval = (
-            <div className="opt-canvas">
-                {
-                    value.map((item, index) => {
-                        return (
-                            <span key = {index} title={item.cn}>
-                                <i className={`iconfont icon-${item.type}`}></i>
-                                <span className="word">{item.simple}</span>
-                            </span>
-                        )
-                    })
-                }
-            </div>
-        );
-    }
-    return {
-        children: optval
-    }
-}
 
 //处理点击航班出现航班详情
 const showDetailModal = function( thisProxy, record ){
@@ -287,7 +268,6 @@ const showDetailModal = function( thisProxy, record ){
 };
 
 const updateFlightDetailData = function( res, updateDetailModalDatasByName, updateDetailModalDatasVisible ){
-    // console.log( res );
     updateDetailModalDatasByName("flight", res);
     //打开详情窗口
     updateDetailModalDatasVisible("flight", true);
@@ -300,6 +280,16 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
     let width = 0;
     let columns = [];
     let i = 0;
+    //增加rownum列
+    let optObj = {
+        title: "行号",
+        dataIndex: "rownum",
+        align: 'center',
+        key: "rownum",
+        width: 60,
+        fixed: 'left'
+    };
+    columns.push(optObj);
     for(let key in colNames){
         const colunmName = key;
         //去掉ID列
@@ -392,29 +382,6 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
         columns.push( obj );
         i++;
     }
-    //增加一列操作列
-    // if( type == ""){
-    //     let optObj = {
-    //         title: "操作",
-    //         dataIndex: "OPERATION",
-    //         align: 'center',
-    //         key: "OPERATION",
-    //         width: 260,
-    //         fixed: 'right',
-    //         render: (value, row, index) => {
-    //             return handleOperationColumn( value, row, index );
-    //         },
-    //         onHeaderCell: ( column ) => {
-    //             //配置表头属性，增加title值
-    //             return {
-    //                 title: "操作"
-    //             }
-    //         }
-    //     };
-    //     columns.push(optObj);
-    //     width += 260;
-    //     i++;
-    // }
 
     return {
         columns,

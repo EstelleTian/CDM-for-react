@@ -7,7 +7,6 @@
     "react-dom": "^16.4.0",
     "react-scripts": "1.1.4"
   },
-  "dev": "BABEL_ENV=development webpack-dev-server --mode development --progress --hot --devtool eval-source-map ",
   "scripts": {
     "start": "webpack-dev-server --mode development --progress --hot --devtool eval-source-map ",
     "build": "webpack --mode production"

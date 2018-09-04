@@ -2,14 +2,15 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import DetailModule from "./DetailModule";
-import { updateDetailModalDatasVisible } from './Redux';
+import { updateDetailModalDatasVisible, unfoldAllDetailModules } from './Redux';
 
 const mapStateToProps = ( state ) => ({
     detailModalDatas: state.detailModalDatas
 })
 
 const mapDispatchToProps = {
-    updateDetailModalDatasVisible
+    updateDetailModalDatasVisible,
+    unfoldAllDetailModules
 }
 
 const DetailModuleContainer = connect(

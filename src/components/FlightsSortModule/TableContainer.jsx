@@ -10,7 +10,7 @@ import {updateTableConditionScroll} from "components/FlightsSortModule/Redux";
 import Table from './Table';
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
-const sortTableDatas = ( tableDatasMap, quicklyFilters, scopeFilter, statusFilter, start, end, scrollId, scroll ) => {
+const sortTableDatas = ( tableDatasMap, quicklyFilters, scopeFilter, statusFilter, start, end, dataRange, scrollId, scroll ) => {
      if( !isValidObject(tableDatasMap) ){
          return [];
      }
@@ -29,21 +29,25 @@ const sortTableDatas = ( tableDatasMap, quicklyFilters, scopeFilter, statusFilte
 
     //排序行数据 队列
     tableDatas = sortDataMap( tableDatas );
+    //增加rownum值
+    for(let n = 0, len = tableDatas.length; n < len; n++){
+        tableDatas[n]["rownum"] = n+1;
+    }
 
     //如果自动滚动开启，根据定位航班id获取在排序数据中index
     if( scroll ){
         for(let i = 0, len = tableDatas.length; i < len; i++){
             const tableData = tableDatas[i];
             if( isValidVariable(tableData["ID"]) && tableData["ID"] == scrollId ){
-                start = ( i - 25 ) < 0 ? 0 : ( i - 25 );
-                end = ( i + 25 ) > len ? len : ( i + 25 );
+                const range = Math.floor(dataRange/2);
+                start = ( i - range ) < 0 ? 0 : ( i - range );
+                end = ( i + range ) > len ? len : ( i + range );
                 break;
             }
         };
     }
 
     //根据start和end截取数据
-    // console.log("当前截取数据:", start, end );
     start = start < 0 ? 0 : start;
     end = end > tableDatas.length ? tableDatas.length : end;
     if( start >= end ){
@@ -149,10 +153,10 @@ const sortDataMap = ( tableDatas ) => {
 
 const mapStateToProps = ( state ) =>{
     const { tableColumns = [], tableDatasMap = {}, tableWidth = 0, property = {} } = state.tableDatas;
-    const { scroll = true, orderBy = 'ATOT', scrollId = '', quicklyFilters = '', start, end } = state.tableCondition;
+    const { scroll = true, orderBy = 'ATOT', scrollId = '', quicklyFilters = '', start, end, dataRange } = state.tableCondition;
     const { userId = '' } = state.loginUserInfo;
     const { scopeFilter = 'all', statusFilter = [] } = state.filterMatches;
-    const tableDatas = sortTableDatas(tableDatasMap, quicklyFilters, scopeFilter, statusFilter, start, end, scrollId, scroll );
+    const tableDatas = sortTableDatas(tableDatasMap, quicklyFilters, scopeFilter, statusFilter, start, end, dataRange, scrollId, scroll );
     return ({
         property,
         tableDatas: tableDatas,
@@ -161,7 +165,8 @@ const mapStateToProps = ( state ) =>{
         autoScroll: scroll,
         orderBy,
         scrollId,
-        userId
+        userId,
+        dataRange
     })
 };
 
