@@ -65,7 +65,9 @@ class Loginform extends React.Component{
         // 200 成功
         if( 200 == res.status*1 ){
             // 用户信息
-            const { username = "", id:userId, allAuthority, waypoints,  system, flowAssemblyAirports, systemProgram,  airports, description, deiceGroupName } = res.user;
+            const { username = "", id:userId, waypoints,  system, flowAssemblyAirports, systemProgram,  airports, description, deiceGroupName } = res.user;
+            // 用户权限
+            const { allAuthority } = res;
             const params = {
                 username, // 用户名
                 loginStatus: true, // 登录状态
@@ -74,7 +76,7 @@ class Loginform extends React.Component{
                 airports, // 用户机场
                 description, // 用户中文名称
                 deiceGroupName, // 除冰分组
-            }
+            };
             // 更新用户信息
             updateUserInfo(params);
 
