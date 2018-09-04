@@ -8,7 +8,7 @@ import { updateFlowcontrolDatas,  updateFlowcontrolConditionShieldLong,
 
 import FlowcontrolList from './FlowcontrolList';
 import { isValidVariable, isValidObject } from 'utils/basic-verify';
-import { isEffective, FlowcontroConstant } from 'utils/flowcontrol-data-util';
+import { isEffective, FlowcontrolConstant } from 'utils/flowcontrol-data-util';
 
 
 /**
@@ -78,8 +78,8 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
         flowcontrolDatas.sort((d1,d2) =>{
             if(isValidObject(d1) && isValidObject(d2)){
                 // LDR 排在最后
-                if(d1.placeType == FlowcontroConstant.TYPE_LDR
-                    && d2.placeType != FlowcontroConstant.TYPE_LDR  ){
+                if(d1.placeType == FlowcontrolConstant.TYPE_LDR
+                    && d2.placeType != FlowcontrolConstant.TYPE_LDR  ){
                     return -1;
                 }
                 // 按程度标记降序排序
@@ -101,15 +101,15 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
 const calculateLevelValue = (data) => {
     const { type, value, assignSlot } = data;
     let res = 0;
-    if(type == FlowcontroConstant.TYPE_MIT ){ // 距离
+    if(type == FlowcontrolConstant.TYPE_MIT ){ // 距离
         res = parseInt( value, 10) / 13;
-    }else if(type == FlowcontroConstant.TYPE_TIME){ // 时间
+    }else if(type == FlowcontrolConstant.TYPE_TIME){ // 时间
         res = value;
-    }else if(type == FlowcontroConstant.TYPE_GS){ // 地面停止
+    }else if(type == FlowcontrolConstant.TYPE_GS){ // 地面停止
         res = 0;
-    }else if(type == FlowcontroConstant.TYPE_ASSIGN){ // 指定时隙
+    }else if(type == FlowcontrolConstant.TYPE_ASSIGN){ // 指定时隙
         res = assignSlot;
-    }else if(type == FlowcontroConstant.TYPE_RESERVE){ // 预留时隙
+    }else if(type == FlowcontrolConstant.TYPE_RESERVE){ // 预留时隙
         res = assignSlot;
     }
 
