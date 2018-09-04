@@ -284,7 +284,7 @@ class NavMenu extends React.Component{
                         key="setting"
                         title={
                             <span>
-                                <Icon type="user" /> {loginUserInfo.username || "未登录" }
+                                <Icon type="user" /> { loginUserInfo.description || "未登录" }
                             </span>
                         }
                     >
