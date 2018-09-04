@@ -7,6 +7,7 @@ import {  request, requestGet } from 'utils/request-actions';
 import moment from 'moment';
 import './APContent.less';
 import {isValidVariable} from "utils/basic-verify";
+import {AuthorizationUtil} from "utils/authorization-util";
 
 const FormItem = Form.Item;
 const Search = Input.Search;
@@ -1001,10 +1002,10 @@ class APContent extends React.Component{
         // 流控类型(AP:机场流控)
         flow.placeType = 'AP', // 固定值
 
-        // 预锁航班时隙变更策略
-        flow.strategy = 'ALL'; // 待处理,
-        // 预锁航班时隙变更策略 时间
-        flow.winTime = ''; // 固定值
+        // // 预锁航班时隙变更策略
+        // flow.strategy = 'ALL'; // 待处理,
+        // // 预锁航班时隙变更策略 时间
+        // flow.winTime = ''; // 固定值
         // 未知,必传
         flow.compressAtStartStrategy = 'ALL'; // 固定值
         // 未知,必传
@@ -1097,7 +1098,9 @@ class APContent extends React.Component{
         const Layout3 = { span: 3 };
         const { flowcontrolPointsList,  checkedControlPoints, levelOptions, templateOptions} = this.state;
 
-        const { clickCloseBtn, dialogName, generateTime} = this.props;
+        const { clickCloseBtn, dialogName, generateTime, loginUserInfo} = this.props;
+        // 用户权限
+        const {allAuthority} = loginUserInfo;
         // 数据生成时间
         const {time} = generateTime;
         // 数据日期
@@ -1109,6 +1112,7 @@ class APContent extends React.Component{
         const timeFormat = 'HHmm';
         const { getFieldDecorator } = this.props.form;
         const type = this.props.form.getFieldValue("type");
+        const strategy = this.props.form.getFieldValue("strategy");
         const flowcontrolTypeFlag = this.props.form.getFieldValue("flowcontrolType");
 
         // 校验规则
@@ -1209,6 +1213,23 @@ class APContent extends React.Component{
                     }
                 ]
             }),
+            // 预锁航班时隙变更策略
+             strategy: getFieldDecorator("strategy", {
+                initialValue: "ALL",
+                rules: [
+                    // {
+                    //     validator : this.validateFlowcontrolAssignSlot
+                    // }
+                ]
+            }),
+            // 时间窗
+            winTime: getFieldDecorator("winTime", (strategy =='PART')  ? {
+                rules: [
+                    {
+                        validator :  this.validateFlowcontrolValue
+                    } // 正整数
+                ]
+            }:{}),
             // 受控起飞机场
             controlDepDirection : getFieldDecorator("controlDepDirection", {
                 initialValue: this.props.loginUserInfo.airports,
@@ -1468,10 +1489,27 @@ class APContent extends React.Component{
                                             <RadioGroup
                                                 // onChange={this.handleChangeType}
                                             >
-                                                <Radio value="TIME">时间</Radio>
-                                                <Radio value="GS">地面停止</Radio>
-                                                <Radio value="REQ">开车申请</Radio>
-                                                <Radio value="ASSIGN">指定时隙</Radio>
+                                                {
+                                                    AuthorizationUtil.hasAuthorized(allAuthority,420) ?
+                                                        <Radio value="TIME">时间</Radio>
+                                                        : ''
+                                                }
+                                                {
+                                                    AuthorizationUtil.hasAuthorized(allAuthority,421) ?
+                                                        <Radio value="GS">地面停止</Radio>
+                                                        : ''
+                                                }
+                                                {
+                                                    AuthorizationUtil.hasAuthorized(allAuthority,422) ?
+                                                        <Radio value="REQ">开车申请</Radio>
+                                                        : ''
+                                                }
+                                                {
+                                                    AuthorizationUtil.hasAuthorized(allAuthority,423) ?
+                                                        <Radio value="ASSIGN">指定时隙</Radio>
+                                                        : ''
+                                                }
+
                                             </RadioGroup>
                                         )
                                     }
@@ -1513,6 +1551,57 @@ class APContent extends React.Component{
                             </Row>
                         </Col>
                     </Col>
+                    {
+                        AuthorizationUtil.hasAuthorized(allAuthority,436) ?
+                            <Col {...Layout24}>
+                                <Col {...BasicTitleLayout} >
+                                    <div className="row-title">
+                                        预锁航班时隙变更策略
+                                    </div>
+                                </Col>
+                                <Col {...ContentLayout} >
+                                    <Row>
+                                        <Col {...Layout3}>
+                                            <div className="label">变更策略</div>
+                                        </Col>
+                                        <Col {...Layout9}>
+                                            <FormItem>
+                                                {
+                                                    rulesGenerate.strategy(
+                                                        <RadioGroup
+                                                        >
+                                                            <Radio value='ALL'>自动压缩</Radio>
+                                                            <Radio value='PART'>公司申请变更</Radio>
+                                                            <Radio value='NONE'>不自动压缩</Radio>
+                                                        </RadioGroup>
+                                                    )
+                                                }
+                                            </FormItem>
+                                        </Col>
+                                        <Col {...Layout4} className="text-center">
+                                            <div className="label">
+                                                {strategy == 'PART' ? '时间窗' :''}
+                                            </div>
+                                        </Col>
+                                        <Col {...Layout6}>
+                                            {strategy == 'PART' ?
+                                                <FormItem>
+                                                    {
+                                                        rulesGenerate.winTime(
+                                                            <Input placeholder="时间窗" className="limit-value" />
+                                                        )
+                                                    }
+                                                    <span className="unit label">分钟</span>
+                                                </FormItem>
+                                                :''}
+
+                                        </Col>
+                                    </Row>
+                                </Col>
+                            </Col>
+                            : ''
+                    }
+
                     <Col {...Layout24}>
                         <Col {...BasicTitleLayout} >
                             <div className="row-title">
