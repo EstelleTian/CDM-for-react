@@ -152,24 +152,17 @@ class FormDialog extends React.Component{
         }
     };
     //时间改变
-    onTimeChange( timemoment, timeString ){
+    onTimeChange( e ){
         const { date, time } = this.state;
         const { showName } = this.props;
-        if( timeString == "" ){
-            //更新选中的日期
+        const timeString = e.target.value;
+        const regexp =/(^[0-1][0-9]|^2[0-3])[0-5]{1}[0-9]{1}$/;
+        if( timeString == "" || regexp.test(timeString) ){ //通过
             this.setState({
                 time: {
-                    value: moment().format('HHmm'),
+                    value: timeString,
                     validateStatus: "",
                     help: ""
-                }
-            });
-        }else{
-            //更新选中的时间
-            this.setState({
-                time: {
-                    ...time,
-                    value: timeString
                 }
             });
             //拼接为12位值
@@ -179,8 +172,16 @@ class FormDialog extends React.Component{
                 this.compareWithEOBT("time", val);
             }
 
+        }else{
+            //更新选中的时间
+            this.setState({
+                time: {
+                    value: timeString,
+                    validateStatus: "error",
+                    help: "请输入有效范围0000-2359"
+                }
+            });
         }
-
     };
     //单选按钮赋值
     onRadioChange(e, name){
@@ -299,7 +300,13 @@ class FormDialog extends React.Component{
             }else if( showName == "PRIORITY" ) {//航班优先级
                 const btnStr = timeAuth.type + "Btn";
                 url = timeAuth[btnStr].url;
-                params["priority"] = this.state.priority*1;
+                if( timeAuth.type == "approve" ){ //批复
+                    const map = rowData.originalData.flightCoordinationRecordsMap[showName];
+                    const applyVal = map.value*1;
+                    params["priority"] = applyVal;
+                }else{
+                    params["priority"] = this.state.priority*1;
+                }
             }else if( showName == "DEICE_STATUS" || showName == "DEICE_GROUP" || showName == "DEICE_POSITION" ) {//除冰组 除冰坪 是否除冰
                 params["deiceGroup"] = deice.deiceGroup;
                 if( deice.show == 'position'){ //机位
@@ -345,11 +352,17 @@ class FormDialog extends React.Component{
 
         const id = rowData["ID"]*1 || null; //id
         const comment = this.refs.comment.textAreaRef.value || ""; //获取备注内容
-        const params = {
+        let params = {
             userId,
             id,
             comment
         }
+        if( showName == "PRIORITY" ) {//航班优先级
+            const map = rowData.originalData.flightCoordinationRecordsMap[showName];
+            const applyVal = map.value*1;
+            params['priority'] = applyVal;
+        }
+
         if( isValidVariable(url) ){
             //发送请求
             request( `${host}/${url}`, "post", params, (res) => {
@@ -385,12 +398,12 @@ class FormDialog extends React.Component{
         let applyVal = "";
         let applyComment = "";
         if( timeAuth.type == "approve" ){
-            if( showName == "HOBT"){
+            if( showName == "HOBT" || showName == "TOBT"){
                 const map = rowData.originalData.flightCoordinationRecordsMap[showName];
                 originalVal = map.originalValue || "";
                 applyVal = map.value || "";
                 applyComment = map.comment || "";
-            }else if( showName == "HOBT" || showName == "PRIORITY"){
+            }else if( showName == "PRIORITY" ){
                 const map = rowData.originalData.flightCoordinationRecordsMap[showName];
                 originalVal = PriorityList[map.originalValue+""] || "";
                 applyVal = PriorityList[map.value+""] || "";
@@ -446,11 +459,7 @@ class FormDialog extends React.Component{
                                 validateStatus={ time.validateStatus }
                                 help={ time.help }
                             >
-                                <TimePicker
-                                    format = 'HHmm'
-                                    value = { time.value == "" ? moment() : moment( time.value, 'HHmm') }
-                                    onChange={ this.onTimeChange }
-                                />
+                                <Input defaultValue={time.value} onChange={ this.onTimeChange }/>
                             </FormItem>
                             <FormItem
                                 label = ""
@@ -545,11 +554,7 @@ class FormDialog extends React.Component{
                                 validateStatus={ time.validateStatus }
                                 help={ time.help }
                             >
-                                <TimePicker
-                                    format = 'HHmm'
-                                    value = { time.value == "" ? moment() : moment( time.value, 'HHmm') }
-                                    onChange={ this.onTimeChange }
-                                />
+                                <Input defaultValue={time.value} onChange={ this.onTimeChange }/>
                             </FormItem>
                             <FormItem
                                 {...formItemLayout}
@@ -628,11 +633,7 @@ class FormDialog extends React.Component{
                                     validateStatus={ time.validateStatus }
                                     help={ time.help }
                                 >
-                                    <TimePicker
-                                        format = 'HHmm'
-                                        value = { time.value == "" ? moment() : moment( time.value, 'HHmm') }
-                                        onChange={ this.onTimeChange }
-                                    />
+                                    <Input defaultValue={time.value} onChange={ this.onTimeChange }/>
                                 </FormItem>
                                 <FormItem
                                     {...formItemLayout}
@@ -715,11 +716,7 @@ class FormDialog extends React.Component{
                                     validateStatus={ time.validateStatus }
                                     help={ time.help }
                                 >
-                                    <TimePicker
-                                        format = 'HHmm'
-                                        value = { applyVal == "" ? moment() : moment( applyVal.substring(8,12), 'HHmm') }
-                                        onChange={ this.onTimeChange }
-                                    />
+                                    <Input defaultValue={time.value} onChange={ this.onTimeChange }/>
                                 </FormItem>
                                 <FormItem
                                     {...formItemLayout}
