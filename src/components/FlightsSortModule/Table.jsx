@@ -423,9 +423,8 @@ class Table extends React.Component{
     };
     //滚动当指定行
     scrollToRow(){
-        const { autoScroll, scrollId  } = this.props;
+        const { scrollId } = this.props;
         //若开启自动滚动 且 滚动有值，再滚动到指定位置
-        // if( autoScroll && isValidVariable(scrollId) ){
         if( this.state.isFirstRequest ){
             let trs = $('.ant-table-scroll tr[flightid="'+ scrollId +'"]');
             //获取目标航班所在行数 - 10 ，以归置到中心位置
@@ -436,14 +435,7 @@ class Table extends React.Component{
             //滚动到指定位置
             $(".ant-table-scroll .ant-table-body").scrollTop(top);
         }
-        // else{
-        //     //滚动到中间位置
-        //     const $scrollDom = $(".ant-table-body");
-        //     const clientHeight = $scrollDom.height();
-        //     //滚动的高度
-        //     $scrollDom.scrollTop(clientHeight/2);
-        //
-        // }
+
     };
     //
     resetDataRange(){

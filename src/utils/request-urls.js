@@ -13,8 +13,10 @@ const getAllAirportsUrl = `${host}/retrieveAirportFlights.bo`;
 const getSingleAirportUrl = `${host}/retrieveFlightDetailById.bo`;
 //根据航班id获取单条航班协调记录数据
 const getSingleCollaborateRecordUrl = `${host}/retrieveRecordById.bo`;
-
-
+//根据航班id获取前段航班信息
+const getSingleFormerFlightUrl = `${host}/retrieveFormerFlightById.bo`;
+//指定前序航班
+const updateFormerFlightUrl = `${host}/updateFormerFlight.bo`;
 
 const flowcontrolHost = "http://192.168.243.120:38181";
 //获取全部流控信息
@@ -45,7 +47,7 @@ export {
     host,
     loginUrl, logoutUrl,
     getSystemConfigUrl, getUserPropertyUrl,
-    getAllAirportsUrl, getSingleAirportUrl, getSingleCollaborateRecordUrl,
+    getAllAirportsUrl, getSingleAirportUrl, getSingleCollaborateRecordUrl, getSingleFormerFlightUrl, updateFormerFlightUrl,
     getFlowcontrolUrl, getNoticeUrl,
     getPointByAirportUrl, getRestrictionUrl,
     publishFlowcontrolUrl, getFlowcontrolTemplateUrl, getFlowcontrolByIdUrl,

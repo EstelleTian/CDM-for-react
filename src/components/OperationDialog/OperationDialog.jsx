@@ -9,7 +9,8 @@ import FormDialog from './Form';
 import { convertData, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "utils/flight-grid-table-data-util";
 import { OperationTypeForTimeColumn, OperationReason } from "utils/flightcoordination";
 import CreateLayer from "components/CreateLayer/CreateLayer";
-import CollaborateRecordsContainer from "components/OperationDialog/CollaborateRecordsContainer";
+import CollaborateRecords from "components/OperationDialog/CollaborateRecords";
+import FormerFlight from "components/OperationDialog/FormerFlight";
 import OutPoolByTOBT from "components/OperationDialog/OutPoolByTOBT";
 import './OperationDialog.less';
 
@@ -53,6 +54,9 @@ class OperationDialog extends React.Component{
 
         this.state = {
             collaborateRecords: { //协调记录窗口显隐
+                show: false
+            },
+            formerFlight: { //指定前序航班窗口显隐
                 show: false
             },
             outPoolByTOBT: {
@@ -106,7 +110,7 @@ class OperationDialog extends React.Component{
     //关闭弹出模态框窗口
     closeDialog( dialogKey ){
         this.setState({
-            [dialogKey]: { //协调记录窗口关闭
+            [dialogKey]: { //协调窗口关闭
                 show: false
             }
         });
@@ -149,6 +153,13 @@ class OperationDialog extends React.Component{
         if( en == "COORDINATION_DETAIL" ){ // 查看协调记录
             this.setState({
                 collaborateRecords: { //协调记录窗口显隐
+                    show: true
+                }
+            });
+            this.closeCollaborateDialog();
+        }else if( en == "FORMER_UPDATE" ){ // 指定前序航班
+            this.setState({
+                formerFlight: { //指定前序航班窗口显隐
                     show: true
                 }
             });
@@ -444,13 +455,34 @@ class OperationDialog extends React.Component{
                         <CreateLayer
                             className="collaborate-records-layer"
                         >
-                            <CollaborateRecordsContainer
+                            <CollaborateRecords
                                 flightid = { rowData["FLIGHTID"] }
                                 id = { rowData["ID"]  }
+                                userId = {userId}
                                 x = { 300 }
                                 y = { 240 }
                                 clickCloseBtn = { () => {
                                     this.closeDialog("collaborateRecords");
+                                } }
+                            />
+
+                        </CreateLayer>
+                    ) : ""
+                }
+                {
+                    this.state.formerFlight.show ? (
+                        <CreateLayer
+                            className="former-layer"
+                        >
+                            <FormerFlight
+                                flightid = { rowData["FLIGHTID"] }
+                                id = { rowData["ID"]  }
+                                userId = {userId}
+                                x = { 600 }
+                                y = { 350 }
+                                requestCallback = { this.requestCallback }
+                                clickCloseBtn = { () => {
+                                    this.closeDialog("formerFlight");
                                 } }
                             />
 
