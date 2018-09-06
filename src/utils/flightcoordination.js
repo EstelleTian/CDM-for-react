@@ -1443,5 +1443,16 @@ const DelayReasonList = {
     "OTHER": "其他"
 };
 
+//协调操作常量--指定前序航班
+const FmeStatusList = {
+    "0": "SCH",
+    "1": "FPL",
+    "2": "DEP",
+    "3": "ARR",
+    "4": "DLA",
+    "5": "RTN_CPL",
+    "6": "CNL"
+};
 
-export { FlightCoordination, AlarmType, OperationTypeForFlightId, OperationTypeForTimeColumn, PriorityList, DelayReasonList, OperationReason };
+
+export { FlightCoordination, AlarmType, OperationTypeForFlightId, OperationTypeForTimeColumn, PriorityList, DelayReasonList, OperationReason, FmeStatusList };

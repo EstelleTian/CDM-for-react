@@ -32,7 +32,8 @@ class Table extends React.Component{
         this.getDisplayFontSize = getDisplayFontSize.bind(this);
         this.TableColumns = TableColumns.bind(this);
         this.state = {
-            airportTimerId : 0
+            airportTimerId : 0,
+            isFirstRequest: true
         };
     }
 
@@ -80,9 +81,6 @@ class Table extends React.Component{
             //航班集合
             const flightViewMap = res.flightViewMap || {};
 
-            let mintime_flight_id = '';
-            let time_interval = -1;
-
             //遍历每个航班，并转化为表格数据
             for(let index in departureClearanceFlightsArr ){
                 //获取航班id
@@ -96,9 +94,17 @@ class Table extends React.Component{
                 const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
                 //将航班原数据补充到航班对象中
                 data.originalData = flight;
-
-                //根据是否是自动滚动，如果是：计算滚动的航班id
-                if( autoScroll ){
+                dataMap[id] = data;
+            }
+            //第一次获取到数据
+            let mintime_flight_id = ''; //航班id
+            let time_interval = -1;
+            if(this.state.isFirstRequest){
+                //遍历每个航班，并转化为表格数据
+                for(let index in departureClearanceFlightsArr ){
+                    //获取航班id
+                    const id = departureClearanceFlightsArr[index];
+                    const data = dataMap[id];
                     // 取自定义排序首个字段与当前时间最接近的航班id
                     //取排序字段，比较当前数据时间和字段绝对差值最小
                     const tempTargetTime = data[orderBy];
@@ -112,21 +118,15 @@ class Table extends React.Component{
                             mintime_flight_id = data['ID'];
                         }
                     }
+                    dataMap[id] = data;
                 }
-                // dataArr.push(data);
-                dataMap[id] = data;
             }
-            //保存航班数据
-            //更新数据生成时间
-            updateGenerateTime({time : generateTime});
-            //更新自动滚动航班id值
-            updateTableConditionScrollId( mintime_flight_id );
             //表格数据进行排序，排序后再存储
             const sortedDataArr = this.sortDataMap( dataMap );
+            let start;
+            let end;
             //如果自动滚动开启，根据定位航班id获取在排序数据中index
-            if( autoScroll ){
-                let start;
-                let end;
+            if( this.state.isFirstRequest ){
                 for(let i = 0, len = sortedDataArr.length; i < len; i++){
                     const tableData = sortedDataArr[i];
                     if( isValidVariable(tableData["ID"]) && tableData["ID"] == mintime_flight_id ){
@@ -139,6 +139,12 @@ class Table extends React.Component{
                 updateTableConditionRange( start, end );
                 updateTableConditionScroll( false );
             };
+            //保存航班数据
+            //更新数据生成时间
+            updateGenerateTime({time : generateTime});
+            //更新自动滚动航班id值
+            updateTableConditionScrollId( mintime_flight_id );
+
             //更新表格航班数据
             console.time("updateTableDatas----------");
             updateTableDatas( dataMap );
@@ -153,6 +159,10 @@ class Table extends React.Component{
             this.handleSubTableDatas(res, 'special', this.converSpecialtData, generateTime);
             this.handleSubTableDatas(res, 'todo', this.convertTodoData, generateTime);
             console.timeEnd("updateOtherTableDatas----------");
+
+            this.setState({
+                isFirstRequest: false
+            })
         }
 
         const airportTimerId = setTimeout(() => {
@@ -252,7 +262,7 @@ class Table extends React.Component{
             //用户基本参数配置
             this.convertUserProperty( userPropertyList );
         }else{
-            //TODO 错误提示
+            //错误提示
             const error = res.error || {};
             if( error.hasOwnProperty("message") ){
                 console.error( error.message || "" );
@@ -407,16 +417,15 @@ class Table extends React.Component{
     };
     //分页、排序、筛选变化时触发
     tableOnChange(pagination, filters, sorter){
-        // console.log(pagination, filters, sorter);
         //获取排序的列名
         const { columnKey } = sorter;
 
     };
     //滚动当指定行
     scrollToRow(){
-        const { autoScroll, scrollId  } = this.props;
+        const { scrollId } = this.props;
         //若开启自动滚动 且 滚动有值，再滚动到指定位置
-        if( autoScroll && isValidVariable(scrollId) ){
+        if( this.state.isFirstRequest ){
             let trs = $('.ant-table-scroll tr[flightid="'+ scrollId +'"]');
             //获取目标航班所在行数 - 10 ，以归置到中心位置
             const rowid = trs.attr("rowid")*1 - 10;
@@ -425,14 +434,8 @@ class Table extends React.Component{
             let top = rowid * heigth;
             //滚动到指定位置
             $(".ant-table-scroll .ant-table-body").scrollTop(top);
-        }else{
-            //滚动到中间位置
-            const $scrollDom = $(".ant-table-body");
-            const clientHeight = $scrollDom.height();
-            //滚动的高度
-            $scrollDom.scrollTop(clientHeight/2);
-
         }
+
     };
     //
     resetDataRange(){
@@ -561,6 +564,12 @@ class Table extends React.Component{
     }
 
     componentDidUpdate(){
+        const { autoScroll } = this.props;
+        if( autoScroll ){
+            this.setState({
+                isFirstRequest: true
+            })
+        }
         //表格滚动到当前的行
         this.scrollToRow();
         //根据定位航班id获取数据范围

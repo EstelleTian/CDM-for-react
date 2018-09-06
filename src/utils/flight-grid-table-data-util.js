@@ -85,6 +85,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         //处理基本数据值和样式
         setDataValue.call(thisProxy, key, value );
         setTitleAndStyleData.call(thisProxy, key, value, flight );
+        setCNLFlightStyle.call(thisProxy, key, value );
     }
     //增加操作列---航班号列
     setOperationForFlightid( "FLIGHTIDOPERATION", flightAuthMap);
@@ -129,15 +130,17 @@ const convertData = function( flight, flightAuthMap, generateTime ){
             //处理字段显示值
             data[key] = options.value;
         }
+
+    };
+    //处理标记航班取消样式（整行灰）
+    function setCNLFlightStyle(key, options){
         //处理字段样式
-        let stylestr = key + "_style";
-        if( options.hasOwnProperty("source") ){
-            if( isValidVariable(options.source) ){
-                data[stylestr] = this.getDisplayStyle(options.source) + this.getDisplayFontSize(options.source);
-            }else{
-                data[stylestr] = data.default_style;
-            }
+        const stylestr = key + "_style";
+        const { source = "" } = options;
+        if( isValidVariable(source) && source == "FLIGHT_CANCEL"){
+            data[stylestr] = this.getDisplayStyle(source) + this.getDisplayFontSize(source);
         }
+
     };
 
     //处理title和style
@@ -649,7 +652,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         if (isValidVariable(value)) {
             titlestr = convertToTableStandardDate(value) + '\n';
             // 判断来源
-            if (source == 'BOARDINGTIME_MENUAL') {
+            if (source == 'ASBT_MENUAL') {
                 // 人工
                 titlestr = titlestr + styleZh;
                 stylestr = this.getDisplayStyle('ASBT_MENUAL');
@@ -659,7 +662,7 @@ const convertData = function( flight, flightAuthMap, generateTime ){
                         + '录入时间: ' + convertToTableStandardDate(timestamp);
                 }
             }
-            if (source == 'BOARDINGTIME_IMPORT'){
+            if (source == 'ASBT_IMPORT'){
                 // 引接
                 titlestr = titlestr + styleZh;
                 stylestr = this.getDisplayStyle('ASBT_IMPORT');
