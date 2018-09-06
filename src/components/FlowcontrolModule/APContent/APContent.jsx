@@ -2,7 +2,7 @@
 import React from 'react';
 import { Row, Col, Icon, Button, Card, Form, Input, Checkbox, Select, Radio, DatePicker, TimePicker, Modal, Spin,    } from 'antd';
 import Loader from 'components/Loader/Loader';
-import { getPointByAirportUrl, getFlowcontrolTemplateUrl, publishFlowcontrolUrl, getFlowcontrolByIdUrl } from 'utils/request-urls';
+import { getPointByAirportUrl, getFlowcontrolTemplateUrl, publishFlowcontrolUrl, updateFlowcontrolUrl,getFlowcontrolByIdUrl } from 'utils/request-urls';
 import {  request, requestGet } from 'utils/request-actions';
 import moment from 'moment';
 import './APContent.less';
@@ -78,7 +78,8 @@ class APContent extends React.Component{
             template : {}, // 流控模板数据对象
             templateOptions: [], // 模板选项
             loading : false, // 加载
-            originalData: {} // 流控原数据(修改页面用)
+            originalData: {}, // 流控原数据(修改页面用)
+            pageType : '发布' // 发布或修改 默认是发布
         }
     }
     // 转换高度选项
@@ -298,11 +299,13 @@ class APContent extends React.Component{
 
                 // 更新State
                     this.setState({
-                        originalData: flowcontrol
+                        originalData: flowcontrol,
+                        pageType : flowcontrol.id ? '修改' : '发布'
                     },()=>{
                         // 关闭加载
                         this.setState({
-                            loading : false
+                            loading : false,
+
                         });
                     })
             }
@@ -994,7 +997,7 @@ class APContent extends React.Component{
     }
     //检验流控点是否选择并提示
     checkFlowcontrolPoints(){
-        const { controlPoints } = this.state;
+        const { controlPoints, pageType } = this.state;
         const checkFlowcontrolName = this.checkFlowcontrolName;
         if(!controlPoints || controlPoints.length == 0){
             Modal.confirm({
@@ -1002,7 +1005,7 @@ class APContent extends React.Component{
                 title: '提示',
                 content: '尚未选择限制方向，则影响的航班将不再考虑受控点因素，建议返回添加受控点。',
                 cancelText: '修改方向',
-                okText: '确认发布',
+                okText: `确认${pageType}`,
                 onOk(){ checkFlowcontrolName() },
             });
         }else {
@@ -1012,6 +1015,7 @@ class APContent extends React.Component{
     }
     //检验流控名称与流控限制条件是否一致，不一致提示
     checkFlowcontrolName(){
+        const {  pageType } = this.state;
         const name = this.props.form.getFieldValue('name');
         const calculationName = this.computeFlowcontrolName();
         const confirmSubmit = this.confirmSubmit;
@@ -1025,7 +1029,7 @@ class APContent extends React.Component{
                 title: '提示',
                 content: '流控限制条件与流控名称暂不相符，建议返回修改流控名称。',
                 cancelText: '修改名称',
-                okText: '确认发布',
+                okText: `确认${pageType}`,
                 onOk(){ confirmSubmit() },
             });
         }
@@ -1049,12 +1053,13 @@ class APContent extends React.Component{
     // 确认提交
     confirmSubmit() {
         const handleConvertFormData = this.handleConvertFormData;
+        const {  pageType } = this.state;
         Modal.confirm({
             // iconType : 'exclamation-circle',
             title: '提示',
-            content: '确定发布本条流控',
+            content:`确定${pageType}本条流控` ,
             cancelText: '取消',
-            okText: '确认发布',
+            okText: `确认${pageType}`,
             onOk(){ handleConvertFormData() },
         });
     }
@@ -1144,10 +1149,12 @@ class APContent extends React.Component{
             loading : true
         });
         // 提交数据
-        request(publishFlowcontrolUrl,'POST',JSON.stringify(params),this.handleSubmitCallback);
+        let url = id ? updateFlowcontrolUrl : publishFlowcontrolUrl;
+        request(url,'POST',JSON.stringify(params),this.handleSubmitCallback);
     }
     // 表单提交回调函数
     handleSubmitCallback(res){
+        const {  pageType } = this.state;
         const { status, flowcontrol} = res;
         //
         const { clickCloseBtn, dialogName } = this.props;
@@ -1157,8 +1164,8 @@ class APContent extends React.Component{
         });
         if(status == 200){
             Modal.success({
-                title: '流控发布成功',
-                content: '流控发布成功',
+                title: `流控${pageType}成功`,
+                content: `流控${pageType}成功`,
                 okText: '确认',
                 onOk(){
                     clickCloseBtn(dialogName);
@@ -1166,7 +1173,7 @@ class APContent extends React.Component{
             });
         }else if(status != 200 && res.error){
             Modal.error({
-                title: '流控发布失败',
+                title: `流控${pageType}失败`,
                 content: res.error.message,
                 okText: '确认',
                 onOk(){ },
