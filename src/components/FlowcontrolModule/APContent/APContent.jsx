@@ -2,11 +2,11 @@
 import React from 'react';
 import { Row, Col, Icon, Button, Card, Form, Input, Checkbox, Select, Radio, DatePicker, TimePicker, Modal, Spin,    } from 'antd';
 import Loader from 'components/Loader/Loader';
-import { getPointByAirportUrl, getFlowcontrolTemplateUrl, publishFlowcontrolUrl } from 'utils/request-urls';
+import { getPointByAirportUrl, getFlowcontrolTemplateUrl, publishFlowcontrolUrl, getFlowcontrolByIdUrl } from 'utils/request-urls';
 import {  request, requestGet } from 'utils/request-actions';
 import moment from 'moment';
 import './APContent.less';
-import {isValidVariable} from "utils/basic-verify";
+import {isValidVariable, isValidObject} from "utils/basic-verify";
 import {AuthorizationUtil} from "utils/authorization-util";
 
 const FormItem = Form.Item;
@@ -34,8 +34,10 @@ class APContent extends React.Component{
 
         this.getPointByAirport = this.getPointByAirport.bind(this);
         this.getFlowcontrolTemplate = this.getFlowcontrolTemplate.bind(this);
+        this.getFlowcontrolData = this.getFlowcontrolData.bind(this);
         this.updatePoints = this.updatePoints.bind(this);
         this.updateTemplate = this.updateTemplate.bind(this);
+        this.updateOriginalData = this.updateOriginalData.bind(this);
         this.resetALLFields = this.resetALLFields.bind(this);
 
         this.onChangeFlowcontrolPoint = this.onChangeFlowcontrolPoint.bind(this);
@@ -61,24 +63,22 @@ class APContent extends React.Component{
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleConvertFormData = this.handleConvertFormData.bind(this);
         this.handleSubmitCallback = this.handleSubmitCallback.bind(this);
-
         this.state = {
             // 高度选项
             levelValues: [600,900,1200,1500,1800,2100,2400,2700,3000,3300,3600,3900,4200,4500,4800,5100,5400,5700,6000,
                 6300,6600,6900,7200,7500,7800,8100,8400,8900,9200,9500,9800,10100,10400,10700,11000,11300,11600,11900,12200,12500,13100,13700,14300,14900],
             // 高度选项
             levelOptions: [],
-            // 勾选的高度值
-            controlLevel:[],
 
-            flowcontrolPointsList : [], // 流控点集合
+            flowcontrolPointsList : [], // 流控点对象集合
+            allFlowcontrolPoints : [], // 全部流控点
             checkedControlPoints : [], // 勾选的限制流控点(含所属组,不用作最终表单提交)
             controlPoints : [], // 勾选的限制流控点(不含所属组,用于最终表单提交)
 
             template : {}, // 流控模板数据对象
             templateOptions: [], // 模板选项
-            loading : false // 加载
-
+            loading : false, // 加载
+            originalData: {} // 流控原数据(修改页面用)
         }
     }
     // 转换高度选项
@@ -125,6 +125,7 @@ class APContent extends React.Component{
     // 更新流控点
     updatePoints(res) {
         let  { flowcontrolPointsList = [] } = res;
+        let allFlowcontrolPoints = [];
         // 过滤流控点
         flowcontrolPointsList = flowcontrolPointsList.filter((item) => {
             if('AP' == item.type){ // 类型为AP(机场)的
@@ -139,10 +140,12 @@ class APContent extends React.Component{
             item.points.map((i,ind) =>{
                 let value = i.name+'_' + i.group; // 以下划线分隔值与所属组值
                 i.value= value;
+                allFlowcontrolPoints.push(i);
             })
         });
         this.setState({
-            flowcontrolPointsList
+            flowcontrolPointsList,
+            allFlowcontrolPoints
         })
     }
     // 重置所有表单组件
@@ -199,6 +202,114 @@ class APContent extends React.Component{
             template : data
         });
     }
+    // 获取流控数据(修改页面)
+    getFlowcontrolData(){
+        // 取流控id
+        const {id} = this.props;
+        // 用户id
+        const { userId } = this.props.loginUserInfo;
+        // 若流控id有效,则是修改
+        if(id){
+
+            const param = {
+                userId,
+                id,
+            };
+            // 开启加载
+            this.setState({
+                loading : true,
+            });
+            request(getFlowcontrolByIdUrl, 'POST', param, this.updateOriginalData)
+        }
+    }
+    // 更新流控原数据
+    updateOriginalData(res) {
+        // 获取流控数据成功
+        if(res && 200 == res.status){
+            // 流控数据
+            const { flowcontrol } = res;
+            if(isValidObject(flowcontrol)){
+
+                // 流控类型 (1:非长期  0:长期)
+                if(flowcontrol.flowcontrolType == 0 ){
+                    flowcontrol.flowcontrolType = true;
+                }else if(flowcontrol.flowcontrolType == 1) {
+                    flowcontrol.flowcontrolType = false;
+                }
+
+                // 指定时隙
+                if(flowcontrol.assignSlot){
+                    flowcontrol.assignSlot = flowcontrol.assignSlot.split(',');
+                }
+
+                // 勾选流控点
+                if(flowcontrol.controlPoints ){
+                    // 将流控数据中的流控点转为数组
+                    let points = flowcontrol.controlPoints.split(',');
+                    // 所有流控点集合
+                    const {flowcontrolPointsList = [], allFlowcontrolPoints = []} = this.state;
+
+                    // 用于存储对应流控点+所属组
+                    let checkedValue = [];
+                    // 用于存储对应流控点
+                    let val = [];
+                    // 对比流控数据中的流控点与本机场的所有流控点，找出交集数据
+                    points.map((item) =>{
+                        item = item.trim();
+                        // 遍历所有流控点集合
+                        for(let i=0; i<allFlowcontrolPoints.length; i++ ){
+                            let point = allFlowcontrolPoints[i];
+                            if(item == point.name){
+                                checkedValue.push(point.value);
+                                val.push(item);
+                            }
+                        }
+                    });
+                    // 更新controlPoints
+                    this.setState({
+                        controlPoints: val
+                    });
+                    // 更新checkedControlPoints
+                    this.setState({
+                        checkedControlPoints : checkedValue
+                    });
+                }
+
+                // 高度
+                if(isValidVariable(flowcontrol.controlLevel)){
+                    let { controlLevel } = flowcontrol;
+                    controlLevel = controlLevel.split(',');
+                    flowcontrol.controlLevel = controlLevel;
+                }
+
+                // 预留时隙
+                if(isValidVariable(flowcontrol.reserveSlots)){
+                    flowcontrol.reserveSlots = flowcontrol.reserveSlots.split(',');
+                }
+
+                // 受控降落机场
+                if(isValidVariable(flowcontrol.controlDirection)){
+                    flowcontrol.controlDirection = flowcontrol.controlDirection.split(',');
+                }
+                // 豁免降落机场
+                if(isValidVariable(flowcontrol.exemptDirection)){
+                    flowcontrol.exemptDirection = flowcontrol.exemptDirection.split(',');
+                }
+
+                // 更新State
+                    this.setState({
+                        originalData: flowcontrol
+                    },()=>{
+                        // 关闭加载
+                        this.setState({
+                            loading : false
+                        });
+                    })
+            }
+        }
+    }
+
+
     // 拼接流控名称
     computeFlowcontrolName() {
         let res = '';
@@ -207,10 +318,10 @@ class APContent extends React.Component{
         if(type == 'GS'){ // 限制类型为地面停止
             // 若未勾选限制流控点,则以受控起飞机场命名
             if(controlPoints.length < 1) {
-                res = controlDepDirection + ' 地面停止'
+                res = controlDepDirection + '放行 停放'
             }else {
                 // 若勾选限制流控点,则以勾选的限制流控点命名
-                res = controlPoints.join(',') + ' 地面停止'
+                res = controlPoints.join(',') + ' 停放'
             }
         }else if(type == 'REQ'){ // 限制类型为开车申请
             // 若未勾选限制流控点,则以受控起飞机场命名
@@ -325,10 +436,10 @@ class APContent extends React.Component{
 
         // 若未勾选限制流控点,则以受控起飞机场命名
         if(controlPoints.length < 1) {
-            res = controlDepDirection + ' 地面停止'
+            res = controlDepDirection + '放行 停放'
         }else {
             // 若勾选限制流控点,则以勾选的限制流控点命名
-            res = controlPoints.join(',') + ' 地面停止'
+            res = controlPoints.join(',') + ' 停放'
         }
         // 设置流控名称
         _form.setFieldsValue({
@@ -949,12 +1060,18 @@ class APContent extends React.Component{
     }
     // 转换表单字段数据并提交
     handleConvertFormData(){
+        // 流控id
+        const {id} = this.state.originalData;
         // 获取全部组件的值
         const data = this.props.form.getFieldsValue();
         const { loginUserInfo, systemConfig } = this.props;
         const { controlPoints, } = this.state;
         // 拷贝组件数据
         let flow = JSON.parse(JSON.stringify(data));
+        // 设置id
+        if(id){
+            flow.id = id;
+        }
         // 处理数据
         // 流控类型 (1:非长期  0:长期)
         if(flow.flowcontrolType){
@@ -969,8 +1086,11 @@ class APContent extends React.Component{
             flow.valueStr = flow.value;
         }
 
-        if(flow.type !=='TIME' && flow.type !=='ASSIGN'){
+        if(flow.type !=='TIME' ){
             delete flow.value;
+        }
+        if(flow.type !=='ASSIGN'){
+            delete flow.assignSlot;
         }
 
         // 限制时间
@@ -1000,15 +1120,10 @@ class APContent extends React.Component{
         // 系统
         flow.source = systemConfig.system;
         // 流控类型(AP:机场流控)
-        flow.placeType = 'AP', // 固定值
-
-        // // 预锁航班时隙变更策略
-        // flow.strategy = 'ALL'; // 待处理,
-        // // 预锁航班时隙变更策略 时间
-        // flow.winTime = ''; // 固定值
-        // 未知,必传
+        flow.placeType = 'AP';// 固定值
+        // 开始前压缩策略,必传
         flow.compressAtStartStrategy = 'ALL'; // 固定值
-        // 未知,必传
+        // 流控起降类型,必传
         flow.flowType = 'DEP'; // 固定值
         // 未知,必传
         flow.priority = ''; // 固定值
@@ -1067,6 +1182,8 @@ class APContent extends React.Component{
         this.getFlowcontrolTemplate();
         // 转换高度选项
         this.connectLevel();
+        // 获取流控数据(修改页面)
+        this.getFlowcontrolData();
     }
 
 
@@ -1096,9 +1213,9 @@ class APContent extends React.Component{
         const Layout5 = { span: 5 };
         const Layout4 = { span: 4 };
         const Layout3 = { span: 3 };
-        const { flowcontrolPointsList,  checkedControlPoints, levelOptions, templateOptions} = this.state;
+        const { flowcontrolPointsList,  checkedControlPoints, levelOptions, templateOptions, originalData} = this.state;
 
-        const { clickCloseBtn, dialogName, generateTime, loginUserInfo} = this.props;
+        const { clickCloseBtn, dialogName, generateTime, loginUserInfo, id} = this.props;
         // 用户权限
         const {allAuthority} = loginUserInfo;
         // 数据生成时间
@@ -1119,6 +1236,7 @@ class APContent extends React.Component{
         const rulesGenerate = {
             // 流控名称
             name: getFieldDecorator("name", {
+                initialValue: originalData.name || '',
                 rules: [
                     {
                         required: true,
@@ -1128,21 +1246,21 @@ class APContent extends React.Component{
             }),
             // 长期流控
             flowcontrolType: getFieldDecorator("flowcontrolType", {
-                initialValue: false,
+                initialValue: originalData.flowcontrolType || false,
             }),
             // 发布用户
             publishUserZh : getFieldDecorator("publishUserZh",{
-                initialValue: this.props.loginUserInfo.description,
+                initialValue: originalData.publishUserZh || this.props.loginUserInfo.description,
                 rules: []
             }),
             // 原发布单位
             originalPublishUnit: getFieldDecorator("originalPublishUnit",{
-                initialValue: "流量室",
+                initialValue: originalData.originalPublishUnit || "流量室",
                 rules: []
             }),
             // 开始日期
             startDate: getFieldDecorator("startDate",{
-                initialValue: moment( standardDate, dateFormat ),
+                initialValue: originalData.startTime ? moment(originalData.startTime.substring(0,8), dateFormat ) : moment( standardDate, dateFormat ),
                 rules: [
                     { required: true,
                         message: "开始日期不能为空"
@@ -1154,7 +1272,7 @@ class APContent extends React.Component{
             }),
             // 开始时间
             startTime: getFieldDecorator("startTime", {
-                initialValue: moment(standardTime, 'HHmm'),
+                initialValue: originalData.startTime ? moment(originalData.startTime.substring(8,12), 'HHmm' ) : moment(standardTime, 'HHmm'),
                 rules: [
                     {
                         required: true,
@@ -1168,7 +1286,7 @@ class APContent extends React.Component{
             }),
             // 截止日期
             endDate: getFieldDecorator("endDate",{
-                // initialValue: moment( endDate, dateFormat ),
+                initialValue: originalData.endTime ? moment(originalData.endTime.substring(0,8), dateFormat ) : null,
                 rules: [
                     {
                         validator :  this.validateEndDate
@@ -1177,7 +1295,7 @@ class APContent extends React.Component{
             }),
             // 截止时间
             endTime: getFieldDecorator("endTime",{
-                // initialValue: moment( endTime, 'HHmm'),
+                initialValue: originalData.endTime ? moment(originalData.endTime.substring(8,12), 'HHmm' ) : null,
                 rules: [
                     {
                         validator :  this.validateEndTime
@@ -1187,7 +1305,7 @@ class APContent extends React.Component{
 
             // 限制类型
             type: getFieldDecorator("type", {
-                initialValue: "TIME",
+                initialValue: originalData.type || "TIME",
                 rules: [
                     {
                         required: true,
@@ -1197,6 +1315,7 @@ class APContent extends React.Component{
             }),
             // 限制数值
             value: getFieldDecorator("value", (type =='TIME')  ? {
+                initialValue: originalData.value || '',
                 rules: [
                     {
                         validator :  this.validateFlowcontrolValue
@@ -1207,6 +1326,7 @@ class APContent extends React.Component{
 
             // 指定时隙
             assignSlot: getFieldDecorator("assignSlot", {
+                initialValue: originalData.assignSlot || [],
                 rules: [
                     {
                         validator : this.validateFlowcontrolAssignSlot
@@ -1223,7 +1343,7 @@ class APContent extends React.Component{
                 ]
             }),
             // 时间窗
-            winTime: getFieldDecorator("winTime", (strategy =='PART')  ? {
+            winTime: getFieldDecorator("winTime", (isValidVariable(id) && strategy =='PART')  ? {
                 rules: [
                     {
                         validator :  this.validateFlowcontrolValue
@@ -1232,7 +1352,7 @@ class APContent extends React.Component{
             }:{}),
             // 受控起飞机场
             controlDepDirection : getFieldDecorator("controlDepDirection", {
-                initialValue: this.props.loginUserInfo.airports,
+                initialValue: originalData.controlDepDirection || this.props.loginUserInfo.airports,
                 rules: []
             }),
             // 豁免起飞机场
@@ -1242,25 +1362,26 @@ class APContent extends React.Component{
             }),
             // 受控降落机场
             controlDirection: getFieldDecorator("controlDirection", {
-                initialValue: [],
+                initialValue: originalData.controlDirection || [],
                 rules: [{
                     validator : this.validateAirportFormat
                 }]
             }),
             // 豁免降落机场
             exemptDirection: getFieldDecorator("exemptDirection", {
-                initialValue: [],
+                initialValue: originalData.exemptDirection || [],
                 rules: [{
                     validator : this.validateAirportFormat
                 }]
             }),
             // 限制高度
             controlLevel : getFieldDecorator("controlLevel", {
-                initialValue: [],
+                initialValue:originalData.controlLevel || [],
                 rules: []
             }),
             // 限制原因
             reason: getFieldDecorator("reason", {
+                initialValue: originalData.reason || '',
                 rules: [
                     {
                         required: true,
@@ -1270,6 +1391,7 @@ class APContent extends React.Component{
             }),
             // 预留时隙
             reserveSlots: getFieldDecorator("reserveSlots", {
+                initialValue: originalData.reserveSlots || [],
                 rules: [
                     {
                         validator : this.validateFlowcontrolReserveSlots
@@ -1278,6 +1400,7 @@ class APContent extends React.Component{
             }),
             // 备注
             comments: getFieldDecorator("comments",{
+                initialValue: originalData.comments || '',
                 rules: []
             })
         };
@@ -1552,7 +1675,7 @@ class APContent extends React.Component{
                         </Col>
                     </Col>
                     {
-                        AuthorizationUtil.hasAuthorized(allAuthority,436) ?
+                        ( isValidVariable(id) && AuthorizationUtil.hasAuthorized(allAuthority,436)) ?
                             <Col {...Layout24}>
                                 <Col {...BasicTitleLayout} >
                                     <div className="row-title">

@@ -6,6 +6,7 @@ import './FlowcontrolItem.less';
 import { convertFlowcontrolData } from 'utils/flowcontrol-data-util';
 import CreateLayer from "components/CreateLayer/CreateLayer";
 import FlowcontrolDetailContainer from "components/FlowcontrolModule/Detail/FlowcontrolDetailContainer";
+import FlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/APFlowcontrolDialog/FlowcontrolDialogContainer";
 
 class FlowcontrolItem extends React.Component{
     constructor( props ){
@@ -13,8 +14,12 @@ class FlowcontrolItem extends React.Component{
 
         this.onCloseBtn = this.onCloseBtn.bind(this);
         this.openDetail = this.openDetail.bind(this);
+        this.handleUpdate = this.handleUpdate.bind(this);
         this.state = {
             detail: {
+                show: false,
+            },
+            apUpdate: {
                 show: false,
             },
 
@@ -24,6 +29,14 @@ class FlowcontrolItem extends React.Component{
     openDetail(){
         this.setState({
             detail: {
+                show: true
+            }
+        });
+    }
+    // 流控修改
+    handleUpdate(){
+        this.setState({
+            apUpdate : {
                 show: true
             }
         });
@@ -46,7 +59,7 @@ class FlowcontrolItem extends React.Component{
             effectiveTime, effectiveDate, casaStatus,
         } = formatData;
 
-        const { detail } = this.state;
+        const { detail, apUpdate } = this.state;
         return (
             <Col span={24} className="flow-item">
                 <Row className="title">
@@ -94,7 +107,7 @@ class FlowcontrolItem extends React.Component{
                     <Col className="operator" span={14}>
                         <i className="iconfont icon-detail" title="详情" onClick={this.openDetail} />
                         <i className="iconfont icon-effect" title="影响"/>
-                        <i className="iconfont icon-edit" title="修改"/>
+                        <i className="iconfont icon-edit" title="修改" onClick={this.handleUpdate}/>
                         <i className="iconfont icon-stop" title="终止"/>
                     </Col>
 
@@ -114,6 +127,24 @@ class FlowcontrolItem extends React.Component{
                                 clickCloseBtn={ this.onCloseBtn }
                             />
                         </CreateLayer> : ''
+                }
+                {
+                    apUpdate.show ?
+                        <CreateLayer
+                            className="flowcontol-layer"
+                        >
+                            <FlowcontrolDialogContainer
+                                titleName="修改机场受限"
+                                type="apUpdate"
+                                pageType="update"
+                                clickCloseBtn={ this.onCloseBtn }
+                                id = {id}
+                                x = { 300 }
+                                y = { 60 }
+                            />
+                        </CreateLayer>
+
+                        : ''
                 }
             </Col>
 
