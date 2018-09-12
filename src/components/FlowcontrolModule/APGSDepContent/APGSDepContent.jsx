@@ -1298,7 +1298,7 @@ class APGSDepContent extends React.Component{
 
                                                 {
                                                     AuthorizationUtil.hasAuthorized(allAuthority,441) ?
-                                                        <Radio value="GS_DEP">地面停止</Radio>
+                                                        <Radio value="GS_DEP">低能见度</Radio>
                                                         : ''
                                                 }
 
