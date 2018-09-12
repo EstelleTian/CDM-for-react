@@ -313,6 +313,7 @@ class NavMenu extends React.Component{
                                 titleName="发布机场受限"
                                 type="apPublish"
                                 clickCloseBtn={ this.onCloseBtn }
+                                placeType = 'AP'
                                 x = { 300 }
                                 y = { 60 }
                             />
@@ -320,18 +321,23 @@ class NavMenu extends React.Component{
 
                         : ''
                 }
-                {/*{*/}
-                    {/*(apGSDepPublish.show) ?*/}
-                        {/*<DraggableDialog*/}
-                            {/*titleName="发布低能见度受限"*/}
-                            {/*type="apGSDepPublish"*/}
-                            {/*width={ 1200 }*/}
-                            {/*clickCloseBtn={ this.onCloseBtn }*/}
-                        {/*>*/}
-                            {/*测试2*/}
-                            {/*<p>dddddd</p>*/}
-                        {/*</DraggableDialog> : ''*/}
-                {/*}*/}
+                {
+                    (apGSDepPublish.show) ?
+                        <CreateLayer
+                            className="flowcontol-layer"
+                        >
+                            <FlowcontrolDialogContainer
+                                titleName="发布低能见度受限"
+                                type="apGSDepPublish"
+                                clickCloseBtn={ this.onCloseBtn }
+                                placeType = 'AP'
+                                limitType = 'GS_DEP'
+                                x = { 300 }
+                                y = { 60 }
+                            />
+                        </CreateLayer>
+                        : ''
+                }
             </div>
 
         )

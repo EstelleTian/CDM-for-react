@@ -422,6 +422,21 @@ const FlowcontrolUtil = {
             res = '不自动压缩';
         }
         return res;
+    },
+
+    setDialogName : (data) => {
+        const {placeType, type, typeSubclass} = data;
+        let res = '';
+        if(placeType == 'AP'){
+            if(type == 'GS' && typeSubclass == 'GS_DEP'){
+                res = '修改低能见度受限'
+            }else {
+                res = '修改机场受限'
+            }
+        }else if(placeType == 'POINT'){
+            res = '修改航路受限'
+        }
+        return res;
     }
 
 };
@@ -468,6 +483,9 @@ const convertFlowcontrolData =(data, generateTime) => {
     result.casaStatus = FlowcontrolUtil.setCasaStatus(data, generateTime);
     // 状态对应的样式名称
     result.statusClassName = FlowcontrolUtil.setstatusClassName(data, generateTime);
+
+    // 修改弹框名称
+    result.dialogName = FlowcontrolUtil.setDialogName(data);
 
     return result
 };

@@ -19,7 +19,7 @@ class FlowcontrolItem extends React.Component{
             detail: {
                 show: false,
             },
-            apUpdate: {
+            modify: {
                 show: false,
             },
 
@@ -36,7 +36,7 @@ class FlowcontrolItem extends React.Component{
     // 流控修改
     handleUpdate(){
         this.setState({
-            apUpdate : {
+            modify : {
                 show: true
             }
         });
@@ -54,12 +54,12 @@ class FlowcontrolItem extends React.Component{
         const { data, generateTime } = this.props;
         const { indexNumber} = this.props;
         const formatData = convertFlowcontrolData(data,generateTime);
-        const { name, id, publishUserZh, reason, placeType,
+        const { name, id, publishUserZh, reason, placeType, dialogName,
             status, statusClassName, controlPoints, type, value, controlDirection,
             effectiveTime, effectiveDate, casaStatus,
         } = formatData;
 
-        const { detail, apUpdate } = this.state;
+        const { detail, modify } = this.state;
         return (
             <Col span={24} className="flow-item">
                 <Row className="title">
@@ -68,15 +68,7 @@ class FlowcontrolItem extends React.Component{
                     >
                         <span className="number"  title={placeType ? `${placeType}流控`: ''} >{indexNumber + " " + placeType }</span>
                         {name}
-                        {/*<div className={ statusClassName ? `${statusClassName} status` : 'status'} >*/}
-                            {/**/}
-                            {/**/}
-                            {/*/!*<span className="place-type">{placeType}</span>*!/*/}
 
-                            {/*/!*<span className="calculate-status" >*!/*/}
-                                {/*/!*<Icon type="loading" />*!/*/}
-                            {/*/!*</span>*!/*/}
-                        {/*</div>*/}
                     </Col>
                     <Col  span={1} ></Col>
                     <Col  span={6} className="effective-time" title={effectiveDate ? `${effectiveDate}`: ''} >
@@ -129,15 +121,16 @@ class FlowcontrolItem extends React.Component{
                         </CreateLayer> : ''
                 }
                 {
-                    apUpdate.show ?
+                    modify.show ?
                         <CreateLayer
                             className="flowcontol-layer"
                         >
                             <FlowcontrolDialogContainer
-                                titleName="修改机场受限"
-                                type="apUpdate"
-                                pageType="update"
+                                titleName= { dialogName}
+                                type="modify"
                                 clickCloseBtn={ this.onCloseBtn }
+                                placeType = {data.placeType}
+                                limitType = {data.typeSubclass}
                                 id = {id}
                                 x = { 300 }
                                 y = { 60 }

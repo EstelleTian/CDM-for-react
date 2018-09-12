@@ -2,6 +2,7 @@
 import React from 'react';
 import { Row, Icon } from 'antd';
 import APContent from "components/FlowcontrolModule/APContent/APContent";
+import APGSDepContent from "components/FlowcontrolModule/APGSDepContent/APGSDepContent";
 import DraggableModule from "components/DraggableModule/DraggableModule";
 
 import './FlowcontrolDialog.less';
@@ -10,9 +11,8 @@ class FlowcontrolDialog extends React.Component{
     constructor( props ){
         super(props);
     }
-
     render(){
-        const { titleName, clickCloseBtn, width = 1050, dialogName, x, y, loginUserInfo, systemConfig, generateTime, id} = this.props;
+        const { titleName, clickCloseBtn, width = 1050, dialogName, x, y, loginUserInfo, systemConfig, generateTime, id, placeType, limitType} = this.props;
         return (
             <DraggableModule
                 bounds = ".root"
@@ -33,15 +33,35 @@ class FlowcontrolDialog extends React.Component{
                                 <Icon type="close" title="关闭"/>
                             </div>
                         </Row>
-                        {/* 表单内容*/}
-                        <APContent
-                            clickCloseBtn = {clickCloseBtn}
-                            dialogName = {dialogName}
-                            loginUserInfo = {loginUserInfo}
-                            systemConfig = {systemConfig}
-                            generateTime = {generateTime}
-                            id = {id}
-                        />
+                        {/*机场流控*/}
+                        {
+                            (placeType == 'AP' && limitType !='GS_DEP') ? <APContent
+                                clickCloseBtn = {clickCloseBtn}
+                                dialogName = {dialogName}
+                                loginUserInfo = {loginUserInfo}
+                                systemConfig = {systemConfig}
+                                generateTime = {generateTime}
+                                id = {id}
+                                placeType = {placeType}
+                            /> : ''
+                        }
+                        {/*低能见度受限*/}
+                        {
+
+                            (placeType == 'AP' && limitType =='GS_DEP') ? <APGSDepContent
+                                clickCloseBtn = {clickCloseBtn}
+                                dialogName = {dialogName}
+                                loginUserInfo = {loginUserInfo}
+                                systemConfig = {systemConfig}
+                                generateTime = {generateTime}
+                                id = {id}
+                                placeType = {placeType}
+                            /> : ''
+                        }
+                        {
+                            placeType == 'POINT' ? '' : ''
+                        }
+
                     </div>
                 </div>
             </DraggableModule>
