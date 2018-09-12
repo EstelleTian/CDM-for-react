@@ -248,7 +248,7 @@ class APContent extends React.Component{
                     // 将流控数据中的流控点转为数组
                     let points = flowcontrol.controlPoints.split(',');
                     // 所有流控点集合
-                    const {flowcontrolPointsList = [], allFlowcontrolPoints = []} = this.state;
+                    const { allFlowcontrolPoints = []} = this.state;
 
                     // 用于存储对应流控点+所属组
                     let checkedValue = [];
@@ -605,21 +605,31 @@ class APContent extends React.Component{
                 startTime:moment(standardTime, timeFormat),
             });
             // 勾选流控点
-            if(templateData.pointsType &&templateData.controlPoints ){
+            if(templateData.controlPoints ){
                 // 将模板数据中的流控点转为数组
                 let points = templateData.controlPoints.split(',');
+                // 所有流控点集合
+                const { allFlowcontrolPoints = []} = this.state;
                 // 用于存储对应流控点+所属组
                 let checkedValue = [];
-                points = points.map((item) =>{
+                // 用于存储对应流控点
+                let val = [];
+                // 对比流控数据中的流控点与本机场的所有流控点，找出交集数据
+                points.map((item) =>{
                     item = item.trim();
-                    const p = item+'_'+ templateData.pointsType;
-                    checkedValue.push(p);
-                    return item;
+                    // 遍历所有流控点集合
+                    for(let i=0; i<allFlowcontrolPoints.length; i++ ){
+                        let point = allFlowcontrolPoints[i];
+                        if(item == point.name){
+                            checkedValue.push(point.value);
+                            val.push(item);
+                        }
+                    }
                 });
 
                 // 更新controlPoints
                 this.setState({
-                    controlPoints: points
+                    controlPoints: val
                 });
                 // 更新checkedControlPoints
                 this.setState({
