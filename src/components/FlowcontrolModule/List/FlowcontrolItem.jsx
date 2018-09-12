@@ -6,7 +6,7 @@ import './FlowcontrolItem.less';
 import { convertFlowcontrolData } from 'utils/flowcontrol-data-util';
 import CreateLayer from "components/CreateLayer/CreateLayer";
 import FlowcontrolDetailContainer from "components/FlowcontrolModule/Detail/FlowcontrolDetailContainer";
-import FlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/APFlowcontrolDialog/FlowcontrolDialogContainer";
+import FlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/FlowcontrolDialog/FlowcontrolDialogContainer";
 
 class FlowcontrolItem extends React.Component{
     constructor( props ){
