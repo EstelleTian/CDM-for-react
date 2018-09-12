@@ -456,7 +456,7 @@ class APGSDepContent extends React.Component{
             // 设置模板对应字段数值
             this.props.form.setFieldsValue({
                 name : templateData.name || '',
-                type : templateData.type || '',
+                type : templateData.typeSubclass || '', // 注意:低能见度受限模板，此处要取typeSubclass值
                 originalPublishUnit: templateData.publishUnit || '',
                 controlDepDirection: templateData.controlDepDirection || '',
                 controlDirection : templateData.controlDirection ?  templateData.controlDirection.split(',') : [],
