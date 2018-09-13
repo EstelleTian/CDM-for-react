@@ -20,7 +20,6 @@ class APGSDepContent extends React.Component{
     constructor( props ){
         super(props);
 
-        this.computeFlowcontrolName = this.computeFlowcontrolName.bind(this);
         this.splicingName = this.splicingName.bind(this);
         this.splicingGSDepTypeName = this.splicingGSDepTypeName.bind(this);
 
@@ -306,22 +305,6 @@ class APGSDepContent extends React.Component{
 
 
     // 拼接流控名称
-    computeFlowcontrolName() {
-        let res = '';
-        const { type,controlDepDirection,value, assignSlot  } = this.props.form.getFieldsValue(['type', 'controlDepDirection', 'value', 'assignSlot']);
-        const { controlPoints } = this.state;
-        if(type == 'GS_DEP'){ // 限制类型为地面停止
-            // 若未勾选限制流控点,则以受控起飞机场命名
-            if(controlPoints.length < 1) {
-                res = controlDepDirection + '放行 低能见度'
-            }else {
-                // 若勾选限制流控点,则以勾选的限制流控点命名
-                res = controlPoints.join(',') + ' 低能见度'
-            }
-        }
-    }
-
-    // 拼接流控名称
     splicingName () {
         let _form = this.props.form;
         // 先校验限制类型
@@ -359,16 +342,20 @@ class APGSDepContent extends React.Component{
         // 结果
         let res = '';
         let _form = this.props.form;
-        let controlDepDirection = _form.getFieldValue('controlDepDirection');
+        let {controlDepDirection, controlDirection }= _form.getFieldsValue(['controlDepDirection', 'controlDirection']);
         const { controlPoints } = this.state;
 
-        // 若未勾选限制流控点,则以受控起飞机场命名
-        if(controlPoints.length < 1) {
-            res = controlDepDirection + '放行 低能见度'
-        }else {
+        // 若受控降落机场有值，则以受控降落机场命名
+        if(controlDirection && controlDirection.length > 0){
+            res = controlDirection.join(',') + ' 低能见度'
+        }else if(controlPoints && controlPoints.length > 0){
             // 若勾选限制流控点,则以勾选的限制流控点命名
             res = controlPoints.join(',') + ' 低能见度'
+        }else {
+            // 若未勾选限制流控点,则以受控起飞机场命名
+            res = controlDepDirection + '放行 低能见度'
         }
+
         return res;
     };
 
