@@ -316,40 +316,62 @@ class APContent extends React.Component{
     // 拼接流控名称
     computeFlowcontrolName() {
         let res = '';
-        const { type,controlDepDirection,value, assignSlot  } = this.props.form.getFieldsValue(['type', 'controlDepDirection', 'value', 'assignSlot']);
+        const { type,controlDepDirection, controlDirection, value, assignSlot  } = this.props.form.getFieldsValue(['type', 'controlDepDirection', 'controlDirection', 'value', 'assignSlot']);
         const { controlPoints } = this.state;
         if(type == 'GS'){ // 限制类型为地面停止
-            // 若未勾选限制流控点,则以受控起飞机场命名
-            if(controlPoints.length < 1) {
-                res = controlDepDirection + '放行 停放'
-            }else {
+            // 若受控降落机场有值，则以受控降落机场命名
+            if(controlDirection && controlDirection.length > 0){
+                res = controlDirection.join(',')+ ' 停放'
+            }else if(controlPoints && controlPoints.length > 0 ){
                 // 若勾选限制流控点,则以勾选的限制流控点命名
                 res = controlPoints.join(',') + ' 停放'
+            } else {
+                // 若未勾选限制流控点,则以受控起飞机场命名
+                res = controlDepDirection + '放行 停放'
             }
+
         }else if(type == 'REQ'){ // 限制类型为开车申请
-            // 若未勾选限制流控点,则以受控起飞机场命名
-            if(controlPoints.length < 1) {
-                res = controlDepDirection + ' 开车申请'
-            }else {
+
+            // 若受控降落机场有值，则以受控降落机场命名
+            if(controlDirection && controlDirection.length > 0){
+                res = controlDirection.join(',')+ ' 开车申请'
+
+            }else if(controlPoints && controlPoints.length > 0 ){
                 // 若勾选限制流控点,则以勾选的限制流控点命名
                 res = controlPoints.join(',') + ' 开车申请'
+            } else {
+                // 若未勾选限制流控点,则以受控起飞机场命名
+                res = controlPoints.join(',') + ' 开车申请'
             }
+
         }else if(type == 'TIME'){ // 限制类型为时间
-            // 若未勾选限制流控点,则以受控起飞机场命名
-            if(controlPoints.length < 1) {
-                res = controlDepDirection + '放行 限制间隔' + value + '分钟'
-            }else {
+
+
+            // 若受控降落机场有值，则以受控降落机场命名
+            if(controlDirection && controlDirection.length > 0){
+                res = controlDirection.join(',') + ' 限制间隔' + value + '分钟'
+
+            }else if(controlPoints && controlPoints.length > 0 ){
                 // 若勾选限制流控点,则以勾选的限制流控点命名
                 res = controlPoints.join(',') + ' 限制间隔' + value + '分钟'
+            } else {
+                // 若未勾选限制流控点,则以受控起飞机场命名
+                res = controlDepDirection + '放行 限制间隔' + value + '分钟'
             }
+
         }else if(type == 'ASSIGN'){ // 限制类型为指定时隙
-            // 若未勾选限制流控点,则以受控起飞机场命名
-            if(controlPoints.length < 1) {
-                res = controlDepDirection + '放行 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
-            }else {
+            // 若受控降落机场有值，则以受控降落机场命名
+            if(controlDirection && controlDirection.length > 0){
+                res = controlDirection.join(',') + ' 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
+
+            }else if(controlPoints && controlPoints.length > 0 ){
                 // 若勾选限制流控点,则以勾选的限制流控点命名
                 res = controlPoints.join(',') + ' 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
+            } else {
+                // 若未勾选限制流控点,则以受控起飞机场命名
+                res = controlDepDirection + '放行 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
             }
+
         }
         return res;
     }
@@ -401,7 +423,7 @@ class APContent extends React.Component{
     handleValidateFlowcontrolValue(errors,values){
         let _form = this.props.form;
         let res = '';
-        const { value,controlDepDirection  } = _form.getFieldsValue(['value', 'controlDepDirection']);
+        const { value,controlDepDirection,  controlDirection } = _form.getFieldsValue(['value', 'controlDepDirection', 'controlDirection']);
         const { controlPoints } = this.state;
         // 校验不通过
         if (errors) {
@@ -415,13 +437,16 @@ class APContent extends React.Component{
                 })
             },500)
         }else {
-            // 若未勾选限制流控点,则以受控起飞机场命名
-            if(controlPoints.length < 1) {
-                res = controlDepDirection + '放行 限制间隔' + value + '分钟'
-            }else {
+            // 若受控降落机场有值，则以受控降落机场命名
+            if(controlDirection && controlDirection.length > 0){
+                res = controlDirection.join(',') +  ' 限制间隔' + value + '分钟'
+            } else if(controlPoints && controlPoints.length > 0 ){
                 // 若勾选限制流控点,则以勾选的限制流控点命名
                 res = controlPoints.join(',') + ' 限制间隔' + value + '分钟'
+            }else {
+                res = controlDepDirection + '放行 限制间隔' + value + '分钟'
             }
+
             // 设置流控名称
             _form.setFieldsValue({
                 name : res
@@ -434,16 +459,19 @@ class APContent extends React.Component{
         // 结果
         let res = '';
         let _form = this.props.form;
-        let controlDepDirection = _form.getFieldValue('controlDepDirection');
+        let {controlDepDirection, controlDirection} = _form.getFieldsValue(['controlDepDirection','controlDirection']);
         const { controlPoints } = this.state;
-
-        // 若未勾选限制流控点,则以受控起飞机场命名
-        if(controlPoints.length < 1) {
-            res = controlDepDirection + '放行 停放'
-        }else {
+        // 若受控降落机场有值，则以受控降落机场命名
+        if(controlDirection && controlDirection.length > 0){
+            res = controlDirection.join(',') + ' 停放';
+        }else if(controlPoints && controlPoints.length > 0 ){
             // 若勾选限制流控点,则以勾选的限制流控点命名
             res = controlPoints.join(',') + ' 停放'
+        } else {
+            // 若未勾选限制流控点,则以受控起飞机场命名
+            res = controlDepDirection + '放行 停放'
         }
+
         // 设置流控名称
         _form.setFieldsValue({
             name : res
@@ -454,14 +482,18 @@ class APContent extends React.Component{
         // 结果
         let res = '';
         let _form = this.props.form;
-        let controlDepDirection = _form.getFieldValue('controlDepDirection');
+        let {controlDepDirection, controlDirection} = _form.getFieldsValue(['controlDepDirection','controlDirection']);
         const { controlPoints } = this.state;
-        // 若未勾选限制流控点,则以受控起飞机场命名
-        if(controlPoints.length < 1) {
-            res = controlDepDirection + ' 开车申请'
-        }else {
+
+        // 若受控降落机场有值，则以受控降落机场命名
+        if(controlDirection && controlDirection.length > 0){
+            res = controlDirection.join(',') + ' 开车申请';
+        }else if(controlPoints && controlPoints.length > 0 ){
             // 若勾选限制流控点,则以勾选的限制流控点命名
             res = controlPoints.join(',') + ' 开车申请'
+        } else {
+            // 若未勾选限制流控点,则以受控起飞机场命名
+            res = controlDepDirection + '放行 开车申请'
         }
         // 设置流控名称
         _form.setFieldsValue({
@@ -481,7 +513,7 @@ class APContent extends React.Component{
     handleValidateFlowcontrolAssignSlot(errors,values){
         let _form = this.props.form;
         let res = '';
-        const { assignSlot,controlDepDirection  } = _form.getFieldsValue(['assignSlot', 'controlDepDirection']);
+        const { assignSlot,controlDepDirection, controlDirection  } = _form.getFieldsValue(['assignSlot', 'controlDepDirection', 'controlDirection']);
         const { controlPoints } = this.state;
         // 校验不通过
         if (errors) {
@@ -495,13 +527,17 @@ class APContent extends React.Component{
                 })
             },500)
         }else {
-            // 若未勾选限制流控点,则以受控起飞机场命名
-            if(controlPoints.length < 1) {
-                res = controlDepDirection + '放行 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
-            }else {
+            // 若受控降落机场有值，则以受控降落机场命名
+            if(controlDirection && controlDirection.length > 0){
+                res = controlDirection.join(',') + ' 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
+            }else if(controlPoints && controlPoints.length > 0){
                 // 若勾选限制流控点,则以勾选的限制流控点命名
                 res = controlPoints.join(',') + ' 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
+            }else {
+                // 若未勾选限制流控点,则以受控起飞机场命名
+                res = controlDepDirection + '放行 指定时隙 ' + assignSlot.join(',') + '分钟各一架次'
             }
+
             // 设置流控名称
             _form.setFieldsValue({
                 name : res
