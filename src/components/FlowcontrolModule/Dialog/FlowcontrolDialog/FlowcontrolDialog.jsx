@@ -3,6 +3,7 @@ import React from 'react';
 import { Row, Icon } from 'antd';
 import APContent from "components/FlowcontrolModule/APContent/APContent";
 import APGSDepContent from "components/FlowcontrolModule/APGSDepContent/APGSDepContent";
+import POINTContent from "components/FlowcontrolModule/POINTContent/POINTContent";
 import DraggableModule from "components/DraggableModule/DraggableModule";
 
 import './FlowcontrolDialog.less';
@@ -59,7 +60,15 @@ class FlowcontrolDialog extends React.Component{
                             /> : ''
                         }
                         {
-                            placeType == 'POINT' ? '' : ''
+                            placeType == 'POINT' ? <POINTContent
+                                clickCloseBtn = {clickCloseBtn}
+                                dialogName = {dialogName}
+                                loginUserInfo = {loginUserInfo}
+                                systemConfig = {systemConfig}
+                                generateTime = {generateTime}
+                                id = {id}
+                                placeType = {placeType}
+                            />  : ''
                         }
 
                     </div>
