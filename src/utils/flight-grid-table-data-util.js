@@ -150,6 +150,10 @@ const convertData = function( flight, flightAuthMap, generateTime ){
                 setFlightidAttrs.call(this, key, options);
                 break;
             }
+            case 'QUALIFICATIONS': {
+                setQualifcationsAttrs.call(this, key, options);
+                break;
+            }
             case 'APPFIX':
             case 'ACCFIX':
             case 'CTO':
@@ -326,6 +330,38 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         }
         data[titlekey] = titlestr;
         data[stylekey] = stylestr + this.getDisplayFontSize('FLIGHTID');
+    };
+
+    //配置资质 value style title信息
+    function setQualifcationsAttrs( key, obj ){
+        let value = obj.value;
+        let formatValue = "";
+        let titlekey = key + "_title";
+        let titleValue = "";
+        //单元格样式
+        let stylekey = key + "_style";
+        let styleValue = "";
+        if(isValidVariable(value)){
+            if(value.substring(1,3) == '20'){
+                formatValue = '二类';
+                titleValue = "资质：二类";
+            }else if(value.substring(1,3) == '21'){
+                formatValue = 'CAT II';
+                titleValue = "资质：CAT II";
+            }else if(value.substring(1,3) == '22'){
+                formatValue = 'HUD150';
+                titleValue = "资质：HUD150";
+            }else if(value.substring(1,3) == '23'){
+                formatValue = 'CAT II HUD150';
+                titleValue = "资质：CAT II HUD150";
+            }
+            styleValue = this.getDisplayStyle(key) + this.getDisplayFontSize(key);
+        }
+
+        data[key] = formatValue;
+        data[stylekey] = styleValue;
+        data[titlekey] = titleValue;
+
     };
 
     //配置 内/外控点  title信息
