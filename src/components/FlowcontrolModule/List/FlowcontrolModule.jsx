@@ -1,9 +1,8 @@
 //航班起飞排序模块
 import React from 'react';
-import { Row, Col } from 'antd';
-import  FlowcontrolHeaderContainer from './FlowcontrolHeaderContainer'
-import  FlowcontrolItemContainer from './FlowcontrolItemContainer'
-import  FlowcontrolListContainer from './FlowcontrolListContainer'
+import { Row } from 'antd';
+import  FlowcontrolHeaderContainer from './FlowcontrolHeaderContainer';
+import  FlowcontrolListContainer from './FlowcontrolListContainer';
 
 import './FlowcontrolModule.less';
 

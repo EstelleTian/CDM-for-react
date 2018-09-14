@@ -1,10 +1,11 @@
 //表格列名
 import React from 'react';
 import $ from 'jquery';
+import { Checkbox } from 'antd';
 import {isValidObject, isValidVariable} from "./basic-verify";
 import { getSingleAirportUrl } from "utils/request-urls";
 import { requestGet } from "utils/request-actions";
-import { Checkbox } from 'antd';
+import HoverPopover from 'components/OperationDialog/HoverPopover';
 
 //需要日期格式化的列
 const DataColumns = [ "SOBT", "EOBT", "TOBT", "HOBT", "ASBT", "AGCT", "COBT", "AOBT", "CTOT", "ATOT", "ALDT", "CTO2", "CTO", "SLOT_STATUS", "TAXI_WAIT", "FLOWCONTROL_POINT_PASSTIME", "FLIGHT_APP_POINT_PASSTIME", "FLIGHT_ACC_POINT_PASSTIME", "EFPS_REQTIME", "EFPS_PUSTIME", "FORMER_CTOT", "FORMER_DEP", "FORMER_ARR", "EFPS_LINTIME", "EFPS_IN_DHLTIME", "EFPS_OUT_DHLTIME", "EFPS_IN_ICETIME", "EFPS_OUT_ICETIME", "EFPS_TAXTIME", "GSOBT", "TOBT_UPDATE_TIME"];
@@ -80,11 +81,20 @@ const handleColumnSort = (d1, d2, colunmName) => {
 };
 //处理单元格样式，用于增加单元格字体大小，背景色，字体颜色
 const handleColumnRender = (value, row, index, colunmName) => {
-    // if( colunmName == "ID" ){
-    //     return {
-    //         children: index*1+1
-    //     }
-    // };
+    //受控航路点
+    if( colunmName == "FLOWCONTROL_POINT" ){
+        const FFixDom = (
+            <HoverPopover
+                rowData = { row }
+            >
+                {value}
+            </HoverPopover>
+        )
+
+        return {
+            children: FFixDom
+        }
+    };
     //获取标题
     const title = row[colunmName + "_title"] || "";
     //若是多选操作，转换为dom
@@ -226,8 +236,6 @@ const handleColumnWidth = ( type, title ) => {
     }
 
     return width;
-
-
 };
 
 /*

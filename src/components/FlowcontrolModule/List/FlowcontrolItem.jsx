@@ -1,5 +1,4 @@
 //流控信息---菜单操作功能
-
 import React from 'react';
 import { Row, Col, Icon } from 'antd';
 import './FlowcontrolItem.less';
@@ -7,39 +6,36 @@ import { convertFlowcontrolData } from 'utils/flowcontrol-data-util';
 import CreateLayer from "components/CreateLayer/CreateLayer";
 import FlowcontrolDetailContainer from "components/FlowcontrolModule/Detail/FlowcontrolDetailContainer";
 import FlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/FlowcontrolDialog/FlowcontrolDialogContainer";
+import ImpactContainer from "components/FlowcontrolModule/Impact/ImpactContainer";
 
 class FlowcontrolItem extends React.Component{
     constructor( props ){
         super(props);
-
         this.onCloseBtn = this.onCloseBtn.bind(this);
-        this.openDetail = this.openDetail.bind(this);
-        this.handleUpdate = this.handleUpdate.bind(this);
+        this.openOperationDialog = this.openOperationDialog.bind(this);
+        this.convertFlowcontrolData = convertFlowcontrolData.bind(this);
         this.state = {
-            detail: {
+            detail: { //流控详情
                 show: false,
             },
-            modify: {
+            modify: { //流控修改
                 show: false,
             },
-
+            impact: { //流控影响航班
+                show: false,
+            },
         }
     }
-    // 打开详情
-    openDetail(){
-        this.setState({
-            detail: {
-                show: true
-            }
-        });
-    }
-    // 流控修改
-    handleUpdate(){
-        this.setState({
-            modify : {
-                show: true
-            }
-        });
+    //操作列--根据key开启操作模块（详情、修改页面、流控影响航班、终止等）
+    openOperationDialog( key ){
+        if( key != undefined || key != "" ){
+            this.setState({
+                [key] : {
+                    show: true
+                }
+            });
+        }
+
     }
     //当点击关闭按钮时，type: 类型
     onCloseBtn( type ){
@@ -51,15 +47,14 @@ class FlowcontrolItem extends React.Component{
     }
 
     render(){
-        const { data, generateTime } = this.props;
-        const { indexNumber} = this.props;
-        const formatData = convertFlowcontrolData(data,generateTime);
+        const { data, generateTime, systemConfig, indexNumber } = this.props;
+        const formatData = this.convertFlowcontrolData( data, generateTime);
         const { name, id, publishUserZh, reason, placeType, dialogName,
             status, statusClassName, controlPoints, type, value, controlDirection,
             effectiveTime, effectiveDate, casaStatus,
         } = formatData;
 
-        const { detail, modify } = this.state;
+        const { detail, modify, impact } = this.state;
         return (
             <Col span={24} className="flow-item">
                 <Row className="title">
@@ -97,9 +92,15 @@ class FlowcontrolItem extends React.Component{
 
                     </Col>
                     <Col className="operator" span={14}>
-                        <i className="iconfont icon-detail" title="详情" onClick={this.openDetail} />
-                        <i className="iconfont icon-effect" title="影响"/>
-                        <i className="iconfont icon-edit" title="修改" onClick={this.handleUpdate}/>
+                        <i className="iconfont icon-detail" title="详情" onClick={()=>{
+                            this.openOperationDialog("detail");
+                        }} />
+                        <i className="iconfont icon-effect" title="影响" onClick={()=>{
+                            this.openOperationDialog("impact");
+                        }}/>
+                        <i className="iconfont icon-edit" title="修改" onClick={()=>{
+                            this.openOperationDialog("modify");
+                        }}/>
                         <i className="iconfont icon-stop" title="终止"/>
                     </Col>
 
@@ -138,6 +139,19 @@ class FlowcontrolItem extends React.Component{
                         </CreateLayer>
 
                         : ''
+                }
+                {
+                    impact.show ?
+                        <CreateLayer
+                            className="flowcontol-layer"
+                        >
+                            <ImpactContainer
+                                formatData = { formatData }
+                                x = { 360 }
+                                y = { 60 }
+                                clickCloseBtn={ this.onCloseBtn }
+                            />
+                        </CreateLayer> : ''
                 }
             </Col>
 

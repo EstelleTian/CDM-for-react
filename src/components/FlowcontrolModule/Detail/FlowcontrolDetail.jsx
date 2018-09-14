@@ -1,4 +1,4 @@
-//机场流控页面
+//流控详情页面
 import React from 'react';
 import {Row, Col, Icon, Card, Table} from 'antd';
 import DraggableModule from "components/DraggableModule/DraggableModule";
@@ -6,6 +6,7 @@ import {getFlowcontrolDetailUrl} from 'utils/request-urls';
 import {FlowcontrolUtil} from 'utils/flowcontrol-data-util';
 import {formatTimeString, getDayTimeFromString} from "utils/basic-verify";
 import {request} from 'utils/request-actions';
+import { convertFlowcontrolData } from 'utils/flowcontrol-data-util';
 import './FlowcontrolDetail.less';
 
 class FlowcontrolDetail extends React.Component {
@@ -13,7 +14,7 @@ class FlowcontrolDetail extends React.Component {
         super(props);
         this.getFlowcontrolDetail = this.getFlowcontrolDetail.bind(this);
         this.handleFlowcontrolDetailData = this.handleFlowcontrolDetailData.bind(this);
-        this.converFlowcontrolData = this.converFlowcontrolData.bind(this);
+        this.convertFlowcontrolData = convertFlowcontrolData.bind(this);
         this.converFlowRecords = this.converFlowRecords.bind(this);
         this.getColums = this.getColums.bind(this);
         this.batchFormattingTime = this.batchFormattingTime.bind(this);
@@ -42,220 +43,31 @@ class FlowcontrolDetail extends React.Component {
     handleFlowcontrolDetailData(res) {
         // 取响应结果中的流控数据
         if (res) {
+            const { flow, flowRecords } = res;
             // 转换流控信息数据
-            this.converFlowcontrolData(res);
+            const flowFormatDatas = this.convertFlowcontrolData( flow );
+            this.setState({
+                ...flowFormatDatas
+            });
             // 转换流控协调记录数据
-            this.converFlowRecords(res);
+            this.converFlowRecords( flowRecords );
         }
     }
 
     //批量格式化
     batchFormattingTime(array) {
-    if(!array){
-        return '';
-    }
-    let arr = array.split(',');
-    arr = arr.map((item) => {
-        return getDayTimeFromString(item)
-    });
-    return arr.join(',');
-};
-
-    // 转换流控信息数据
-    converFlowcontrolData(data) {
-        const {systemConfig} = this.props;
-
-
-        // 生效时间计算
-        const  setEffectiveTime = (flow) => {
-          const { relativeStartTime,endTime, lastModifyTime, relativeEndTime } = flow;
-          // 生效开始时间
-          let start = relativeStartTime;
-          // 生效结束时间
-          let end = '';
-          // 若结束时间和最后修改时间都有效，则生效结束时间取两者最小的
-          if(endTime && lastModifyTime){
-                end = (endTime > lastModifyTime) ? lastModifyTime : endTime;
-          }else if(endTime && !lastModifyTime){// 若结束时间有效且最后修改时间无效
-              // 若结束时间与相对结束时间不相等，则取相对结束时间
-                if(relativeEndTime && (endTime != relativeEndTime)){
-                    end = relativeEndTime;
-                }else {
-                    end = endTime;
-                }
-          }else if(!endTime && lastModifyTime){ // 若结束时间无效且最后修改时间有效
-              end = lastModifyTime;
-          }
-
-          start = getDayTimeFromString(start);
-          end = getDayTimeFromString(end);
-          return `${start}~${end}`
-        };
-        // 流控状态转换
-        const  setflowStatus = (flow) => {
-            const { status, relativeStatus, placeType,  } = flow;
-            let resObj = {
-                statusZh : '',
-                className : '',
-            };
-            if(!status){
-                return resObj;
-            }
-            let res = '';
-            if(status == 'PUBLISH'){
-                resObj.statusZh = '已发布';
-                resObj.className = 'running';
-            }else if(status == 'RUNNING'){
-                resObj.statusZh = '正在执行';
-                resObj.className = 'running';
-            }else if(status == 'FUTURE'){
-                resObj.statusZh = '将要执行';
-                resObj.className = 'future';
-            }else if(status == 'TERMINATED'){
-                resObj.statusZh = '人工终止';
-                resObj.className = 'terminated';
-            }else if(status == 'STOP'){
-                resObj.statusZh = '系统终止';
-                resObj.className = 'terminated';
-            }else if(status == 'FINISHED'){
-                resObj.statusZh = '正常结束';
-                resObj.className = 'finished';
-            }else if(status == 'DISCARD'){
-                resObj.statusZh = '已废弃';
-                resObj.className = 'cancel';
-            }else if(status == 'PRE_PUBLISH'){
-                resObj.statusZh = '将要发布';
-                resObj.className = 'running';
-            }else if(status == 'PRE_UPDATE'){
-                resObj.statusZh = '将要更新';
-                resObj.className = 'running';
-            }else if(status == 'PRE_TERMINATED'){
-                resObj.statusZh = '将要终止';
-                resObj.className = 'terminated';
-            }
-            // 相对状态
-            if(placeType =='POINT' && status && relativeStatus ){
-                // 系统名
-                const {systemElem} = systemConfig;
-                // 状态与相对状态不相同，取相对状态值
-                if(status != relativeStatus){
-                    if(relativeStatus == 'RUNNING'){
-                        resObj.statusZh = `${systemElem}(正在执行)`;
-                        resObj.className = 'running';
-                    }else if(relativeStatus == 'FINISHED'){
-                        resObj.statusZh = `${systemElem}(正常结束)`;
-                        resObj.className = 'finished';
-                    }
-                }
-            }
-            return resObj;
-        };
-
-
-        // flow 流控信息
-        const {flow} = data;
-        // id
-        const id = flow.id || '';
-        // 流控名称
-        const name = flow.name || '';
-        //生效时间
-        const effectiveTime = setEffectiveTime(flow);
-        // 流控状态
-        const flowStatus = setflowStatus(flow).statusZh;
-        const flowStatusClassName = setflowStatus(flow).className;
-        // 流控名称(包括id)
-        const nameComplex = name + ' (' + id + ')';
-        // 发布用户
-        const publishUser = flow.publishUserZh + ' (' + flow.publishUser + ')';
-        // 来源
-        const source = flow.source || '';
-        // 原发布单位
-        const originalPublishUnit = flow.originalPublishUnit || '';
-        // 类型
-        let flowcontrolType = FlowcontrolUtil.setFlowcontrolType(flow);
-
-        // 开始时间
-        const startTime = getDayTimeFromString(flow.startTime);
-         // 结束时间
-        const endTime = getDayTimeFromString(flow.endTime);
-         // 创建时间
-        const generateTime = getDayTimeFromString(flow.generateTime);
-         // 修改时间
-        const lastModifyTime = getDayTimeFromString(flow.lastModifyTime);
-         // 纳入计算时间
-        const startFlowCasaTime = getDayTimeFromString(flow.startFlowCasaTime);
-
-        // 限制类型
-        const type = FlowcontrolUtil.setType(flow);
-
-        // 限制数值
-        const value = FlowcontrolUtil.setValue(flow);
-
-        //  受控航路点
-        const controlPoints = flow.controlPoints || '';
-        // 受控方向
-        const flowcontrolDirection = flow.flowcontrolDirection || '';
-
-        // 受控起飞机场
-        const controlDepDirection = flow.controlDepDirection || '';
-        // 受控降落机场
-        const controlDirection = flow.controlDirection || '';
-        // 豁免起飞机场
-        const exemptDepDirection = flow.exemptDepDirection || '';
-        // 豁免降落机场
-        const exemptDirection = flow.exemptDirection || '';
-        //限制高度
-        const controlLevel = flow.controlLevel || '';
-        //预留时隙
-        const reserveSlots = this.batchFormattingTime(flow.reserveSlots);
-        // 预锁航班时隙变更策略
-        const compressAtStartStrategy = FlowcontrolUtil.setCompressAtStartStrategy(flow);
-        // 压缩时间范围
-        const compressAtStartWinStart = flow.compressAtStartWinStart || '';
-        const compressAtEndWinEnd = flow.compressAtEndWinEnd || '';
-        // 原因
-        const reason = FlowcontrolUtil.setReason(flow);
-        // 备注信息
-        const comments = flow.comments || '';
-
-        this.setState({
-            name,
-            effectiveTime,
-            flowStatus,
-            flowStatusClassName,
-            nameComplex,
-            publishUser,
-            source,
-            originalPublishUnit,
-            flowcontrolType,
-            startTime,
-            endTime,
-            generateTime,
-            lastModifyTime,
-            startFlowCasaTime,
-            type,
-            value,
-            controlPoints,
-            flowcontrolDirection,
-            controlDepDirection,
-            controlDirection,
-            exemptDepDirection,
-            exemptDirection,
-            controlLevel,
-            reserveSlots,
-            compressAtStartStrategy,
-            compressAtStartWinStart,
-            compressAtEndWinEnd,
-            reason,
-            comments,
-        })
-
-
-    }
+        if(!array){
+            return '';
+        }
+        let arr = array.split(',');
+        arr = arr.map((item) => {
+            return getDayTimeFromString(item)
+        });
+        return arr.join(',');
+    };
 
     // 转换流控协调记录数据
-    converFlowRecords(data){
-        const {flowRecords} = data;
+    converFlowRecords( flowRecords ){
 
         // 转换协调类型
        const setType =(record) => {
@@ -423,10 +235,11 @@ class FlowcontrolDetail extends React.Component {
         };
 
         let records = [];
-
-        flowRecords.map((item) =>{
-            records.push(converRecord(item));
-        })
+        if( Object.keys(flowRecords).length > 0 ){
+            flowRecords.map((item) =>{
+                records.push(converRecord(item));
+            });
+        }
 
         this.setState({
             flowRecords : records
@@ -512,16 +325,16 @@ class FlowcontrolDetail extends React.Component {
     render() {
         const {titleName, clickCloseBtn, width = 800, dialogName, x, y } = this.props;
         const {
-            name, effectiveTime, flowStatus, nameComplex, flowStatusClassName, source, flowcontrolType, publishUser, originalPublishUnit,
-            type, value, reason, controlPoints, flowcontrolDirection, controlDepDirection,controlDirection,
+            name, id, effectiveTime, flowStatus, flowStatusClassName, source, placeType, publishUser, originalPublishUnit,
+            type, value, reason, controlPoints, flowcontrolDirection, controlDepDirection,controlDirection, flowcontrolType,
             exemptDepDirection, exemptDirection, controlLevel, reserveSlots, startTime, endTime, generateTime,
             lastModifyTime, startFlowCasaTime, compressAtStartStrategy, compressAtStartWinStart, compressAtEndWinEnd,
             comments, flowRecords} = this.state;
+        const Layout1 = {span: 1};
         const Layout2 = {span: 2};
+        const Layout3 = {span: 3};
         const Layout4 = {span: 4};
-        const Layout6 = {span: 6};
         const Layout8 = {span: 8};
-        const Layout12 = {span: 12};
         const Layout18 = {span: 18};
         const Layout24 = {span: 24};
         const columns = this.getColums();
@@ -568,7 +381,7 @@ class FlowcontrolDetail extends React.Component {
                                                     <div className="trem">流控名称</div>
                                                 </Col>
                                                 <Col {...Layout8}>
-                                                    <div className="detail">{ nameComplex }</div>
+                                                    <div className="detail">{ `${name}(${id})` }</div>
                                                 </Col>
                                                 <Col {...Layout4}>
                                                     <div className="trem">来源</div>
@@ -580,7 +393,7 @@ class FlowcontrolDetail extends React.Component {
                                                     <div className="trem">类型</div>
                                                 </Col>
                                                 <Col {...Layout2}>
-                                                    <div className="detail">{flowcontrolType}</div>
+                                                    <div className="detail">{placeType}</div>
                                                 </Col>
                                             </Col>
                                             <Col {...Layout24}>
@@ -593,8 +406,14 @@ class FlowcontrolDetail extends React.Component {
                                                 <Col {...Layout4}>
                                                     <div className="trem">原发布单位</div>
                                                 </Col>
-                                                <Col {...Layout8}>
+                                                <Col {...Layout4}>
                                                     <div className="detail">{ originalPublishUnit }</div>
+                                                </Col>
+                                                <Col {...Layout1}>
+                                                    <div className=""></div>
+                                                </Col>
+                                                <Col {...Layout3}>
+                                                    <div className="detail">{ flowcontrolType }</div>
                                                 </Col>
                                             </Col>
                                         </Row>

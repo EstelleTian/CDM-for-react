@@ -86,7 +86,7 @@ class FlowcontrolList extends React.Component{
 
     render(){
         // 流控数据
-        const { flowcontrolViewMap = [], flowGenerateTime } = this.props;
+        const { flowcontrolViewMap = [], flowGenerateTime, systemConfig } = this.props;
         return (
             <Col span={24} className="flowcontrol-list">
                 <Row className="flow-item-wrapper">
@@ -98,6 +98,7 @@ class FlowcontrolList extends React.Component{
                                     data = {item}
                                     indexNumber = { (index +1) }
                                     generateTime = { flowGenerateTime }
+                                    systemConfig = { systemConfig }
                                 />
                             )
                         })

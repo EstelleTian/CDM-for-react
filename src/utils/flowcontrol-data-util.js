@@ -3,6 +3,7 @@
  */
 
 import { isValidVariable, isValidObject, addStringTime } from './basic-verify';
+import {getDayTimeFromString} from "utils/basic-verify";
 /**
  * Flowcontrol对象常量
  */
@@ -151,7 +152,7 @@ const FlowcontrolUtil = {
      * */
     setFlowcontrolType: (data)=> {
         // 流控限类型
-        let {flowcontrolType} = data;
+        const {flowcontrolType} = data;
         let res = '';
         // 类型 0 : 长期  1 : 非长期
         if(flowcontrolType == 0){
@@ -171,16 +172,12 @@ const FlowcontrolUtil = {
     setDataTime: (data, generateTime) => {
         // 流控
         let {status, startTime = "", endTime = "", placeType, relativeStartTime, relativeEndTime, relativeStatus} = data;
-
-
         // 转换后的结果
         let res = {};
         let sTime = '';
         let eTime = '';
         let startDate = '';
         let endDate = '';
-
-
         // 相对状态时间
         if (placeType == 'POINT' && relativeStatus != status) {
 
@@ -210,7 +207,6 @@ const FlowcontrolUtil = {
 
         return res;
     },
-
 
     // 时间格式化 hh:mm
     formatTime4: (time) => {
@@ -244,8 +240,6 @@ const FlowcontrolUtil = {
     setStatus: (data, generateTime) => {
         // 流控
         let {status, type, startTime = "", endTime = "", value, placeType, relativeStartTime, relativeStatus} = data;
-
-
         // 转换后的结果
         let res = '';
         if (status == FlowcontrolConstant.FLOWCONTROL_STATUS_PRE_PUBLISH) {
@@ -300,8 +294,6 @@ const FlowcontrolUtil = {
     setCasaStatus: (data, generateTime) => {
         // 流控
         let {status, type, endTime = "", value, previewId, startFlowCasaTime} = data;
-
-
         // 转换后的结果
         let res = '';
         // 预演流控发布正式流控 默认显已计算
@@ -342,7 +334,6 @@ const FlowcontrolUtil = {
     setstatusClassName: (data, generateTime) => {
         // 流控
         let {status, type, endTime, value} = data;
-
         // 转换后的结果
         let res = '';
         if (status == FlowcontrolConstant.FLOWCONTROL_STATUS_PRE_PUBLISH) { // 将要发布
@@ -376,8 +367,6 @@ const FlowcontrolUtil = {
         }
         return res;
     },
-
-
     /**
      * 流控限制数值
      * @param data 数据对象
@@ -387,7 +376,6 @@ const FlowcontrolUtil = {
     setValue: (data) => {
         // 流控
         let {type, value, assignSlot} = data;
-
         // 转换后的结果
         let res = '';
         if (type == FlowcontrolConstant.TYPE_MIT) {
@@ -403,7 +391,6 @@ const FlowcontrolUtil = {
         }
         return res;
     },
-
     /**
      * 预锁航班时隙变更策略
      *  data 流控数据
@@ -411,7 +398,6 @@ const FlowcontrolUtil = {
     setCompressAtStartStrategy: (data) => {
         // 变更策略
         let {compressAtStartStrategy} = data;
-
         // 转换后的结果
         let res = '';
         if (compressAtStartStrategy == 'PART') {
@@ -423,7 +409,6 @@ const FlowcontrolUtil = {
         }
         return res;
     },
-
     setDialogName : (data) => {
         const {placeType, type, typeSubclass} = data;
         let res = '';
@@ -437,57 +422,191 @@ const FlowcontrolUtil = {
             res = '修改航路受限'
         }
         return res;
+    },
+    //计算流控生效时间
+    setEffectiveTime: (flow) => {
+        const { relativeStartTime, endTime, lastModifyTime, relativeEndTime } = flow;
+        // 生效开始时间
+        let start = relativeStartTime;
+        // 生效结束时间
+        let end = '';
+        // 若结束时间和最后修改时间都有效，则生效结束时间取两者最小的
+        if(endTime && lastModifyTime){
+            end = (endTime > lastModifyTime) ? lastModifyTime : endTime;
+        }else if(endTime && !lastModifyTime){// 若结束时间有效且最后修改时间无效
+            // 若结束时间与相对结束时间不相等，则取相对结束时间
+            if(relativeEndTime && (endTime != relativeEndTime)){
+                end = relativeEndTime;
+            }else {
+                end = endTime;
+            }
+        }else if(!endTime && lastModifyTime){ // 若结束时间无效且最后修改时间有效
+            end = lastModifyTime;
+        }
+
+        start = getDayTimeFromString(start);
+        end = getDayTimeFromString(end);
+        return `${start}~${end}`
+    },
+    //批量格式化
+    batchFormattingTime(array) {
+        if(!array){
+            return '';
+        }
+        let arr = array.split(',');
+        arr = arr.map((item) => {
+            return getDayTimeFromString(item)
+        });
+        return arr.join(',');
+    },
+    // 转换流控信息数据
+    setflowStatus(flow, systemConfig){
+        const { status, relativeStatus, placeType } = flow;
+        let resObj = {
+            statusZh : '',
+            className : '',
+        };
+        if(!status){
+            return resObj;
+        }
+        if(status == 'PUBLISH'){
+            resObj.statusZh = '已发布';
+            resObj.className = 'running';
+        }else if(status == 'RUNNING'){
+            resObj.statusZh = '正在执行';
+            resObj.className = 'running';
+        }else if(status == 'FUTURE'){
+            resObj.statusZh = '将要执行';
+            resObj.className = 'future';
+        }else if(status == 'TERMINATED'){
+            resObj.statusZh = '人工终止';
+            resObj.className = 'terminated';
+        }else if(status == 'STOP'){
+            resObj.statusZh = '系统终止';
+            resObj.className = 'terminated';
+        }else if(status == 'FINISHED'){
+            resObj.statusZh = '正常结束';
+            resObj.className = 'finished';
+        }else if(status == 'DISCARD'){
+            resObj.statusZh = '已废弃';
+            resObj.className = 'cancel';
+        }else if(status == 'PRE_PUBLISH'){
+            resObj.statusZh = '将要发布';
+            resObj.className = 'running';
+        }else if(status == 'PRE_UPDATE'){
+            resObj.statusZh = '将要更新';
+            resObj.className = 'running';
+        }else if(status == 'PRE_TERMINATED'){
+            resObj.statusZh = '将要终止';
+            resObj.className = 'terminated';
+        }
+        // 相对状态
+        if(placeType =='POINT' && status && relativeStatus ){
+            // 系统名
+            const {systemElem} = systemConfig;
+            // 状态与相对状态不相同，取相对状态值
+            if(status != relativeStatus){
+                if(relativeStatus == 'RUNNING'){
+                    resObj.statusZh = `${systemElem}(正在执行)`;
+                    resObj.className = 'running';
+                }else if(relativeStatus == 'FINISHED'){
+                    resObj.statusZh = `${systemElem}(正常结束)`;
+                    resObj.className = 'finished';
+                }
+            }
+        }
+        return resObj;
     }
 
 };
 
-// 流控数据转换(适用于侧边栏流控信息列表)
-const convertFlowcontrolData =(data, generateTime) => {
+// 流控数据转换
+const convertFlowcontrolData = function(data, generateTime){
     // 校验数据
     if(!isValidObject(data)){
         return {};
     }
-
     // 转换后的结果对象
     let result = {};
-    // 流控名称
-    result.name = data.name || '';
     // 流控id
     result.id = data.id || '';
+    // 流控名称
+    result.name = data.name || '';
+    // 流控生效时间范围（日期/时间）
+    result.effectiveRangeTime = FlowcontrolUtil.setEffectiveTime(data);
+    // 流控时间
+    result.dataTime = FlowcontrolUtil.setDataTime(data);
+    // 流控生效时间（时间）
+    result.effectiveTime = `${result.dataTime.startTime}-${result.dataTime.endTime}`;
+    // 流控生效日期
+    result.effectiveDate = (result.dataTime.endDate) ? `${result.dataTime.startDate}/${result.dataTime.endDate}`: `${result.dataTime.startDate}`;
+    // 是否是长期流控
+    result.flowcontrolType = FlowcontrolUtil.setFlowcontrolType(data);
+    // 流控状态
+    result.status = FlowcontrolUtil.setStatus(data, generateTime);
+    // 状态对应的样式名称
+    result.statusClassName = FlowcontrolUtil.setstatusClassName(data, generateTime);
+    // 流控状态
+    const {systemConfig} = this.props;
+    result.flowStatus = FlowcontrolUtil.setflowStatus(data, systemConfig).statusZh;
+    result.flowStatusClassName = FlowcontrolUtil.setflowStatus(data, systemConfig).className;
     // 发布者
-    result.publishUser = data.publishUser || '';
+    result.publishUser = data.publishUserZh + ' (' + data.publishUser + ')';
     // 发布者中文
     result.publishUserZh = data.publishUserZh || '';
+    // 来源
+    result.source = data.source || '';
+    // 原发布单位
+    result.originalPublishUnit = data.originalPublishUnit || '';
+    // 流控类型
+    result.placeType = FlowcontrolUtil.setPlaceType(data);
+    // 开始时间
+    result.startTime = getDayTimeFromString(data.startTime);
+    // 结束时间
+    result.endTime = getDayTimeFromString(data.endTime);
+    // 创建时间
+    result.generateTime = getDayTimeFromString(data.generateTime);
+    // 修改时间
+    result.lastModifyTime = getDayTimeFromString(data.lastModifyTime);
+    //更新时间
+    result.updateTime = FlowcontrolUtil.formatTime4(data.generateTime);
+    // 纳入计算时间
+    result.startFlowCasaTime = getDayTimeFromString(data.startFlowCasaTime);
+    // 限制类型
+    result.type = FlowcontrolUtil.setType(data);
     // 限制数值
     result.value = FlowcontrolUtil.setValue(data);
     // 受控航路点
     result.controlPoints = data.controlPoints || '';
+    // 受控方向
+    result.flowcontrolDirection = data.flowcontrolDirection || '';
+    // 受控起飞机场
+    result.controlDepDirection = data.controlDepDirection || '';
     // 受控降落机场
     result.controlDirection = data.controlDirection || '';
+    // 豁免起飞机场
+    result.exemptDepDirection = data.exemptDepDirection || '';
+    // 豁免降落机场
+    result.exemptDirection = data.exemptDirection || '';
+    //限制高度
+    result.controlLevel = data.controlLevel || '';
+    //预留时隙
+    result.reserveSlots = FlowcontrolUtil.batchFormattingTime(data.reserveSlots);
+    // 预锁航班时隙变更策略
+    result.compressAtStartStrategy = FlowcontrolUtil.setCompressAtStartStrategy(data);
+    // 压缩时间范围
+    result.compressAtStartWinStart = data.compressAtStartWinStart || '';
+    result.compressAtEndWinEnd = data.compressAtEndWinEnd || '';
     // 原因
     result.reason = FlowcontrolUtil.setReason(data);
-    // 流控类型
-    result.placeType = FlowcontrolUtil.setPlaceType(data);
-    // 限制类型
-    result.type = FlowcontrolUtil.setType(data);
-    // 流控时间
-    result.dataTime = FlowcontrolUtil.setDataTime(data);
-
-    // 流控生效时间
-    result.effectiveTime = `${result.dataTime.startTime}-${result.dataTime.endTime}`;
-    // 流控生效日期
-    result.effectiveDate = (result.dataTime.endDate) ? `${result.dataTime.startDate}/${result.dataTime.endDate}`: `${result.dataTime.startDate}`;
-    // 流控状态
-    result.status = FlowcontrolUtil.setStatus(data, generateTime);
-    // 流控计算状态
-    result.casaStatus = FlowcontrolUtil.setCasaStatus(data, generateTime);
-    // 状态对应的样式名称
-    result.statusClassName = FlowcontrolUtil.setstatusClassName(data, generateTime);
+    // 备注信息
+    result.comments = data.comments || '';
 
     // 修改弹框名称
     result.dialogName = FlowcontrolUtil.setDialogName(data);
-
-    return result
+    // 流控计算状态
+    result.casaStatus = FlowcontrolUtil.setCasaStatus(data, generateTime);
+    return result;
 };
 
 // 校验流控是否为正在生效状态
