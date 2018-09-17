@@ -35,7 +35,9 @@ class NavMenu extends React.Component{
             },
             apGSDepPublish : {
                 show: false,
-            }
+            },pointPublish : {
+                show: false,
+            },
         }
 
     }
@@ -144,7 +146,7 @@ class NavMenu extends React.Component{
         const count = this.getFilterCount();
         const { show } = sidebarConfig;
         const { airports } = loginUserInfo;
-        const { apPublish, apGSDepPublish } = this.state;
+        const { apPublish, apGSDepPublish, pointPublish } = this.state;
         return (
             <div className="opt-menu-canvas">
                 <Menu
@@ -190,7 +192,12 @@ class NavMenu extends React.Component{
                         >
                             <label>发布低能见度受限</label>
                         </Menu.Item>
-                        <Menu.Item key="point-publish"><label>发布航路受限</label></Menu.Item>
+                        <Menu.Item
+                            key="pointPublish"
+                            onClick= {this.onMenuTitleSelect}
+                        >
+                            <label>发布航路受限</label>
+                        </Menu.Item>
                         <Menu.Item key="composite-publish"><label>发布复合航路受限</label></Menu.Item>
                         <Menu.Item key="ldr-publish"><label>发布大面积延误恢复</label></Menu.Item>
                         <Menu.Item key="translation-publish"><label>发布大面积延误</label></Menu.Item>
@@ -332,6 +339,22 @@ class NavMenu extends React.Component{
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType = 'AP'
                                 limitType = 'GS_DEP'
+                                x = { 300 }
+                                y = { 60 }
+                            />
+                        </CreateLayer>
+                        : ''
+                }
+                {
+                    (pointPublish.show) ?
+                        <CreateLayer
+                            className="flowcontol-layer"
+                        >
+                            <FlowcontrolDialogContainer
+                                titleName="发布航路受限"
+                                type="pointPublish"
+                                clickCloseBtn={ this.onCloseBtn }
+                                placeType = 'POINT'
                                 x = { 300 }
                                 y = { 60 }
                             />
