@@ -10,7 +10,7 @@ const FlightsSortModule = () => (
     <Row className="container">
         <TableMenuContainer/>
         <TableContainer/>
-        <OperationDialogContainer />
+        {/*<OperationDialogContainer />*/}
     </Row>
 )
 

@@ -32,7 +32,8 @@ const convertDisplayStyle = ( colStyle = {} ) => {
 
 //根据dataKey获取指定样式值
 const getDisplayStyle = function( dataKey ){
-    const { displayStyle = {} } = this.props.property;
+    const property = this.props.property || this.property;
+    const { displayStyle } = property;
     if (!isValidObject(displayStyle) || !isValidVariable(displayStyle[dataKey])) {
         return '';
     }
@@ -45,7 +46,8 @@ const getDisplayStyle = function( dataKey ){
 
 //根据dataKey获取指定样式-中文值
 const getDisplayStyleZh = function( dataKey ){
-    const { displayStyleComment = {} } = this.props.property;
+    const property = this.props.property || this.property;
+    const { displayStyleComment } = property;
     if (!isValidObject(displayStyleComment) || !isValidVariable(displayStyleComment[dataKey])) {
         return '';
     } else {
@@ -55,7 +57,8 @@ const getDisplayStyleZh = function( dataKey ){
 
 //根据dataKey获取指定字体大小  displayFontSize == colFontSize
 const getDisplayFontSize = function( dataKey ){
-    const { colFontSize = {} } = this.props.property;
+    const property = this.props.property || this.property;
+    const { colFontSize } = property;
     if (isValidObject(colFontSize)){
         if (!isValidVariable(colFontSize[dataKey]) || !isValidVariable(colFontSize[dataKey]['font-size'])) {
             return '';

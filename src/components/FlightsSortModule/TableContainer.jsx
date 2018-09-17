@@ -157,6 +157,7 @@ const mapStateToProps = ( state ) =>{
     const { userId = '' } = state.loginUserInfo;
     const { scopeFilter = 'all', statusFilter = [] } = state.filterMatches;
     const tableDatas = sortTableDatas(tableDatasMap, quicklyFilters, scopeFilter, statusFilter, start, end, dataRange, scrollId, scroll );
+    const { dialogName } = state.operationDatas;
     return ({
         property,
         tableDatas: tableDatas,
@@ -166,7 +167,8 @@ const mapStateToProps = ( state ) =>{
         orderBy,
         scrollId,
         userId,
-        dataRange
+        dataRange,
+        dialogName
     })
 };
 

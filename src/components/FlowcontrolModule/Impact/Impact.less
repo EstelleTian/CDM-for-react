@@ -3,7 +3,7 @@
     border-bottom: 1px solid #aaa;
     .main-title{
       text-align: center;
-      margin-bottom: 0.5rem;
+      margin: 0.5rem 0;
       >span{
         font-size: 1.75rem;
       }
@@ -13,29 +13,38 @@
       .effectiveTime{
         padding-right: 1rem;
       }
+      .status.running {
+        color: #38b48b ;
+      }
+      .status.future {
+        color: #2ca9e1;
+      }
+      .status.terminated {
+        color: #d69090;
+      }
+      .status.cancel {
+        color: #a59aca;
+      }
+      .status.finished {
+        color: #afafb0;
+      }
     }
     .main-date{
       padding: 0px 5rem;
-      margin: 0.5rem 0;
       >div{
         font-size: 1.25rem;
+        margin: 0.5rem 0 0.25rem 0;
       }
     }
   }
+  .flowcontrol-table{
+    margin-top: 1rem;
+    height: 50rem;
+  }
 }
 
-.status.running {
-  color: #38b48b ;
-}
-.status.future {
-  color: #2ca9e1;
-}
-.status.terminated {
-  color: #d69090;
-}
-.status.cancel {
-  color: #a59aca;
-}
-.status.finished {
-  color: #afafb0;
+.collaborate-canvas{
+  .content{
+    padding: 0;
+  }
 }

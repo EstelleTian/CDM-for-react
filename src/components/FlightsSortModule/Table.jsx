@@ -5,8 +5,10 @@ import shallowequal from 'shallowequal';
 import { requestGet } from 'utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from 'utils/request-urls';
 import { isValidVariable, isValidObject, calculateStringTimeDiff } from 'utils/basic-verify';
+import { resetFrozenTableStyle, sortDataMap } from "utils/table-common-funcs";
 import { TableColumns } from "utils/table-config";
 import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize, convertAlarmData, convertExpiredData, converSpecialtData, convertTodoData } from "utils/flight-grid-table-data-util";
+import OperationDialogContainer from 'components/OperationDialog/OperationDialogContainer';
 import './Table.less';
 
 class Table extends React.Component{
@@ -18,10 +20,9 @@ class Table extends React.Component{
         this.getAirportsParams = this.getAirportsParams.bind(this);
         this.tableOnChange = this.tableOnChange.bind(this);
         this.scrollToRow = this.scrollToRow.bind(this);
-        this.resetFrozenTableStyle = this.resetFrozenTableStyle.bind(this);
         this.handleSubTableDatas = this.handleSubTableDatas.bind(this);
         this.onListenTableScroll = this.onListenTableScroll.bind(this);
-        this.sortDataMap = this.sortDataMap.bind(this);
+        this.sortDataMap = sortDataMap.bind(this);
         this.convertData = convertData.bind(this);
         this.convertAlarmData = convertAlarmData.bind(this);
         this.convertExpiredData = convertExpiredData.bind(this);
@@ -70,7 +71,7 @@ class Table extends React.Component{
         //如果协调窗口开启，不更新
         if( $(".dialog-container").length <= 0 ){
             const { updateTableDatas, updateGenerateInfo, updateGenerateTime, orderBy, updateTableConditionScrollId, autoScroll, updateTableConditionRange, updateTableConditionScroll, dataRange } = this.props;
-                    //表格数据
+            //表格数据
             let dataMap = {};
             //数据生成时间
             const generateTime = res.generateTime;
@@ -175,33 +176,6 @@ class Table extends React.Component{
         });
 
     };
-    //表格数据排序
-    sortDataMap( dataMap ){
-        //默认排序队列
-        const sortArr = ["ATOT", "CTOT", "TOBT", "EOBT", "SOBT", "ID"];
-        let tableDatas = Object.values( dataMap ); //转为数组
-        //排序
-        tableDatas = tableDatas.sort((d1, d2) => {
-            for (let index in sortArr) {
-                let sortColumnName = sortArr[index];
-                let data1 = d1[sortColumnName] + "";
-                let data2 = d2[sortColumnName] + "";
-                if (isValidVariable(data1) && isValidVariable(data2)) {
-                    let res = data1.localeCompare(data2);
-                    if (0 != res) {
-                        return res;
-                    }
-                } else if (isValidVariable(data1)) {
-                    return -1;
-                } else if (isValidVariable(data2)) {
-                    return 1;
-                } else {
-                    continue;
-                }
-            }
-        });
-        return tableDatas;
-    };
     /* 处理副表数据后保存到store中
      * data : 全部航班数据集合
      * tableName ： 表名称
@@ -270,7 +244,7 @@ class Table extends React.Component{
                 console.error( "获取参数接口失败，错误未知." );
             }
         }
-    }
+    };
     //转化用户配置信息
     convertUserProperty( user_property ){
         const { updateTableDatasProperty, updateTableDatasColumns, updateSubTableDatasProperty } = this.props;
@@ -442,28 +416,6 @@ class Table extends React.Component{
         const { tableDatas } = this.props;
 
     };
-    //重置冻结表样式
-    resetFrozenTableStyle(){
-        const $fixedLeft = $(".ant-table-fixed-left");
-        const $fixedRight = $(".ant-table-fixed-right");
-
-        const handleOverflow = ( $dom ) => {
-            if( $dom.length > 0 ){
-                $dom.addClass('overflow');
-                const $scroll = $(".ant-table-scroll");
-
-                const antScroll = $scroll.height() || 0;
-                const antBody = $(".ant-table-body", $scroll).height() || 0;
-                const antHead = $(".ant-table-header", $scroll).height() || 0;
-                if( antBody + antHead + 5 < antScroll ){
-                    $dom.removeClass('overflow');
-                }
-            }
-        }
-        handleOverflow( $fixedLeft );
-        handleOverflow( $fixedRight );
-    }
-
     onListenTableScroll(){
         const $scrollDom = $(".ant-table-body");
         const { updateTableConditionRangeByKey, autoScroll } = this.props;
@@ -575,7 +527,7 @@ class Table extends React.Component{
         //根据定位航班id获取数据范围
         this.resetDataRange();
         //处理冻结表格样式
-        this.resetFrozenTableStyle();
+        resetFrozenTableStyle();
         //监听滚动
         this.onListenTableScroll();
     }
@@ -588,6 +540,10 @@ class Table extends React.Component{
         if( this.props.autoScroll != nextProps.autoScroll ){
             return true;
         }
+        //如果dialogName不一样，更新
+        if( this.props.dialogName != nextProps.dialogName ){
+            return true;
+        }
         const thisTableDatas = this.props.tableDatas || [];
         const nextTableDatas = nextProps.tableDatas || [];
         const isDiff = shallowequal(thisTableDatas, nextTableDatas);
@@ -598,9 +554,9 @@ class Table extends React.Component{
         }
     }
     render(){
-        const { tableDatas, tableColumns, scrollX} = this.props;
+        const { tableDatas, tableColumns, scrollX, dialogName} = this.props;
         return(
-            <Col span={24} className="main-table">
+            <Col span={24} className="main-table" tablename="main">
                 <AntTable
                     columns={ tableColumns }
                     dataSource={ tableDatas }
@@ -621,6 +577,9 @@ class Table extends React.Component{
                          }
                      }}
                 />
+                {
+                    dialogName == "main" ? <OperationDialogContainer /> : ""
+                }
             </Col>
         )
     }

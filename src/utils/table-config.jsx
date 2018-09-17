@@ -156,6 +156,7 @@ const handleColumnRender = (value, row, index, colunmName) => {
     return {
         children: value,
         props:{
+            className: "nowrap",
             title: title,
             style: resStyleObj
         }
@@ -171,6 +172,8 @@ const handleColumnWidth = ( type, title ) => {
         width = 85;
     }else if( title == 'RWY' ){
         width = 65;
+    }else if( title == '资质' ){
+        width = 132;
     }else if( !numReg.test(title) && title.length == 4 ){ //不是字母且是4位
         width = 90;
     }else if( numReg.test(title) && title.length == 4 ){ //是字母且是4位
@@ -243,7 +246,7 @@ const handleColumnWidth = ( type, title ) => {
  * colunmName  列名
  * record  行对象
  */
-const handleRightClickFunc = function( thisProxy, colunmName, record, x, y){
+const handleRightClickFunc = function( thisProxy, colunmName, record, x, y, tableName){
     if( isValidVariable(colunmName) ){
         const { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } = thisProxy.props;
         //根据列名和行对象，获取选中单元格的值
@@ -251,10 +254,10 @@ const handleRightClickFunc = function( thisProxy, colunmName, record, x, y){
         //显示航班协调窗口
         updateOperationDatasAuth(optValue, record);
         //更新数据，需要展开的协调窗口名称和位置
-        updateOperationDatasShowNameAndPosition( "", 0, 0 );
+        updateOperationDatasShowNameAndPosition( "", 0, 0, tableName );
         //更新数据，需要展开的协调窗口名称和位置
         setTimeout(()=>{
-            updateOperationDatasShowNameAndPosition( colunmName, x, y );
+            updateOperationDatasShowNameAndPosition( colunmName, x, y, tableName );
         }, 0)
 
 
@@ -347,20 +350,33 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
                     const offsetTop = targetParent.offsetTop;
                     const targetHeight = targetParent.clientHeight;
                     const targetWidth = targetParent.clientWidth;
-                    const $scrollDom = $(".ant-table-body");
+                    const $mainTable = $(targetParent).parents(".main-table");
+                    const $scrollDom = $(".ant-table-body", $mainTable );
+                    const tableName = $mainTable.attr("tablename"); //获取选中表格名称
                     //滚动条滚动高度
                     const orgTop = $scrollDom[0].scrollTop;
                     const orgLeft = $scrollDom[0].scrollLeft;
-                    //加上指示箭头宽度的1/2
-                    let x = offsetLeft - orgLeft + targetWidth + 6;
                     //加上表格头和表格查询栏高度
-                    let y = offsetTop - orgTop + 68;
-
-                    if( x < 0 ){
-                        x = targetWidth + 6;
+                    let otherHeight = 68;
+                    let otherWidth = 6;
+                    if(tableName == "impact"){
+                        otherHeight = 200;
+                        otherWidth = 18;
                     }
 
-                    handleRightClickFunc(thisProxy, colunmName, record, x, y);
+                    //加上指示箭头宽度的1/2
+                    let x = offsetLeft - orgLeft + targetWidth + otherWidth;
+                    let y = offsetTop - orgTop + otherHeight - targetHeight;
+
+                    if( x < 0 ){
+                        if( colunmName == "FLIGHTID" ){
+                            x = offsetLeft + targetWidth + otherWidth;
+                        }else{
+                            x = targetWidth + otherWidth;
+                        }
+                    }
+
+                    handleRightClickFunc(thisProxy, colunmName, record, x, y, tableName);
                 },
                 //左键
                 onClick: ( e )=>{

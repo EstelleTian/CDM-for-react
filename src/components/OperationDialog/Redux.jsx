@@ -7,11 +7,12 @@ const UPDATE_OPERATION_DATAS_SHOWNAME_AND_POSITION= 'operationDatas/update/showN
 const UPDATE_OPERATION_DATAS_AUTH= 'operationDatas/update/auth';
 //action-creator
 //更新显示协调窗口名称和位置
-const updateOperationDatasShowNameAndPosition = ( name, x, y ) => ({
+const updateOperationDatasShowNameAndPosition = ( name, x, y, tableName ) => ({
     type: UPDATE_OPERATION_DATAS_SHOWNAME_AND_POSITION,
     name,
     x,
-    y
+    y,
+    tableName
 });
 //更新显示协调窗口权限数据
 const updateOperationDatasAuth = ( auth, rowData ) => ({
@@ -27,6 +28,7 @@ const initData = {
     flightid: "", //航班号
     auth: [], //航班对应权限对象集合
     rowData: {}, //航班行数据对象集合
+    dialogName: "main" //展示在哪个表格上 main 主表  impact 流控影响航班表
 };
 //store 协调窗口数据
 const operationDatas = ( state = initData, action) => {
@@ -37,6 +39,7 @@ const operationDatas = ( state = initData, action) => {
                 showName: action.name || "",
                 x: action.x || 0,
                 y: action.y || 0,
+                dialogName: action.tableName
             }
         }
         case UPDATE_OPERATION_DATAS_AUTH: {

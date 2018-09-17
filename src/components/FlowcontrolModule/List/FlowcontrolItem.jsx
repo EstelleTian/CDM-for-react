@@ -1,12 +1,13 @@
 //流控信息---菜单操作功能
 import React from 'react';
-import { Row, Col, Icon } from 'antd';
-import './FlowcontrolItem.less';
+import { Row, Col, Icon, Modal } from 'antd';
+import {isValidVariable} from "utils/basic-verify";
 import { convertFlowcontrolData } from 'utils/flowcontrol-data-util';
 import CreateLayer from "components/CreateLayer/CreateLayer";
 import FlowcontrolDetailContainer from "components/FlowcontrolModule/Detail/FlowcontrolDetailContainer";
 import FlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/FlowcontrolDialog/FlowcontrolDialogContainer";
 import ImpactContainer from "components/FlowcontrolModule/Impact/ImpactContainer";
+import './FlowcontrolItem.less';
 
 class FlowcontrolItem extends React.Component{
     constructor( props ){
@@ -27,16 +28,32 @@ class FlowcontrolItem extends React.Component{
         }
     }
     //操作列--根据key开启操作模块（详情、修改页面、流控影响航班、终止等）
-    openOperationDialog( key ){
+    openOperationDialog( key, casaStatus ){
         if( key != undefined || key != "" ){
-            this.setState({
-                [key] : {
-                    show: true
+            if( key == 'impact' ){
+                if( isValidVariable(casaStatus) && casaStatus == "计算中" ){
+                    Modal.warning({
+                        iconType : 'exclamation-circle',
+                        title: '提示',
+                        content: '流控正在计算中,请稍后再试',
+                        okText: `确定`
+                    });
+                }else{
+                    this.setState({
+                        [key] : {
+                            show: true
+                        }
+                    });
                 }
-            });
+            }else{
+                this.setState({
+                    [key] : {
+                        show: true
+                    }
+                });
+            }
         }
-
-    }
+    };
     //当点击关闭按钮时，type: 类型
     onCloseBtn( type ){
         this.setState({
@@ -63,16 +80,13 @@ class FlowcontrolItem extends React.Component{
                     >
                         <span className="number"  title={placeType ? `${placeType}流控`: ''} >{indexNumber + " " + placeType }</span>
                         {name}
-
                     </Col>
                     <Col  span={1} ></Col>
                     <Col  span={6} className="effective-time" title={effectiveDate ? `${effectiveDate}`: ''} >
                         <i className="iconfont icon-time" title="生效时间" />
                         <span>{effectiveTime}</span>
                     </Col>
-
                 </Row>
-
                 <Row className="row value-title">
                     <Col span={4} >限制类型</Col>
                     <Col span={4} >限制数值</Col>
@@ -88,18 +102,18 @@ class FlowcontrolItem extends React.Component{
                     <Col span={4} className="reason" title={reason ? `原因:${reason}` : ''}>{reason}</Col>
                 </Row>
                 <Row className="row">
-                    <Col span={10}>
-
+                    <Col span={3} className="casaStatus">
+                        { casaStatus }
                     </Col>
-                    <Col className="operator" span={14}>
+                    <Col className="operator" span={21}>
                         <i className="iconfont icon-detail" title="详情" onClick={()=>{
-                            this.openOperationDialog("detail");
+                            this.openOperationDialog("detail", casaStatus);
                         }} />
                         <i className="iconfont icon-effect" title="影响" onClick={()=>{
-                            this.openOperationDialog("impact");
+                            this.openOperationDialog("impact", casaStatus);
                         }}/>
                         <i className="iconfont icon-edit" title="修改" onClick={()=>{
-                            this.openOperationDialog("modify");
+                            this.openOperationDialog("modify", casaStatus);
                         }}/>
                         <i className="iconfont icon-stop" title="终止"/>
                     </Col>
@@ -147,8 +161,9 @@ class FlowcontrolItem extends React.Component{
                         >
                             <ImpactContainer
                                 formatData = { formatData }
-                                x = { 360 }
+                                x = { 200 }
                                 y = { 60 }
+                                id = {id}
                                 clickCloseBtn={ this.onCloseBtn }
                             />
                         </CreateLayer> : ''
