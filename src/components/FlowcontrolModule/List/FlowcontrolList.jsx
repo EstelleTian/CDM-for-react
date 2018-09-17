@@ -14,6 +14,7 @@ class FlowcontrolList extends React.Component{
         this.getParams = this.getParams.bind(this);
         this.getFlowcontrolDatas = this.getFlowcontrolDatas.bind(this);
         this.handleUpdateFlowcontrolData = this.handleUpdateFlowcontrolData.bind(this);
+        this.convertData = this.convertData.bind(this);
         this.state = {
             flowcontrolTimerId : 0
         };
@@ -59,9 +60,12 @@ class FlowcontrolList extends React.Component{
         // 更新流控数据生成时间
         updateFlowGenerateTime(generateTime);
         // 取流控数据
-        const {result = {}} = res;
+        const {result = {}, authMap = {} } = res;
+        // 合并数据
+        const flowDatas = this.convertData(result, authMap);
+
         // 更新流控数据
-        updateFlowcontrolDatas(result);
+        updateFlowcontrolDatas(flowDatas);
         // 定时30秒后再次获取流控数据并更新
         const flowcontrolTimerId = setTimeout(() => {
             // 获取流控数据
@@ -70,6 +74,20 @@ class FlowcontrolList extends React.Component{
         this.setState({
             flowcontrolTimerId
         });
+    }
+    // 将操作权限与流控数据合并
+    convertData(dataMap,authMap) {
+        let result = {};
+        let map = Object.keys(dataMap);
+        map.map((item,index) => {
+            let auth = authMap[item];
+            if(auth){
+                result[item] = {...dataMap[item],auth}
+            }
+        });
+
+        return result
+
     }
 
     // 立即调用

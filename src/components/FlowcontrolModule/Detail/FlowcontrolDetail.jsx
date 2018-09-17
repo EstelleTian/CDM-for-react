@@ -14,7 +14,6 @@ class FlowcontrolDetail extends React.Component {
         super(props);
         this.getFlowcontrolDetail = this.getFlowcontrolDetail.bind(this);
         this.handleFlowcontrolDetailData = this.handleFlowcontrolDetailData.bind(this);
-        this.convertFlowcontrolData = convertFlowcontrolData.bind(this);
         this.converFlowRecords = this.converFlowRecords.bind(this);
         this.getColums = this.getColums.bind(this);
         this.batchFormattingTime = this.batchFormattingTime.bind(this);
@@ -44,8 +43,9 @@ class FlowcontrolDetail extends React.Component {
         // 取响应结果中的流控数据
         if (res) {
             const { flow, flowRecords } = res;
+            const {  systemConfig } = this.props;
             // 转换流控信息数据
-            const flowFormatDatas = this.convertFlowcontrolData( flow );
+            const flowFormatDatas = convertFlowcontrolData( flow, null,  systemConfig);
             this.setState({
                 ...flowFormatDatas
             });

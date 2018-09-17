@@ -9,6 +9,61 @@ import {getDayTimeFromString} from "utils/basic-verify";
  */
 const FlowcontrolConstant = {
 
+    option : [
+
+        {
+
+            key: 'flowcontrolDetail',
+            en : 'flowcontrolDetail',
+            cn : '详情',
+            type : 'detail',
+            order : 100
+        },
+
+        {
+
+            key: 'flowcontrolImpactFlights',
+            en : 'flowcontrolImpactFlights',
+            cn : '影响',
+            type : 'effect',
+            order : 200
+        },
+        {
+
+            key: 'flowcontrolEdit',
+            en : 'flowcontrolEdit',
+            cn : '修改',
+            type : 'edit',
+            order : 300
+        },
+
+        {
+
+            key: 'flowcontrolReserveSlot',
+            en : 'flowcontrolReserveSlot',
+            cn : '预留时隙',
+            type : 'former',
+            order : 400
+        },
+
+        {
+
+            key: 'terminateFlowControl',
+            en : 'terminateFlowControl',
+            type : 'stop',
+            cn : '终止',
+            order : 1300
+        }, {
+
+            key: 'release',
+            en : 'release',
+            type : 'stop',
+            cn : '正常放行',
+            order : 1301
+        },
+
+    ],
+
     FLOWCONTROL_TYPE_LONG: 0, // 跨日流控
     FLOWCONTROL_TYPE_NORMAL: 1, // 常规流控
 
@@ -516,12 +571,35 @@ const FlowcontrolUtil = {
             }
         }
         return resObj;
+    },
+    /**
+     * 获取操作项
+     *
+     * @param auth
+     * @returns
+     */
+    setOperations(auth) {
+        let authMap = [];
+        for (let i in auth){
+            FlowcontrolConstant.option.map((item,index) => {
+                if(i == item.key){
+                    let obj = {};
+                    let show = auth[i];
+                    obj = {...item, show};
+                    authMap.push(obj);
+                }
+            });
+
+        }
+
+
+        return authMap;
     }
 
 };
 
 // 流控数据转换
-const convertFlowcontrolData = function(data, generateTime){
+const convertFlowcontrolData = function(data, generateTime, systemConfig){
     // 校验数据
     if(!isValidObject(data)){
         return {};
@@ -547,7 +625,7 @@ const convertFlowcontrolData = function(data, generateTime){
     // 状态对应的样式名称
     result.statusClassName = FlowcontrolUtil.setstatusClassName(data, generateTime);
     // 流控状态
-    const {systemConfig} = this.props;
+    // const {systemConfig} = this.props;
     result.flowStatus = FlowcontrolUtil.setflowStatus(data, systemConfig).statusZh;
     result.flowStatusClassName = FlowcontrolUtil.setflowStatus(data, systemConfig).className;
     // 发布者
@@ -606,6 +684,8 @@ const convertFlowcontrolData = function(data, generateTime){
     result.dialogName = FlowcontrolUtil.setDialogName(data);
     // 流控计算状态
     result.casaStatus = FlowcontrolUtil.setCasaStatus(data, generateTime);
+
+    result.operations = FlowcontrolUtil.setOperations(data.auth);
     return result;
 };
 
