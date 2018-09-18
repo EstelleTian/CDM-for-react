@@ -299,7 +299,9 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
         width: 60,
         fixed: 'left'
     };
-    columns.push(optObj);
+    if( type == "" ){
+        columns.push(optObj);
+    }
     for(let key in colNames){
         const colunmName = key;
         //去掉ID列
