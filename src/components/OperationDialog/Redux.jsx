@@ -39,7 +39,7 @@ const operationDatas = ( state = initData, action) => {
                 showName: action.name || "",
                 x: action.x || 0,
                 y: action.y || 0,
-                dialogName: action.tableName
+                dialogName: action.tableName || ""
             }
         }
         case UPDATE_OPERATION_DATAS_AUTH: {

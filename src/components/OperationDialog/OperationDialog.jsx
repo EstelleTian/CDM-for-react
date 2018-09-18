@@ -103,9 +103,9 @@ class OperationDialog extends React.Component{
 
     //关闭协调窗口
     closeCollaborateDialog(){
-        const { updateOperationDatasShowNameAndPosition } = this.props;
+        const { updateOperationDatasShowNameAndPosition, tableName } = this.props;
         //更新数据，需要展开的协调窗口名称和位置
-        updateOperationDatasShowNameAndPosition( "", 0, 0 );
+        updateOperationDatasShowNameAndPosition( "", 0, 0, tableName );
     };
     //关闭弹出模态框窗口
     closeDialog( dialogKey ){
@@ -342,8 +342,7 @@ class OperationDialog extends React.Component{
 
     render(){
         const { userId, deiceGroupName, deicePositionArray, generateTime } = this.props;
-        const { showName = "", auth, rowData = {}, x = 0, y = 0 } = this.props.operationDatas;
-
+        const { auth, showName = "", rowData = {}, x = 0, y = 0 } = this.props.operationDatas;
         //时间列显示权限
         let timeAuth = this.getTimeColumnsAuth( rowData, showName );
 

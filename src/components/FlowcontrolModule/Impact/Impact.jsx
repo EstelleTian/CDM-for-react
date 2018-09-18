@@ -1,15 +1,19 @@
 import React from 'react';
-import { Row, Col, Icon, Table as AntTable, message } from 'antd';
+import { Row, Col, Icon, Table as AntTable, message, Input } from 'antd';
 import DraggableModule from "components/DraggableModule/DraggableModule";
 import {isValidObject, isValidVariable} from "utils/basic-verify";
 import { resetFrozenTableStyle, sortDataMap } from "utils/table-common-funcs";
 import { requestGet } from "utils/request-actions";
 import { retrieveFlowcontrolImpactFlightsUrl, getUserPropertyUrl } from "utils/request-urls";
 import { TableColumns } from "utils/table-config";
+import {OperationReason} from "utils/flightcoordination";
+import Loader from "components/Loader/Loader";
 import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "utils/flight-grid-table-data-util";
 import OperationDialogContainer from 'components/OperationDialog/OperationDialogContainer';
 import './Impact.less';
-import {OperationReason} from "utils/flightcoordination";
+
+
+const Search = Input.Search;
 
 class Impact extends React.Component{
     constructor( props ){
@@ -24,6 +28,7 @@ class Impact extends React.Component{
         this.convertUserProperty = this.convertUserProperty.bind(this);
         this.convertToTableDatas = this.convertToTableDatas.bind(this);
         this.requestCallback = this.requestCallback.bind(this);
+        this.onQuicklySearch = this.onQuicklySearch.bind(this);
 
         this.state = {
             flowTimerId: 0,
@@ -32,7 +37,10 @@ class Impact extends React.Component{
             airportConfigurationMap: {}, //机场参数信息
             tableColumns: [],
             tableDatasMap: {}, //表格数据
-            scrollX: 0
+            scrollX: 0,
+            flowGenerateTime: "",
+            isfold: true, //流控影响航班 收起 flase、展开 true
+            quicklyFilters: "" //快速过滤条件
         };
     }
     //转换系统基本参数信息
@@ -155,7 +163,8 @@ class Impact extends React.Component{
             }
         }
         this.setState({
-            tableDatasMap: dataMap
+            tableDatasMap: dataMap,
+            flowGenerateTime: generateTime
         });
         const flowTimerId = setTimeout(() => {
             //获取机场航班
@@ -172,8 +181,33 @@ class Impact extends React.Component{
     };
     //将表格数据转换为数组格式
     convertToTableDatas( tableDatasMap ){
+        const { quicklyFilters } = this.state;
+        //条件过滤查询
+        const quicklyFilterFunc = ( tableDatas, quicklyFilters ) => {
+            if( isValidVariable(quicklyFilters) ){
+                tableDatas = tableDatas.filter( ( item ) => {
+                    let flag = false;
+                    for(let i in item){
+                        if( i.indexOf("_style") == -1 && i.indexOf("_title") == -1 ){
+                            const itemVal = item[i] + "" || "";
+                            //若值包含过滤条件，则中，否则不显示
+                            if( isValidVariable(itemVal) ){
+                                if( itemVal.toLowerCase().indexOf( quicklyFilters.toLowerCase() ) > -1 ){
+                                    flag = true;
+                                }
+                            }
+                        }
+                    }
+                    return flag;
+                })
+            }
+            return tableDatas;
+        };
+
         //表格数据进行排序，排序后再存储
-        const sortedDataArr = sortDataMap( tableDatasMap );
+        let sortedDataArr = sortDataMap( tableDatasMap );
+        //根据条件过滤
+        sortedDataArr = quicklyFilterFunc( sortedDataArr, quicklyFilters );
         let newSortedDataArr = [];
         //增加行号值
         for(let i in sortedDataArr ){
@@ -212,6 +246,14 @@ class Impact extends React.Component{
             message.error( showMes, 5 );
         }
     };
+    //输入框快速过滤
+    onQuicklySearch( value ){
+        console.log(value);
+        const val = value.trim();
+        this.setState({
+            quicklyFilters: val
+        })
+    }
 
     componentDidMount(){
         //请求
@@ -250,9 +292,9 @@ class Impact extends React.Component{
     }
 
     render(){
-        const { formatData, clickCloseBtn, width = 1500, x, y, dialogName} = this.props;
+        const { formatData, clickCloseBtn, width = 1500, x, y, dialogName, type} = this.props;
         const { name, effectiveTime, publishUserZh, flowStatus, flowStatusClassName, startTime, endTime, generateTime, lastModifyTime, updateTime } = formatData;
-        const { tableColumns, scrollX, tableDatasMap } = this.state;
+        const { tableColumns, scrollX, tableDatasMap, flowGenerateTime, isfold } = this.state;
         const tableDatas = this.convertToTableDatas(tableDatasMap);
         return (
             <DraggableModule
@@ -268,11 +310,34 @@ class Impact extends React.Component{
                             <div
                                 className="close-target"
                                 onClick={ () => {
-                                    clickCloseBtn("impact");
+                                    clickCloseBtn(type);
                                 } }
                             >
                                 <Icon type="close" title="关闭"/>
                             </div>
+                            {
+                                isfold ?<div
+                                    className="close-target"
+                                    onClick={ () => {
+                                        this.setState({
+                                            isfold: false
+                                        })
+                                    } }
+                                    title = "收起"
+                                >
+                                    <i className="iconfont icon-arrow-on"/>
+                                </div> : <div
+                                    className="close-target"
+                                    onClick={ () => {
+                                        this.setState({
+                                            isfold: true
+                                        })
+                                    } }
+                                    title = "展开"
+                                >
+                                    <i className="iconfont icon-arrow-down"/>
+                                </div>
+                            }
                         </Row>
                         <div className="content">
                             <Row className="short-info">
@@ -298,40 +363,60 @@ class Impact extends React.Component{
                                     <Col span={4}>{publishUserZh || "——"}</Col>
                                 </Col>
                             </Row>
-                            <Row>
-                                <Col span={24} className="main-table flowcontrol-table"  tablename="impact">
-                                    <AntTable
-                                        columns={ tableColumns }
-                                        dataSource={ tableDatas }
-                                        rowKey="ID"
-                                        size="small"
-                                        scroll={{
-                                            x: scrollX,
-                                            y: '100%'
-                                        }}
-                                        pagination = { false }
-                                        onChange = { this.tableOnChange }
-                                        onRow = {(record, index) =>{
-                                            const id = record["ID"] || "";
-                                            //用于自动滚动定位，对tr增加属性值 index为行号
-                                            return {
-                                                flightid: id,
-                                                rowid: index*1+1
-                                            }
-                                        }}
-                                    />
-                                </Col>
-                            </Row>
+                            {
+                                isfold ?
+                                <Row>
+                                    <Col span={24} className="menu">
+                                        <Search
+                                            placeholder = "快速查询"
+                                            className = "quickly-search"
+                                            onSearch = { this.onQuicklySearch }
+                                            style = {{ width: 200 }}
+                                        />
+                                        <span className="total">
+                                            <label> { tableDatas.length || "0" }</label>
+                                            <span>条受控航班</span>
+                                        </span>
+                                    </Col>
+                                    <Col span={24} className="main-table flowcontrol-table"  tablename="impact">
+                                        <AntTable
+                                            columns={ tableColumns }
+                                            dataSource={ tableDatas }
+                                            rowKey="ID"
+                                            size="small"
+                                            scroll={{
+                                                x: scrollX,
+                                                y: '100%'
+                                            }}
+                                            pagination = { false }
+                                            onChange = { this.tableOnChange }
+                                            onRow = {(record, index) =>{
+                                                const id = record["ID"] || "";
+                                                //用于自动滚动定位，对tr增加属性值 index为行号
+                                                return {
+                                                    flightid: id,
+                                                    rowid: index*1+1
+                                                }
+                                            }}
+                                        />
+                                    </Col>
+                                    { flowGenerateTime ? "" : <Loader />}
+                                </Row>
+                                : ""
+                            }
+
                             {
                                 dialogName == "impact" ?
                                     <OperationDialogContainer
                                         requestCallback = { this.requestCallback }
+                                        tableName = "impact"
                                     />
                                     : ""
                             }
 
                         </div>
                     </div>
+
                 </div>
             </DraggableModule>
         )

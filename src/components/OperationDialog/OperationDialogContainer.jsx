@@ -26,7 +26,8 @@ const mapStateToProps = ( state, nextProps ) => ({
     deicePositionArray: getDeicePosition( state ), //冰坪下拉框
     operationDatas: state.operationDatas,
     property: state.tableDatas.property,
-    requestCallback: nextProps.requestCallback
+    requestCallback: nextProps.requestCallback,
+    tableName: nextProps.tableName
 })
 
 const mapDispatchToProps = {

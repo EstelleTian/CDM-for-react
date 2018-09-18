@@ -359,7 +359,7 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
                     let otherHeight = 68;
                     let otherWidth = 6;
                     if(tableName == "impact"){
-                        otherHeight = 200;
+                        otherHeight = 232;
                         otherWidth = 18;
                     }
 

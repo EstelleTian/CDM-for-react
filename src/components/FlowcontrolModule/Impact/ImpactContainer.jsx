@@ -11,6 +11,7 @@ const mapStateToProps = ( state, nextProps ) => ({
     clickCloseBtn: nextProps.clickCloseBtn,
     dialogName: state.operationDatas.dialogName,
     id: nextProps.id,
+    type: nextProps.type,
     x: nextProps.x || 0,
     y: nextProps.y || 0
 });

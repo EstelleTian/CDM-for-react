@@ -176,6 +176,7 @@ class FlowcontrolItem extends React.Component{
                         >
                             <ImpactContainer
                                 formatData = { formatData }
+                                type = "flowcontrolImpactFlights"
                                 x = { 200 }
                                 y = { 60 }
                                 id = {id}

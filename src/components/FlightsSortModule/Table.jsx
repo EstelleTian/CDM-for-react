@@ -610,6 +610,7 @@ class Table extends React.Component{
                     dialogName == "main"
                         ? <OperationDialogContainer
                             requestCallback = { this.requestCallback }
+                            tableName = "main"
                             />
                         : ""
                 }
