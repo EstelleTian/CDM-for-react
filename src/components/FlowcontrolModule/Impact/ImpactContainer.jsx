@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom';
 import Impact from './Impact'
 import { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } from "../../OperationDialog/Redux";
+import {updateDetailModalDatasByName, updateDetailModalDatasVisible} from "components/DetailModule/Redux";
 
 const mapStateToProps = ( state, nextProps ) => ({
     userId: state.loginUserInfo.userId || "",
@@ -18,7 +19,9 @@ const mapStateToProps = ( state, nextProps ) => ({
 
 const mapDispatchToProps = {
     updateOperationDatasShowNameAndPosition,
-    updateOperationDatasAuth
+    updateOperationDatasAuth,
+    updateDetailModalDatasByName,
+    updateDetailModalDatasVisible
 };
 
 const ImpactContainer = connect(
