@@ -1,10 +1,11 @@
 import React from 'react';
-import { Table as AntTable, Col } from 'antd';
+import { Table as AntTable, Col, message } from 'antd';
 import $ from 'jquery';
 import shallowequal from 'shallowequal';
 import { requestGet } from 'utils/request-actions';
 import { getAllAirportsUrl, getUserPropertyUrl } from 'utils/request-urls';
 import { isValidVariable, isValidObject, calculateStringTimeDiff } from 'utils/basic-verify';
+import { OperationReason } from "utils/flightcoordination";
 import { resetFrozenTableStyle, sortDataMap } from "utils/table-common-funcs";
 import { TableColumns } from "utils/table-config";
 import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize, convertAlarmData, convertExpiredData, converSpecialtData, convertTodoData } from "utils/flight-grid-table-data-util";
@@ -22,6 +23,7 @@ class Table extends React.Component{
         this.scrollToRow = this.scrollToRow.bind(this);
         this.handleSubTableDatas = this.handleSubTableDatas.bind(this);
         this.onListenTableScroll = this.onListenTableScroll.bind(this);
+        this.requestCallback = this.requestCallback.bind(this);
         this.sortDataMap = sortDataMap.bind(this);
         this.convertData = convertData.bind(this);
         this.convertAlarmData = convertAlarmData.bind(this);
@@ -452,6 +454,33 @@ class Table extends React.Component{
         })
     }
 
+    //表单提交后--单条数据更新方法
+    requestCallback( res, mes ){
+        const { updateMultiTableDatas } = this.props;
+        const { flightView, generateTime, error } = res;
+        if( isValidVariable(flightView) ){
+            const { flightFieldViewMap = {}, flightAuthMap = {} } = flightView;
+            const { ID = {} } =flightFieldViewMap;
+            const id = ID.value;
+            //数据转化
+            const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
+            //将航班原数据补充到航班对象中
+            data.originalData = flightView;
+            const map = { [id]: data };
+            //更新数据
+            updateMultiTableDatas( map );
+            //提示成功
+            message.success( mes + "成功", 5 );
+
+        }else{
+            //提示失败
+            const msg = error.message || "";
+            const res = OperationReason[msg] || msg;
+            const showMes = mes + "失败," + res;
+            message.error( showMes, 5 );
+        }
+    };
+
     componentWillMount(){
         const { userId, history } = this.props;
         if( !isValidVariable(userId) ){
@@ -578,7 +607,11 @@ class Table extends React.Component{
                      }}
                 />
                 {
-                    dialogName == "main" ? <OperationDialogContainer /> : ""
+                    dialogName == "main"
+                        ? <OperationDialogContainer
+                            requestCallback = { this.requestCallback }
+                            />
+                        : ""
                 }
             </Col>
         )

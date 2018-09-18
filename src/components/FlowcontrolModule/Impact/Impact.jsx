@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, Icon, Table as AntTable } from 'antd';
+import { Row, Col, Icon, Table as AntTable, message } from 'antd';
 import DraggableModule from "components/DraggableModule/DraggableModule";
 import {isValidObject, isValidVariable} from "utils/basic-verify";
 import { resetFrozenTableStyle, sortDataMap } from "utils/table-common-funcs";
@@ -9,6 +9,7 @@ import { TableColumns } from "utils/table-config";
 import { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize } from "utils/flight-grid-table-data-util";
 import OperationDialogContainer from 'components/OperationDialog/OperationDialogContainer';
 import './Impact.less';
+import {OperationReason} from "utils/flightcoordination";
 
 class Impact extends React.Component{
     constructor( props ){
@@ -21,17 +22,19 @@ class Impact extends React.Component{
         this.convertFlowcontrolImpactFlightsInfo = this.convertFlowcontrolImpactFlightsInfo.bind(this);
         this.convertBasicConfigInfo = this.convertBasicConfigInfo.bind(this);
         this.convertUserProperty = this.convertUserProperty.bind(this);
+        this.convertToTableDatas = this.convertToTableDatas.bind(this);
+        this.requestCallback = this.requestCallback.bind(this);
 
         this.state = {
+            flowTimerId: 0,
             physicsRunwayGap: "", //跑道配置信息  "02L/20R,02L;02R/20L,02R"
             systemConfigMap: {}, //系统参数信息
             airportConfigurationMap: {}, //机场参数信息
             tableColumns: [],
-            tableDatas: [],
+            tableDatasMap: {}, //表格数据
             scrollX: 0
         };
     }
-
     //转换系统基本参数信息
     convertBasicConfigInfo( res ){
         const status = res.status*1;
@@ -130,6 +133,7 @@ class Impact extends React.Component{
     };
     //流控影响航班数据获取
     convertFlowcontrolImpactFlightsInfo(res){
+        const { userId, id } = this.props;
         //获取航班值
         const { flightsView = {}, generateTime  } = res;
         //航班id集合
@@ -150,9 +154,26 @@ class Impact extends React.Component{
                 dataMap[id] = data;
             }
         }
+        this.setState({
+            tableDatasMap: dataMap
+        });
+        const flowTimerId = setTimeout(() => {
+            //获取机场航班
+            const params = {
+                userId: userId,
+                id: id*1
+            };
+            requestGet( retrieveFlowcontrolImpactFlightsUrl, params, this.convertFlowcontrolImpactFlightsInfo );
+        }, 30*1000);
+        this.setState({
+            flowTimerId
+        });
 
+    };
+    //将表格数据转换为数组格式
+    convertToTableDatas( tableDatasMap ){
         //表格数据进行排序，排序后再存储
-        const sortedDataArr = sortDataMap( dataMap );
+        const sortedDataArr = sortDataMap( tableDatasMap );
         let newSortedDataArr = [];
         //增加行号值
         for(let i in sortedDataArr ){
@@ -160,11 +181,36 @@ class Impact extends React.Component{
             data["rownum"] = i*1 +1;
             newSortedDataArr.push(data);
         }
+        return newSortedDataArr;
+    }
+    //表单提交后--单条数据更新方法
+    requestCallback( res, mes ){
+        const { flightView, generateTime, error } = res;
+        if( isValidVariable(flightView) ){
+            const { flightFieldViewMap = {}, flightAuthMap = {} } = flightView;
+            const { ID = {} } =flightFieldViewMap;
+            const id = ID.value;
+            //数据转化
+            const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
+            //将航班原数据补充到航班对象中
+            data.originalData = flightView;
+            //更新数据
+            let { tableDatasMap } = this.state;
+            //若有该航班，更新;没有添加
+            tableDatasMap[id] = data;
+            this.setState({
+                tableDatasMap: tableDatasMap
+            });
+            //提示成功
+            message.success( mes + "成功", 5 );
 
-        this.setState({
-            tableDatas: newSortedDataArr
-        });
-
+        }else{
+            //提示失败
+            const msg = error.message || "";
+            const res = OperationReason[msg] || msg;
+            const showMes = mes + "失败," + res;
+            message.error( showMes, 5 );
+        }
     };
 
     componentDidMount(){
@@ -197,10 +243,17 @@ class Impact extends React.Component{
         resetFrozenTableStyle();
     }
 
+    componentWillUnmount(){
+        //清除定时器
+        const { flowTimerId = 0} = this.state;
+        clearTimeout( flowTimerId );
+    }
+
     render(){
         const { formatData, clickCloseBtn, width = 1500, x, y, dialogName} = this.props;
         const { name, effectiveTime, publishUserZh, flowStatus, flowStatusClassName, startTime, endTime, generateTime, lastModifyTime, updateTime } = formatData;
-        const { tableColumns, scrollX, tableDatas } = this.state;
+        const { tableColumns, scrollX, tableDatasMap } = this.state;
+        const tableDatas = this.convertToTableDatas(tableDatasMap);
         return (
             <DraggableModule
                 bounds = ".root"
@@ -270,7 +323,11 @@ class Impact extends React.Component{
                                 </Col>
                             </Row>
                             {
-                                dialogName == "impact" ? <OperationDialogContainer /> : ""
+                                dialogName == "impact" ?
+                                    <OperationDialogContainer
+                                        requestCallback = { this.requestCallback }
+                                    />
+                                    : ""
                             }
 
                         </div>

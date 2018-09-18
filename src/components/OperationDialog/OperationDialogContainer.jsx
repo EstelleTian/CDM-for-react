@@ -3,7 +3,6 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import OperationDialog from "./OperationDialog";
 import { updateOperationDatasShowNameAndPosition } from './Redux';
-import { updateMultiTableDatas } from "components/FlightsSortModule/Redux";
 import {isValidObject} from "utils/basic-verify";
 
 const getDeicePosition = (state) => {
@@ -20,18 +19,18 @@ const getDeicePosition = (state) => {
 
 };
 
-const mapStateToProps = ( state ) => ({
+const mapStateToProps = ( state, nextProps ) => ({
     userId: state.loginUserInfo.userId || "",
     generateTime: state.generateTime.time || "",
     deiceGroupName: state.loginUserInfo.deiceGroupName || "",
     deicePositionArray: getDeicePosition( state ), //冰坪下拉框
     operationDatas: state.operationDatas,
-    property: state.tableDatas.property
+    property: state.tableDatas.property,
+    requestCallback: nextProps.requestCallback
 })
 
 const mapDispatchToProps = {
-    updateOperationDatasShowNameAndPosition,
-    updateMultiTableDatas
+    updateOperationDatasShowNameAndPosition
 }
 
 const OperationDialogContainer = connect(

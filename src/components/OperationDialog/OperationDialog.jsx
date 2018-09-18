@@ -48,9 +48,9 @@ class OperationDialog extends React.Component{
         this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
         this.getDisplayFontSize = getDisplayFontSize.bind(this);
         this.getTimeColumnsAuth = this.getTimeColumnsAuth.bind(this);
-        this.requestCallback = this.requestCallback.bind(this);
         this.resetDialogPositon = this.resetDialogPositon.bind(this);
         this.closeDialog = this.closeDialog.bind(this);
+        this.requestCallBackFunc = this.requestCallBackFunc.bind(this);
 
         this.state = {
             collaborateRecords: { //协调记录窗口显隐
@@ -116,38 +116,14 @@ class OperationDialog extends React.Component{
         });
     };
 
-    //表单提交后--单条数据更新方法
-    requestCallback( res, mes ){
+    requestCallBackFunc( res, mes ){
         this.closeCollaborateDialog();
-        const { updateMultiTableDatas } = this.props;
-        const { flightView, generateTime, error } = res;
-        if( isValidVariable(flightView) ){
-            const { flightFieldViewMap = {}, flightAuthMap = {} } = flightView;
-            const { ID = {} } =flightFieldViewMap;
-            const id = ID.value;
-            //数据转化
-            const data = this.convertData( flightFieldViewMap, flightAuthMap, generateTime );
-            //将航班原数据补充到航班对象中
-            data.originalData = flightView;
-            const map = { [id]: data };
-            //更新数据
-            updateMultiTableDatas( map );
-            //提示成功
-            message.success( mes + "成功", 5 );
-
-        }else{
-            //提示失败
-            const msg = error.message || "";
-            const res = OperationReason[msg] || msg;
-            const showMes = mes + "失败," + res;
-            message.error( showMes, 5 );
-        }
-
+        this.props.requestCallback( res, mes );
     };
 
     //处理航班号id提交操作事件
     handleFlightIdClick( item, rowData ){
-        const { userId = "", generateTime } = this.props;
+        const { userId = "", generateTime, requestCallback } = this.props;
         //选中的操作名称
         const { en = "", cn = "", url = "" } = item;
         if( en == "COORDINATION_DETAIL" ){ // 查看协调记录
@@ -207,8 +183,8 @@ class OperationDialog extends React.Component{
             }
             //发送请求
             request( `${host}/${url}`, "post", params, (res) => {
-                console.log(res);
-                this.requestCallback(res, rowData['FLIGHTID'] + " " + cn);
+                this.closeCollaborateDialog();
+                requestCallback(res, rowData['FLIGHTID'] + " " + cn);
             }, ( err ) => {
                 message.error(rowData['FLIGHTID'] + " " + cn + "请求失败", 5 );
             });
@@ -440,7 +416,7 @@ class OperationDialog extends React.Component{
                                             deiceGroupName={deiceGroupName}
                                             deicePositionArray={deicePositionArray}
                                             timeAuth={timeAuth}
-                                            requestCallback = { this.requestCallback }
+                                            requestCallback = {this.requestCallBackFunc}
                                         />
                                     </div>
                                     : <ReasonDialog
@@ -480,7 +456,7 @@ class OperationDialog extends React.Component{
                                 userId = {userId}
                                 x = { 600 }
                                 y = { 350 }
-                                requestCallback = { this.requestCallback }
+                                requestCallback = {this.requestCallBackFunc}
                                 clickCloseBtn = { () => {
                                     this.closeDialog("formerFlight");
                                 } }
@@ -504,7 +480,7 @@ class OperationDialog extends React.Component{
                                 flightid = { rowData["FLIGHTID"] }
                                 tobt = { rowData["TOBT"] }
                                 generateTime = { generateTime }
-                                requestCallback = { this.requestCallback }
+                                requestCallback = {this.requestCallBackFunc}
                                 name =  { this.state.outPoolByTOBT.name }
                                 clickCloseBtn = { () => {
                                     this.closeDialog("outPoolByTOBT");

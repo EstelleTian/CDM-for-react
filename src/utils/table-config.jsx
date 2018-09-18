@@ -269,13 +269,12 @@ const handleRightClickFunc = function( thisProxy, colunmName, record, x, y, tabl
 const showDetailModal = function( thisProxy, record ){
     const { updateDetailModalDatasVisible, updateDetailModalDatasByName, userId } = thisProxy.props;
     const id = record["ID"] || "";
-
-    //根据航班id获取单条航班数据
-    requestGet( getSingleAirportUrl, {id, userId}, function(res){
-        updateFlightDetailData(res, updateDetailModalDatasByName, updateDetailModalDatasVisible);
-    } );
-
-
+    if( isValidVariable(updateDetailModalDatasByName)  ){
+        //根据航班id获取单条航班数据
+        requestGet( getSingleAirportUrl, {id, userId}, function(res){
+            updateFlightDetailData(res, updateDetailModalDatasByName, updateDetailModalDatasVisible);
+        } );
+    }
 };
 
 const updateFlightDetailData = function( res, updateDetailModalDatasByName, updateDetailModalDatasVisible ){

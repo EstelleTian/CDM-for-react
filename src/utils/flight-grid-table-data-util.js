@@ -1297,7 +1297,12 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         }
         // 判断时间是否失效
         if(invalid){
-            const { invalidDataStyle = "" } = this.props.property;
+            let invalidDataStyle = "";
+            if( this.props.hasOwnProperty("property") ){
+                invalidDataStyle = this.props.property.invalidDataStyle;
+            }else if( this.hasOwnProperty("property") ){
+                invalidDataStyle = this.property.invalidDataStyle;
+            }
             if (isValidVariable(data.CTOT)) {
                 data.CTOT_style = this.getDisplayStyle('DEFAULT') + this.getDisplayFontSize('CTOT')
                     + invalidDataStyle;

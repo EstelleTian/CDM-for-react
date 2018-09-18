@@ -6,7 +6,7 @@ import { updateTableDatas, updateTableDatasProperty, updateTableDatasColumns, up
 import { updateSubTableDatasProperty, updateSubTableDatas } from '../SubTable/Redux';
 import { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } from '../OperationDialog/Redux';
 import { updateDetailModalDatasVisible, updateDetailModalDatasByName } from '../DetailModule/Redux';
-import {updateTableConditionScroll} from "components/FlightsSortModule/Redux";
+import {updateMultiTableDatas, updateTableConditionScroll} from "components/FlightsSortModule/Redux";
 import Table from './Table';
 
 //表格排序，针对初始化后表格根据sortArr值依次排序
@@ -188,7 +188,8 @@ const mapDispatchToProps = {
     updateDetailModalDatasVisible,
     updateDetailModalDatasByName,
     updateTableConditionScroll,
-    updateBasicConfigInfo
+    updateBasicConfigInfo,
+    updateMultiTableDatas
 };
 
 const TableContainer = connect(
