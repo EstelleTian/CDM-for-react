@@ -12,17 +12,19 @@ import './FlowcontrolItem.less';
 class FlowcontrolItem extends React.Component{
     constructor( props ){
         super(props);
+
         this.onCloseBtn = this.onCloseBtn.bind(this);
         this.openOperationDialog = this.openOperationDialog.bind(this);
-        this.convertFlowcontrolData = convertFlowcontrolData.bind(this);
+        this.getOperations = this.getOperations.bind(this);
+
         this.state = {
-            detail: { //流控详情
+            flowcontrolDetail: { //流控详情
                 show: false,
             },
-            modify: { //流控修改
+            flowcontrolEdit: { //流控修改
                 show: false,
             },
-            impact: { //流控影响航班
+            flowcontrolImpactFlights: { //流控影响航班
                 show: false,
             },
         }
@@ -30,7 +32,7 @@ class FlowcontrolItem extends React.Component{
     //操作列--根据key开启操作模块（详情、修改页面、流控影响航班、终止等）
     openOperationDialog( key, casaStatus ){
         if( key != undefined || key != "" ){
-            if( key == 'impact' ){
+            if( key == 'flowcontrolImpactFlights' ){
                 if( isValidVariable(casaStatus) && casaStatus == "计算中" ){
                     Modal.warning({
                         iconType : 'exclamation-circle',
@@ -63,15 +65,34 @@ class FlowcontrolItem extends React.Component{
         });
     }
 
+    // 获取操作选项
+    getOperations(operations, casaStatus) {
+        // 先排序
+        operations.sort((a,b) => {
+            return a.order * 1 - b.order * 1;
+        });
+
+        return operations.map((item,index) => {
+            if(item.show){
+                return (
+                    <i className={`iconfont icon-${item.type}`} key={index} title={ item.cn} onClick={()=>{
+                        this.openOperationDialog(item.en, casaStatus);
+                    }} />
+                )
+            }
+
+        })
+    }
+
     render(){
         const { data, generateTime, systemConfig, indexNumber } = this.props;
-        const formatData = this.convertFlowcontrolData( data, generateTime);
+        const formatData = convertFlowcontrolData( data, generateTime, systemConfig);
         const { name, id, publishUserZh, reason, placeType, dialogName,
             status, statusClassName, controlPoints, type, value, controlDirection,
-            effectiveTime, effectiveDate, casaStatus,
+            effectiveTime, effectiveDate, casaStatus, operations,
         } = formatData;
 
-        const { detail, modify, impact } = this.state;
+        const { flowcontrolDetail, flowcontrolEdit, flowcontrolImpactFlights } = this.state;
         return (
             <Col span={24} className="flow-item">
                 <Row className="title">
@@ -106,27 +127,21 @@ class FlowcontrolItem extends React.Component{
                         { casaStatus }
                     </Col>
                     <Col className="operator" span={21}>
-                        <i className="iconfont icon-detail" title="详情" onClick={()=>{
-                            this.openOperationDialog("detail", casaStatus);
-                        }} />
-                        <i className="iconfont icon-effect" title="影响" onClick={()=>{
-                            this.openOperationDialog("impact", casaStatus);
-                        }}/>
-                        <i className="iconfont icon-edit" title="修改" onClick={()=>{
-                            this.openOperationDialog("modify", casaStatus);
-                        }}/>
-                        <i className="iconfont icon-stop" title="终止"/>
+
+                        {
+                            this.getOperations(operations, casaStatus)
+                        }
                     </Col>
 
                 </Row>
                 {
-                    detail.show ?
+                    flowcontrolDetail.show ?
                         <CreateLayer
                             className="flowcontol-layer"
                         >
                             <FlowcontrolDetailContainer
                                 titleName="流控信息详情"
-                                type="detail"
+                                type="flowcontrolDetail"
                                 id = {id}
                                 x = { 360 }
                                 y = { 60 }
@@ -136,13 +151,13 @@ class FlowcontrolItem extends React.Component{
                         </CreateLayer> : ''
                 }
                 {
-                    modify.show ?
+                    flowcontrolEdit.show ?
                         <CreateLayer
                             className="flowcontol-layer"
                         >
                             <FlowcontrolDialogContainer
                                 titleName= { dialogName}
-                                type="modify"
+                                type="flowcontrolEdit"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType = {data.placeType}
                                 limitType = {data.typeSubclass}
@@ -155,7 +170,7 @@ class FlowcontrolItem extends React.Component{
                         : ''
                 }
                 {
-                    impact.show ?
+                    flowcontrolImpactFlights.show ?
                         <CreateLayer
                             className="flowcontol-layer"
                         >
