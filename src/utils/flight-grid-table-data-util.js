@@ -268,6 +268,10 @@ const convertData = function( flight, flightAuthMap, generateTime ){
                 setFlowcontrolPointPassTimeAttrs.call(this, key, options);
                 break;
             }
+            case 'FLOWCONTROL_POINT': {
+                setFlowcontrolMonitorPointInfo.call(this, key, options);
+                break;
+            }
             case 'EFPS_REQTIME':
             case 'EFPS_PUSTIME':
             case 'EFPS_LINTIME':
@@ -1272,6 +1276,25 @@ const convertData = function( flight, flightAuthMap, generateTime ){
         }
         data[titlekey] = titlestr;
     };
+
+    //解析受控航路点字段，获取受控航迹信息用于popover显示
+    function setFlowcontrolMonitorPointInfo( key, obj ){
+        const { processMap } = obj;
+        //航迹信息
+        if( isValidVariable(processMap) ){
+            const { MONITORPOINTINFO } = processMap;
+            if( isValidVariable(MONITORPOINTINFO) ){
+                const { list } = MONITORPOINTINFO;
+                //增加航迹信息集合数据
+                if( isValidVariable(list) ){
+                    data["MONITORPOINTINFO"] = list;
+                }
+            }
+        }
+
+
+    };
+
     //电子进程单 相关时间
     function setEfpsTimeAttrs( key, obj ){
         let titlekey = key + "_title";

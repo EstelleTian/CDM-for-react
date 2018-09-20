@@ -116,11 +116,7 @@ class NavMenu extends React.Component{
                 updateSidebarKey(selectKey);
             }
         }
-
-
-
-
-    }
+    };
 
     //当点击关闭按钮时，type: 类型
     onCloseBtn( type ){
@@ -129,7 +125,7 @@ class NavMenu extends React.Component{
                 show: false
             }
         });
-    }
+    };
     //获取过滤条件判断是否计数，用于判断是否显示过滤提示红点
     getFilterCount() {
         const { filterMatches = {} } = this.props;
@@ -139,7 +135,7 @@ class NavMenu extends React.Component{
             count++;
         }
         return count;
-    }
+    };
 
     render(){
         const { filterMatches, loginUserInfo, sidebarConfig, } = this.props;
