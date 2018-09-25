@@ -160,7 +160,7 @@ class FlowcontrolItem extends React.Component{
                                 type="flowcontrolEdit"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType = {data.placeType}
-                                limitType = {data.typeSubclass}
+                                limitType = {data.typeSubclass || data.type}
                                 id = {id}
                                 x = { 300 }
                                 y = { 60 }
