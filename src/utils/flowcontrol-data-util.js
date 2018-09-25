@@ -470,7 +470,9 @@ const FlowcontrolUtil = {
         if(placeType == 'AP'){
             if(type == 'GS' && typeSubclass == 'GS_DEP'){
                 res = '修改低能见度受限'
-            }else {
+            }else if(type == 'TRANSLATION'){
+                res = '修改大页面延误'
+            }else  {
                 res = '修改机场受限'
             }
         }else if(placeType == 'POINT'){
