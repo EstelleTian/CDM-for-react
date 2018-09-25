@@ -89,7 +89,7 @@ const handleColumnRender = (value, row, index, colunmName) => {
             >
                 {value}
             </HoverPopover>
-        )
+        );
 
         return {
             children: FFixDom

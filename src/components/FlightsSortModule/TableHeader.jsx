@@ -92,12 +92,6 @@ class TableHeader extends React.Component{
 
     render(){
         const { subTableDatas = {}} = this.props;
-        const poolData = subTableDatas.pool;
-        const alarmData = subTableDatas.alarm;
-        const expiredData = subTableDatas.expired;
-        const specialData = subTableDatas.special;
-        const todoData = subTableDatas.todo;
-        const { expired, special, pool, alarm, todo } = this.state;
         const subTableKeys = Object.keys(this.state);
 
         return (
