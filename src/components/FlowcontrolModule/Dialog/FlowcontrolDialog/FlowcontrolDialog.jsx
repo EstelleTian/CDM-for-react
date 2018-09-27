@@ -4,6 +4,7 @@ import { Row, Icon } from 'antd';
 import APContent from "components/FlowcontrolModule/APContent/APContent";
 import APGSDepContent from "components/FlowcontrolModule/APGSDepContent/APGSDepContent";
 import POINTContent from "components/FlowcontrolModule/POINTContent/POINTContent";
+import TRANSLATIONContent from "components/FlowcontrolModule/TRANSLATIONContent/TRANSLATIONContent";
 import DraggableModule from "components/DraggableModule/DraggableModule";
 
 import './FlowcontrolDialog.less';
@@ -36,7 +37,7 @@ class FlowcontrolDialog extends React.Component{
                         </Row>
                         {/*机场流控*/}
                         {
-                            (placeType == 'AP' && limitType !='GS_DEP') ? <APContent
+                            (placeType == 'AP' && !limitType) ? <APContent
                                 clickCloseBtn = {clickCloseBtn}
                                 dialogName = {dialogName}
                                 loginUserInfo = {loginUserInfo}
@@ -50,6 +51,18 @@ class FlowcontrolDialog extends React.Component{
                         {
 
                             (placeType == 'AP' && limitType =='GS_DEP') ? <APGSDepContent
+                                clickCloseBtn = {clickCloseBtn}
+                                dialogName = {dialogName}
+                                loginUserInfo = {loginUserInfo}
+                                systemConfig = {systemConfig}
+                                generateTime = {generateTime}
+                                id = {id}
+                                placeType = {placeType}
+                            /> : ''
+                        }
+                        {
+
+                            (placeType == 'AP' && limitType =='TRANSLATION') ? <TRANSLATIONContent
                                 clickCloseBtn = {clickCloseBtn}
                                 dialogName = {dialogName}
                                 loginUserInfo = {loginUserInfo}

@@ -37,7 +37,9 @@ class NavMenu extends React.Component{
                 show: false,
             },pointPublish : {
                 show: false,
-            },
+            },translationPublish : {
+                show: false,
+            }
         }
 
     }
@@ -142,7 +144,7 @@ class NavMenu extends React.Component{
         const count = this.getFilterCount();
         const { show } = sidebarConfig;
         const { airports } = loginUserInfo;
-        const { apPublish, apGSDepPublish, pointPublish } = this.state;
+        const { apPublish, apGSDepPublish, pointPublish, translationPublish } = this.state;
         return (
             <div className="opt-menu-canvas">
                 <Menu
@@ -196,7 +198,12 @@ class NavMenu extends React.Component{
                         </Menu.Item>
                         <Menu.Item key="composite-publish"><label>发布复合航路受限</label></Menu.Item>
                         <Menu.Item key="ldr-publish"><label>发布大面积延误恢复</label></Menu.Item>
-                        <Menu.Item key="translation-publish"><label>发布大面积延误</label></Menu.Item>
+                        <Menu.Item
+                            key="translationPublish"
+                            onClick= {this.onMenuTitleSelect}
+                        >
+                            <label>发布大面积延误</label>
+                        </Menu.Item>
                         <Menu.Item key="template-manage"><label>流控信息模板管理</label></Menu.Item>
                         <Menu.Item key="impact-flights-export"><label>流控信息导出</label></Menu.Item>
                     </SubMenu>
@@ -351,6 +358,23 @@ class NavMenu extends React.Component{
                                 type="pointPublish"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType = 'POINT'
+                                x = { 300 }
+                                y = { 60 }
+                            />
+                        </CreateLayer>
+                        : ''
+                }
+                {
+                    (translationPublish.show) ?
+                        <CreateLayer
+                            className="flowcontol-layer"
+                        >
+                            <FlowcontrolDialogContainer
+                                titleName="发布大面积延误"
+                                type="translationPublish"
+                                clickCloseBtn={ this.onCloseBtn }
+                                placeType = 'AP'
+                                limitType = 'TRANSLATION'
                                 x = { 300 }
                                 y = { 60 }
                             />

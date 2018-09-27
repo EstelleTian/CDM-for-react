@@ -1219,12 +1219,12 @@ class POINTContent extends React.Component{
         // 限制方向
         flow.flowcontrolDirection = direction;
 
-        // 受控降落机场
+        // 受控起飞机场
         flow.controlDepDirection = flow.controlDepDirection.join(',').toUpperCase();
 
         // 受控降落机场
         flow.controlDirection = flow.controlDirection.join(',').toUpperCase();
-        // 豁免降落机场
+        // 豁免起飞机场
         flow.exemptDepDirection = flow.exemptDepDirection.join(',').toUpperCase();
         // 豁免降落机场
         flow.exemptDirection = flow.exemptDirection.join(',').toUpperCase();
