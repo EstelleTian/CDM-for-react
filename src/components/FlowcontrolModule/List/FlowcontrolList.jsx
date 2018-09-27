@@ -5,6 +5,8 @@ import { Row, Col } from 'antd';
 import { getFlowcontrolUrl } from 'utils/request-urls';
 import {  request } from 'utils/request-actions';
 
+import QueueAnim from 'rc-queue-anim';
+
 import FlowcontrolItem from "./FlowcontrolItem";
 import './FlowcontrolList.less';
 
@@ -108,20 +110,21 @@ class FlowcontrolList extends React.Component{
         return (
             <Col span={24} className="flowcontrol-list">
                 <Row className="flow-item-wrapper">
+                    <QueueAnim delay={300} className="queue-simple">
                     {
                         flowcontrolViewMap.map((item,index) =>{
                             return (
-                                <FlowcontrolItem
-                                    key={item.id}
-                                    data = {item}
-                                    indexNumber = { (index +1) }
-                                    generateTime = { flowGenerateTime }
-                                    systemConfig = { systemConfig }
-                                />
+                                    <FlowcontrolItem
+                                        key={item.id}
+                                        data = {item}
+                                        indexNumber = { (index +1) }
+                                        generateTime = { flowGenerateTime }
+                                        systemConfig = { systemConfig }
+                                    />
                             )
                         })
                     }
-
+                    </QueueAnim>
                 </Row>
 
             </Col>

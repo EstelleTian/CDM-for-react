@@ -171,14 +171,12 @@ class Loginform extends React.Component{
             <div className="login bc-image-11">
                 <Row type="flex" justify="center" align="middle">
                     <Col xs={{ span: 16}}  md={{ span: 12}} lg={{ span: 13}}  xl={{ span: 9}} xxl={{ span: 7}} >
-
                         <div className="content">
                             <div className="head"></div>
                             <Form className="login_form" onSubmit={this.handleSubmit}>
                                 <FormItem>
                                     <h2 className="title">{systemElem}{systemName}</h2>
                                 </FormItem>
-
                                 <FormItem>
                                     {
                                         rulesGenerate.username(

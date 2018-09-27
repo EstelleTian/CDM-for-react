@@ -140,8 +140,6 @@ class TableHeader extends React.Component{
 
                     })
                 }
-
-
             </div>
         )
     }

@@ -1,11 +1,8 @@
 //侧边栏组件
-
 import React from 'react';
-import { Col } from 'antd'
 import FlowcontrolModule from '../FlowcontrolModule/List/FlowcontrolModule';
 import NoticeModule from '../NoticeModule/List/NoticeModule';
 import RestrictionModule from '../RestrictionModule/List/RestrictionModule';
-
 
 class Sidebar extends React.Component{
     constructor( props ){
@@ -16,19 +13,26 @@ class Sidebar extends React.Component{
         const { key = '' } = sidebarConfig;
 
         return (
-            <Col className="card sidebar bc-1" span={6}>
-                {
-                    ( key == 'flowcontrol-info' ) ? <FlowcontrolModule/> : ''
-                }
-                {
-                    ( key == 'notice-info' ) ? <NoticeModule/>: ''
-                }
-                {
-                    ( key == 'restriction-info' ) ? <RestrictionModule /> : ''
-                }
-
-
-            </Col>
+            <div className="card sidebar bc-1">
+                    {
+                        ( key == 'flowcontrol-info' ) ?
+                            <FlowcontrolModule
+                                key = "flowcontrol-info"
+                            /> : ''
+                    }
+                    {
+                        ( key == 'notice-info' ) ?
+                            <NoticeModule
+                                key = "notice-info"
+                            /> : ''
+                    }
+                    {
+                        ( key == 'restriction-info' ) ?
+                            <RestrictionModule
+                                key = "restriction-info"
+                            /> : ''
+                    }
+            </div>
         )
     }
 };

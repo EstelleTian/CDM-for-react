@@ -7,6 +7,7 @@ import FlightsSortModule from 'components/FlightsSortModule/FlightsSortModule';
 import SidebarContainer from 'components/Sidebar/SidebarContainer';
 import DetailModuleContainer from 'components/DetailModule/DetailModuleContainer';
 import Loader from 'components/Loader/Loader';
+import QueueAnim from 'rc-queue-anim';
 import "./Home.less";
 
 const { Content } = Layout;
@@ -31,18 +32,22 @@ class HomePage extends React.Component{
                                 <FlightsSortModule/>
 
                             </Col>
-                            {
-                                sideBarShow ? <SidebarContainer /> : ''
-                            }
+                                { sideBarShow ?
+                                    <SidebarContainer
+                                        key = "siderBar"
+                                    />
+                                    : ""}
                         </Row>
-                        {
-                            detailShow ?
-                            <DetailModuleContainer
-                                name = "flight"
-                            /> : ''
-                        }
-
-
+                        <QueueAnim className="detail-anim"
+                                   type = "bottom"
+                        >
+                            { detailShow ?
+                                <DetailModuleContainer
+                                    key = "detail"
+                                    name = "flight"
+                                />
+                             : ""}
+                        </QueueAnim>
                     </Content>
 
                 </Layout>
