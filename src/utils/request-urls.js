@@ -34,7 +34,10 @@ const getFlowcontrolTemplateUrl = `${flowcontrolHost}/flowTemplate/retrieveByUse
 const getPointByAirportUrl = `${flowcontrolHost}/flowcontrolPoints/retrievePointsByAirport.action`;
 // 发布流控
 const publishFlowcontrolUrl = `${flowcontrolHost}/flow/publish.action`;
+// 修改流控
 const updateFlowcontrolUrl = `${flowcontrolHost}/flow/update.action`;
+// 终止流控
+const terminateFlowcontrolUrl = `${flowcontrolHost}/flow/terminate.action`;
 
 // 获取通告信息
 const getNoticeUrl = `${host}/retrieveNoticeInformation.bo`;
@@ -54,5 +57,5 @@ export {
     getFlowcontrolUrl, getNoticeUrl,
     getPointByAirportUrl, getRestrictionUrl,
     publishFlowcontrolUrl, updateFlowcontrolUrl, getFlowcontrolTemplateUrl, getFlowcontrolByIdUrl,
-    getFlowcontrolDetailUrl, retrieveFlowcontrolImpactFlightsUrl, getNoticeDetailUrl, getRestrictionDetailUrl,
+    getFlowcontrolDetailUrl, terminateFlowcontrolUrl, retrieveFlowcontrolImpactFlightsUrl, getNoticeDetailUrl, getRestrictionDetailUrl,
 };
