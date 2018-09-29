@@ -163,7 +163,7 @@ class Terminate extends React.Component {
         const {loginUserInfo, clickCloseBtn, dialogName} = this.props;
         // 用户权限
         const {allAuthority} = loginUserInfo;
-        if(!AuthorizationUtil.hasAuthorized(allAuthority, 437111) ){
+        if(!AuthorizationUtil.hasAuthorized(allAuthority, 437) ){
             const handleConvertFormData = this.handleConvertFormData;
             Modal.confirm({
                 // iconType : 'exclamation-circle',
@@ -225,7 +225,7 @@ class Terminate extends React.Component {
         return (
             <div>
                 {
-                    AuthorizationUtil.hasAuthorized(allAuthority, 437111) ?
+                    AuthorizationUtil.hasAuthorized(allAuthority, 437) ?
                         <DraggableModule
                             bounds=".root"
                             x={x}
