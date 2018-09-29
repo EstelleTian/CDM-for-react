@@ -197,7 +197,7 @@ class FlowcontrolItem extends React.Component{
                             <TerminateContainer
                                 titleName="终止流控"
                                 type = "terminateFlowControl"
-                                x = { 200 }
+                                x = { 400 }
                                 y = { 60 }
                                 id = {id}
                                 clickCloseBtn={ this.onCloseBtn }
