@@ -229,28 +229,25 @@ const FlowcontrolUtil = {
         let {status, startTime = "", endTime = "", placeType, relativeStartTime, relativeEndTime, relativeStatus} = data;
         // 转换后的结果
         let res = {};
-        let sTime = '';
-        let eTime = '';
-        let startDate = '';
-        let endDate = '';
+
+        let sTime = FlowcontrolUtil.formatTime4(startTime);
+        let startDate = FlowcontrolUtil.formatDate(startTime);
+        let eTime = FlowcontrolUtil.formatTime4(endTime);
+        let endDate = FlowcontrolUtil.formatDate(endTime);
+
         // 相对状态时间
         if (placeType == 'POINT' && relativeStatus != status) {
 
             if (isValidVariable(relativeStartTime) && startTime != relativeStartTime) {
-                sTime = `(${FlowcontrolUtil.formatTime4(relativeStartTime)})`;
+                sTime = `${sTime}(${FlowcontrolUtil.formatTime4(relativeStartTime)})`;
                 startDate = FlowcontrolUtil.formatDate(relativeStartTime);
             }
 
             if (isValidVariable(relativeEndTime) && endTime != relativeEndTime) {
-                eTime = `(${FlowcontrolUtil.formatTime4(relativeEndTime)})`;
+                eTime += `${eTime}(${FlowcontrolUtil.formatTime4(relativeEndTime)})`;
                 endDate = FlowcontrolUtil.formatDate(relativeEndTime);
             }
 
-        } else {
-            sTime = FlowcontrolUtil.formatTime4(startTime);
-            startDate = FlowcontrolUtil.formatDate(startTime);
-            eTime = FlowcontrolUtil.formatTime4(endTime);
-            endDate = FlowcontrolUtil.formatDate(endTime);
         }
 
         res = {
@@ -333,9 +330,9 @@ const FlowcontrolUtil = {
             && relativeStatus != status
         ) {
             if (relativeStatus == FlowcontrolConstant.FLOWCONTROL_STATUS_RUNNING) {
-                res = '(正在执行)'
+                res += '(正在执行)'
             } else if (relativeStatus == FlowcontrolConstant.FLOWCONTROL_STATUS_FINISHED) {
-                res = '(正常结束)'
+                res += '(正常结束)'
             }
         }
         return res;
