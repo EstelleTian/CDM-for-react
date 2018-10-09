@@ -54,6 +54,7 @@ class APContent extends React.Component{
         this.validateStartTime = this.validateStartTime.bind(this);
         this.validateEndDate = this.validateEndDate.bind(this);
         this.validateEndTime = this.validateEndTime.bind(this);
+        this.validateFlowcontrolType = this.validateFlowcontrolType.bind(this);
         this.ForceTriggerValidate = this.ForceTriggerValidate.bind(this);
         this.handleChangeReserveSlots = this.handleChangeReserveSlots.bind(this);
         this.checkFlowcontrolPoints = this.checkFlowcontrolPoints.bind(this);
@@ -1007,6 +1008,19 @@ class APContent extends React.Component{
         }
 
     };
+    // 流控类型--校验
+    validateFlowcontrolType = (rule, value, callback) => {
+        const _form = this.props.form;
+        const type = _form.getFieldValue('type');
+        // 若选中的类型为REQ，则清空截止日期和时间
+        if (type == 'REQ') {
+            _form.setFieldsValue({
+                endDate: null,
+                endTime: null
+            });
+        }
+        callback();
+    };
 
     //流控名称--校验规则
     validateFlowcontrolName = (rule, value, callback) => {
@@ -1363,7 +1377,9 @@ class APContent extends React.Component{
                     {
                         required: true,
                         message: "请选择限制类型"
-                    },
+                    },{
+                        validator :  this.validateFlowcontrolType
+                    }
                 ]
             }),
             // 限制数值
@@ -1609,6 +1625,7 @@ class APContent extends React.Component{
                                                 <DatePicker
                                                     allowClear={true} // 显示清除按钮
                                                     placeholder="截止日期,可选项"
+                                                    disabled = {type == 'REQ' ? true : false}
                                                     disabledDate={ (current) => {
                                                         //不能选早于今天的 false显示 true不显示
                                                         //今天
@@ -1618,7 +1635,6 @@ class APContent extends React.Component{
                                                     } }
 
                                                     format={dateFormat}
-                                                    // onChange={ this.onEndDateChange }
                                                 />
                                             )
                                         }
@@ -1634,7 +1650,7 @@ class APContent extends React.Component{
                                                     format={timeFormat}
                                                     onChange={ this.onEndTimeChange }
                                                     placeholder="截止时间,可选项"
-
+                                                    disabled = {type == 'REQ' ? true : false}
                                                 />
                                             )
                                         }

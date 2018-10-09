@@ -58,6 +58,7 @@ class POINTContent extends React.Component{
         this.validateEndDate = this.validateEndDate.bind(this);
         this.validateEndTime = this.validateEndTime.bind(this);
         this.validateFlowcontrolPoints = this.validateFlowcontrolPoints.bind(this);
+        this.validateFlowcontrolType = this.validateFlowcontrolType.bind(this);
 
         this.ForceTriggerValidate = this.ForceTriggerValidate.bind(this);
         this.handleChangeReserveSlots = this.handleChangeReserveSlots.bind(this);
@@ -1066,6 +1067,20 @@ class POINTContent extends React.Component{
 
     };
 
+    // 流控类型--校验
+    validateFlowcontrolType = (rule, value, callback) => {
+        const _form = this.props.form;
+        const type = _form.getFieldValue('type');
+        // 若选中的类型为REQ，则清空截止日期和时间
+        if (type == 'REQ') {
+            _form.setFieldsValue({
+                endDate: null,
+                endTime: null
+            });
+        }
+        callback();
+    };
+
     //流控名称--校验规则
     validateFlowcontrolName = (rule, value, callback) => {
         //若value值为空
@@ -1429,7 +1444,9 @@ class POINTContent extends React.Component{
                     {
                         required: true,
                         message: "请选择限制类型"
-                    },
+                    },{
+                        validator :  this.validateFlowcontrolType
+                    }
                 ]
             }),
             // 限制数值
@@ -1697,7 +1714,7 @@ class POINTContent extends React.Component{
                                                     } }
 
                                                     format={dateFormat}
-                                                    // onChange={ this.onEndDateChange }
+                                                    disabled = {type == 'REQ' ? true : false}
                                                 />
                                             )
                                         }
@@ -1713,7 +1730,7 @@ class POINTContent extends React.Component{
                                                     format={timeFormat}
                                                     onChange={ this.onEndTimeChange }
                                                     placeholder="截止时间,可选项"
-
+                                                    disabled = {type == 'REQ' ? true : false}
                                                 />
                                             )
                                         }
