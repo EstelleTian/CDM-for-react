@@ -3,7 +3,7 @@ import React from 'react';
 import FlowcontrolModule from '../FlowcontrolModule/List/FlowcontrolModule';
 import NoticeModule from '../NoticeModule/List/NoticeModule';
 import RestrictionModule from '../RestrictionModule/List/RestrictionModule';
-
+import './Sidebar.less';
 class Sidebar extends React.Component{
     constructor( props ){
         super(props);
