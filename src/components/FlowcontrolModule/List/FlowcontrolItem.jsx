@@ -6,6 +6,7 @@ import { convertFlowcontrolData } from 'utils/flowcontrol-data-util';
 import CreateLayer from "components/CreateLayer/CreateLayer";
 import FlowcontrolDetailContainer from "components/FlowcontrolModule/Detail/FlowcontrolDetailContainer";
 import FlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/FlowcontrolDialog/FlowcontrolDialogContainer";
+import TerminateContainer from "components/FlowcontrolModule/Terminate/TerminateContainer";
 import ImpactContainer from "components/FlowcontrolModule/Impact/ImpactContainer";
 import './FlowcontrolItem.less';
 
@@ -27,6 +28,9 @@ class FlowcontrolItem extends React.Component{
             flowcontrolImpactFlights: { //流控影响航班
                 show: false,
             },
+            terminateFlowControl : {
+                show : false,
+            }
         }
     }
     //操作列--根据key开启操作模块（详情、修改页面、流控影响航班、终止等）
@@ -92,7 +96,7 @@ class FlowcontrolItem extends React.Component{
             effectiveTime, effectiveDate, casaStatus, operations,
         } = formatData;
 
-        const { flowcontrolDetail, flowcontrolEdit, flowcontrolImpactFlights } = this.state;
+        const { flowcontrolDetail, flowcontrolEdit, flowcontrolImpactFlights, terminateFlowControl } = this.state;
         return (
             <Col span={24} className="flow-item">
                 <Row className="title">
@@ -184,6 +188,24 @@ class FlowcontrolItem extends React.Component{
                             />
                         </CreateLayer> : ''
                 }
+
+                {
+                    terminateFlowControl.show ?
+                        <CreateLayer
+                            className="flowcontol-layer"
+                        >
+                            <TerminateContainer
+                                titleName="终止流控"
+                                type = "terminateFlowControl"
+                                x = { 400 }
+                                y = { 60 }
+                                id = {id}
+                                clickCloseBtn={ this.onCloseBtn }
+                            />
+                        </CreateLayer>
+                        : ''
+                }
+
             </Col>
 
 

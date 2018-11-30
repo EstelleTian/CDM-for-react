@@ -183,11 +183,9 @@ class NavMenu extends React.Component {
                 >
                     <SubMenu key="toggle-siderbar"
                              title={
-                                 <span title={ show ? '关闭侧边栏' : '开启侧边栏'}>
-                                    <Icon
-                                        className="trigger"
-                                        type={ show ? 'menu-unfold' : 'menu-fold'}
-                                    />
+                                 <span title="展示/关闭侧边栏">
+                                     <i className=" trigger iconfont icon-more"></i>
+
                                 </span>
                              }
                              onTitleClick={ this.onMenuTitleSelect }/>
@@ -323,7 +321,8 @@ class NavMenu extends React.Component {
                         key="setting"
                         title={
                             <span>
-                                <Icon type="user" /> { loginUserInfo.description || "未登录" }
+                                <i className="iconfont icon-user"></i>
+                                { loginUserInfo.description || "未登录" }
                             </span>
                         }
                     >

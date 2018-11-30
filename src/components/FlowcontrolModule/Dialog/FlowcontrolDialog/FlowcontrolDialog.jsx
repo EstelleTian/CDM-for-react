@@ -37,7 +37,7 @@ class FlowcontrolDialog extends React.Component{
                         </Row>
                         {/*机场流控*/}
                         {
-                            (placeType == 'AP' && !limitType) ? <APContent
+                            (placeType == 'AP' && (limitType !=='GS_DEP' && !limitType !=='TRANSLATION')) ? <APContent
                                 clickCloseBtn = {clickCloseBtn}
                                 dialogName = {dialogName}
                                 loginUserInfo = {loginUserInfo}

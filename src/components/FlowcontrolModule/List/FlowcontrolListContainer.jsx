@@ -143,7 +143,8 @@ const mapStateToProps = ( state ) => {
         placeType,
         orderBy,
         quicklyFilters,
-        systemConfig: state.systemConfig || {}
+        systemConfig: state.systemConfig || {},
+        loginUserInfo : state.loginUserInfo || {}
     } )
 };
 
