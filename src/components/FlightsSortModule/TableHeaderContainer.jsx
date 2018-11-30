@@ -2,6 +2,8 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import { updateGenerateTime } from './Redux';
+import {updateDetailModalDatasByName, updateDetailModalDatasVisible} from "components/DetailModule/Redux";
+import { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } from '../OperationDialog/Redux';
 import TableHeader from './TableHeader';
 // 格式化数据生成时间
 const formatGenerateTime =(generateTime) => {
@@ -22,11 +24,17 @@ const formatGenerateTime =(generateTime) => {
 
 const mapStateToProps = ( state ) => ({
     generateTime: formatGenerateTime(state.generateTime),
-    subTableDatas: state.subTableDatas
+    subTableDatas: state.subTableDatas,
+    userId:state.loginUserInfo.userId,
+    dialogName:state.operationDatas.dialogName
 });
 
 const mapDispatchToProps = {
     updateGenerateTime,
+    updateDetailModalDatasByName,
+    updateDetailModalDatasVisible,
+    updateOperationDatasAuth,
+    updateOperationDatasShowNameAndPosition
 };
 
 const TableHeaderContainer = connect(

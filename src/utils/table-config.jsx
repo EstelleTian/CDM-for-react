@@ -351,7 +351,8 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
                     const offsetTop = targetParent.offsetTop;
                     const targetHeight = targetParent.clientHeight;
                     const targetWidth = targetParent.clientWidth;
-                    const $mainTable = $(targetParent).parents(".main-table");
+                    const tableContainer = thisProxy.state.tableContainer
+                    const $mainTable = $(targetParent).parents(`.${tableContainer}`);
                     const $scrollDom = $(".ant-table-body", $mainTable );
                     const tableName = $mainTable.attr("tablename"); //获取选中表格名称
                     //滚动条滚动高度
@@ -362,6 +363,21 @@ const TableColumns = function( type, colDisplay, colNames, colTitle ){
                     let otherWidth = 6;
                     if(tableName == "impact"){
                         otherHeight = 232;
+                        otherWidth = 18;
+                    }if(tableName == 'special'){
+                        otherHeight = 100;
+                        otherWidth = 18;
+                    }if(tableName == 'expired'){
+                        otherHeight = 100;
+                        otherWidth = 18;
+                    }if(tableName == 'pool'){
+                        otherHeight = 100;
+                        otherWidth = 18;
+                    }if(tableName == 'alarm'){
+                        otherHeight = 100;
+                        otherWidth = 18;
+                    }if(tableName == 'todo'){
+                        otherHeight = 100;
                         otherWidth = 18;
                     }
 

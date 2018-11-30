@@ -1,4 +1,4 @@
-const host = "http://192.168.243.187:28180";
+const host = "http://192.168.243.67:28180";
 // 用户登录
 const loginUrl = `${host}/userLogon.bo`;
 // 用户登出
@@ -11,6 +11,8 @@ const getUserPropertyUrl = `${host}/retrieveNeedBasicParam.bo`;
 const getAllAirportsUrl = `${host}/retrieveAirportFlights.bo`;
 //根据航班id获取单条航班数据
 const getSingleAirportUrl = `${host}/retrieveFlightDetailById.bo`;
+//航班查询
+const getFlightDetailUrl = `${host}/retrieveFlightDetailByFlightId.bo`;
 //根据航班id获取单条航班协调记录数据
 const getSingleCollaborateRecordUrl = `${host}/retrieveRecordById.bo`;
 //根据航班id获取前段航班信息
@@ -50,7 +52,7 @@ export {
     host,
     loginUrl, logoutUrl,
     getSystemConfigUrl, getUserPropertyUrl,
-    getAllAirportsUrl, getSingleAirportUrl, getSingleCollaborateRecordUrl, getSingleFormerFlightUrl, updateFormerFlightUrl,
+    getAllAirportsUrl, getSingleAirportUrl, getSingleCollaborateRecordUrl, getSingleFormerFlightUrl, updateFormerFlightUrl,getFlightDetailUrl,
     getFlowcontrolUrl, getNoticeUrl,
     getPointByAirportUrl, getRestrictionUrl,
     publishFlowcontrolUrl, updateFlowcontrolUrl, getFlowcontrolTemplateUrl, getFlowcontrolByIdUrl,

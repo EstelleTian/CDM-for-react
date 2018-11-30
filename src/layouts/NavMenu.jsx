@@ -1,10 +1,13 @@
 import React from 'react';
-import { connect } from 'react-redux';
-import { Menu, Checkbox, Radio, Icon, message} from 'antd';
-import { request } from 'utils/request-actions';
-import { logoutUrl } from 'utils/request-urls';
+import {connect} from 'react-redux';
+import $ from 'jquery';
+import {Menu, Checkbox, Radio, Icon, message} from 'antd';
+import {request} from 'utils/request-actions';
+import {logoutUrl} from 'utils/request-urls';
 import CreateLayer from "components/CreateLayer/CreateLayer";
 import FlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/FlowcontrolDialog/FlowcontrolDialogContainer";
+import { TableColumns } from "utils/table-config";
+import FlightSearchModule from "components/FlightSearchModule/FlightSearchModule";
 import './NavMenu.less';
 
 const SubMenu = Menu.SubMenu;
@@ -13,14 +16,14 @@ const RadioGroup = Radio.Group;
 const CheckboxGroup = Checkbox.Group;
 
 const options = [
-    { label: '已起飞', value: 'dep' },
-    { label: '已落地', value: 'arr' },
-    { label: '已取消', value: 'cnl' },
-    { label: '未发FPL报', value: 'nofpl' },
+    {label: '已起飞', value: 'dep'},
+    {label: '已落地', value: 'arr'},
+    {label: '已取消', value: 'cnl'},
+    {label: '未发FPL报', value: 'nofpl'},
 ];
 
-class NavMenu extends React.Component{
-    constructor(props){
+class NavMenu extends React.Component {
+    constructor(props) {
         super(props);
         this.onRadioChange = this.onRadioChange.bind(this);
         this.onCheckboxChange = this.onCheckboxChange.bind(this);
@@ -29,109 +32,135 @@ class NavMenu extends React.Component{
         this.handleLogout = this.handleLogout.bind(this);
         this.handleUpdateSidebar = this.handleUpdateSidebar.bind(this);
         this.logout = this.logout.bind(this);
+        this.tableColumnsObj = TableColumns.bind(this);
         this.state = {
             apPublish: {
                 show: false,
             },
-            apGSDepPublish : {
+            apGSDepPublish: {
                 show: false,
-            },pointPublish : {
+            }, pointPublish: {
                 show: false,
-            },translationPublish : {
+            }, translationPublish: {
                 show: false,
-            }
+            },
+            flightSearch: {
+                cn: "航班查询",
+                show: false,
+                x: 0,
+                y: 0
+            },
+            tableContainer:'search-table'
         }
 
     }
+
     // 处理登出
-    handleLogout(){
-        const {  loginUserInfo } = this.props;
-        const {  userId } = loginUserInfo;
+    handleLogout() {
+        const {loginUserInfo} = this.props;
+        const {userId} = loginUserInfo;
         const params = {
-            "userId":userId,
+            "userId": userId,
         };
-        request(logoutUrl,'POST',params,this.logout);
+        request(logoutUrl, 'POST', params, this.logout);
     }
+
     // 用户登出
-    logout(res){
-        const {  userLogout, history } = this.props;
-        const { status = 0 } = res;
+    logout(res) {
+        const {userLogout, history} = this.props;
+        const {status = 0} = res;
         const warning = () => {
             message.warning('登出失败,请稍后重试');
         };
-        if(200 == status*1){ // 成功
+        if (200 == status * 1) { // 成功
             // 用户登出
             userLogout();
             // 跳转到主页面
             history.push('/');
-        }else { // 失败
+        } else { // 失败
             warning();
         }
     }
 
     //过滤--单选--时间范围
-    onRadioChange(e){
+    onRadioChange(e) {
         // console.log('radio checked', e.target.value);
-        this.props.updateScopeFilter( e.target.value );
+        this.props.updateScopeFilter(e.target.value);
 
     };
+
     //过滤--多选--航班状态
-    onCheckboxChange( checkedValues ){
+    onCheckboxChange(checkedValues) {
         // console.log('checked = ', checkedValues);
-        this.props.updateStatusFilter( checkedValues );
+        this.props.updateStatusFilter(checkedValues);
     };
+
     //导航栏目选中
-    onMenuTitleSelect({item, key, domEvent, keyPath }){
+    onMenuTitleSelect({item, key, domEvent, keyPath}) {
         let obj = this.state[key];
-        if(obj){
+        if (obj) {
             let show = this.state[key].show;
-            this.setState({
-                [key]: {
-                    show: !show,
-                }
-            });
+            if(key != 'flightSearch'){
+                this.setState({
+                    [key]: {
+                        show: !show,
+                    }
+                });
+            }else{
+                let { clientX = 0, clientY = 0 }  = domEvent;
+                const dom = $(".menu-right");
+                const height = dom.height();
+                this.setState({
+                    [key]: {
+                        x: clientX - 150,
+                        show: !show,
+                        y: height + 18
+                    }
+                });
+            }
         }
-        if('toggle-siderbar' == key // 侧边栏切换显示按钮
+        if ('toggle-siderbar' == key // 侧边栏切换显示按钮
             || 'flowcontrol-info' == key // 流控
             || 'restriction-info' == key // 限制信息
             || 'notice-info' == key // 通告信息
-        ){
+        ) {
             this.handleUpdateSidebar(key);
         }
 
     }
 
     // 处理更新侧边栏
-    handleUpdateSidebar(selectKey){
-        const { updateSidebarKey, updateSidebarStatus, sidebarConfig } = this.props;
+    handleUpdateSidebar(selectKey) {
+        const {updateSidebarKey, updateSidebarStatus, sidebarConfig} = this.props;
         const {show, key} = sidebarConfig;
         // 侧边栏切换显示按钮
-        if(selectKey == 'toggle-siderbar'){
+        if (selectKey == 'toggle-siderbar') {
             updateSidebarStatus(!show);
-        }else {
+        } else {
             // 若侧边栏当前未显示，则切换侧边栏为显示状态
-            if(!show){
+            if (!show) {
                 updateSidebarStatus(true);
             }
             // 若选中的菜单栏key值与侧边栏当前显示的模块key值不同,则切换显示模块
-            if(selectKey != key ){
+            if (selectKey != key) {
                 updateSidebarKey(selectKey);
             }
         }
     };
 
     //当点击关闭按钮时，type: 类型
-    onCloseBtn( type ){
+    onCloseBtn(type) {
         this.setState({
             [type]: {
                 show: false
             }
         });
     };
+
     //获取过滤条件判断是否计数，用于判断是否显示过滤提示红点
     getFilterCount() {
-        const { filterMatches = {} } = this.props;
-        const { scopeFilter = "all", statusFilter = [] } = filterMatches;
+        const {filterMatches = {}} = this.props;
+        const {scopeFilter = "all", statusFilter = []} = filterMatches;
         let count = statusFilter.length;
         if (scopeFilter != 'all') {
             count++;
@@ -139,12 +168,12 @@ class NavMenu extends React.Component{
         return count;
     };
 
-    render(){
-        const { filterMatches, loginUserInfo, sidebarConfig, } = this.props;
+    render() {
+        const {filterMatches, loginUserInfo, sidebarConfig, searchTableDatas,dialogName} = this.props;
         const count = this.getFilterCount();
-        const { show } = sidebarConfig;
-        const { airports } = loginUserInfo;
-        const { apPublish, apGSDepPublish, pointPublish, translationPublish } = this.state;
+        const {show} = sidebarConfig;
+        const {airports} = loginUserInfo;
+        const {apPublish, apGSDepPublish, pointPublish, translationPublish, flightSearch} = this.state;
         return (
             <div className="opt-menu-canvas">
                 <Menu
@@ -161,14 +190,14 @@ class NavMenu extends React.Component{
                                     />
                                 </span>
                              }
-                             onTitleClick={ this.onMenuTitleSelect } />
-                    <SubMenu key="navigator-flight-search"
+                             onTitleClick={ this.onMenuTitleSelect }/>
+                    <SubMenu key="flightSearch"
                              title={
                                  <span title="航班查询">
                                     <i className="iconfont icon-search2"></i>
                                 </span>
                              }
-                             onTitleClick={ this.onMenuTitleSelect } />
+                             onTitleClick={ this.onMenuTitleSelect }/>
                     <SubMenu
                         key="flowcontrol-info"
                         title={
@@ -180,19 +209,19 @@ class NavMenu extends React.Component{
                     >
                         <Menu.Item
                             key="apPublish"
-                            onClick= {this.onMenuTitleSelect}
+                            onClick={this.onMenuTitleSelect}
                         >
                             <label>发布机场受限</label>
                         </Menu.Item>
                         <Menu.Item
                             key="apGSDepPublish"
-                            onClick= {this.onMenuTitleSelect}
+                            onClick={this.onMenuTitleSelect}
                         >
                             <label>发布低能见度受限</label>
                         </Menu.Item>
                         <Menu.Item
                             key="pointPublish"
-                            onClick= {this.onMenuTitleSelect}
+                            onClick={this.onMenuTitleSelect}
                         >
                             <label>发布航路受限</label>
                         </Menu.Item>
@@ -200,7 +229,7 @@ class NavMenu extends React.Component{
                         <Menu.Item key="ldr-publish"><label>发布大面积延误恢复</label></Menu.Item>
                         <Menu.Item
                             key="translationPublish"
-                            onClick= {this.onMenuTitleSelect}
+                            onClick={this.onMenuTitleSelect}
                         >
                             <label>发布大面积延误</label>
                         </Menu.Item>
@@ -299,16 +328,16 @@ class NavMenu extends React.Component{
                         }
                     >
                         <Menu.Item key="help">
-                            <label><Icon type="book" />帮助手册</label>
+                            <label><Icon type="book"/>帮助手册</label>
                         </Menu.Item>
                         <Menu.Item key="history">
-                            <label><Icon type="api" />历史查询</label>
+                            <label><Icon type="api"/>历史查询</label>
                         </Menu.Item>
                         <Menu.Item key="resetPwd">
-                            <label><Icon type="key" />修改密码</label>
+                            <label><Icon type="key"/>修改密码</label>
                         </Menu.Item>
-                        <Menu.Item key="logout" onClick={this.handleLogout} >
-                            <label ><Icon type="logout" />登出</label>
+                        <Menu.Item key="logout" onClick={this.handleLogout}>
+                            <label ><Icon type="logout"/>登出</label>
                         </Menu.Item>
 
                     </SubMenu>
@@ -323,9 +352,9 @@ class NavMenu extends React.Component{
                                 titleName="发布机场受限"
                                 type="apPublish"
                                 clickCloseBtn={ this.onCloseBtn }
-                                placeType = 'AP'
-                                x = { 300 }
-                                y = { 60 }
+                                placeType='AP'
+                                x={ 300 }
+                                y={ 60 }
                             />
                         </CreateLayer>
 
@@ -340,10 +369,10 @@ class NavMenu extends React.Component{
                                 titleName="发布低能见度受限"
                                 type="apGSDepPublish"
                                 clickCloseBtn={ this.onCloseBtn }
-                                placeType = 'AP'
-                                limitType = 'GS_DEP'
-                                x = { 300 }
-                                y = { 60 }
+                                placeType='AP'
+                                limitType='GS_DEP'
+                                x={ 300 }
+                                y={ 60 }
                             />
                         </CreateLayer>
                         : ''
@@ -357,9 +386,9 @@ class NavMenu extends React.Component{
                                 titleName="发布航路受限"
                                 type="pointPublish"
                                 clickCloseBtn={ this.onCloseBtn }
-                                placeType = 'POINT'
-                                x = { 300 }
-                                y = { 60 }
+                                placeType='POINT'
+                                x={ 300 }
+                                y={ 60 }
                             />
                         </CreateLayer>
                         : ''
@@ -373,18 +402,40 @@ class NavMenu extends React.Component{
                                 titleName="发布大面积延误"
                                 type="translationPublish"
                                 clickCloseBtn={ this.onCloseBtn }
-                                placeType = 'AP'
-                                limitType = 'TRANSLATION'
-                                x = { 300 }
-                                y = { 60 }
+                                placeType='AP'
+                                limitType='TRANSLATION'
+                                x={ 300 }
+                                y={ 60 }
                             />
                         </CreateLayer>
                         : ''
+                }
+                {
+                    (flightSearch.show)?
+                    <CreateLayer
+                        key={'flightSearch'}
+                        className="flights-search"
+                    >
+                        <FlightSearchModule
+                            titleName = { '航班查询' }
+                            key = { 'flightSearch' }
+                            type = { 'flightSearch'}
+                            loginUserInfo = {loginUserInfo}
+                            property = { searchTableDatas['flightSearch'] }
+                            // tableDatas = { Object.values( searchTableDatas['flightSearch'].datas || {} )  }
+                            tableColumnsObj = { this.tableColumnsObj('flightSearch', searchTableDatas['flightSearch'].colDisplay,  searchTableDatas['flightSearch'].colNames,  searchTableDatas['flightSearch'].colTitle) }
+                            x = { flightSearch.x }
+                            y = { flightSearch.y }
+                            clickCloseBtn = { this.onCloseBtn }
+                            dialogName = {dialogName}
+                        />
+                    </CreateLayer> :""
                 }
             </div>
 
         )
     }
-};
+}
+;
 
 export default NavMenu;

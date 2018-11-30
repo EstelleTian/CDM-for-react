@@ -36,7 +36,8 @@ class Table extends React.Component{
         this.TableColumns = TableColumns.bind(this);
         this.state = {
             airportTimerId : 0,
-            isFirstRequest: true
+            isFirstRequest: true,
+            tableContainer:"main-table"
         };
     }
 
@@ -249,7 +250,7 @@ class Table extends React.Component{
     };
     //转化用户配置信息
     convertUserProperty( user_property ){
-        const { updateTableDatasProperty, updateTableDatasColumns, updateSubTableDatasProperty } = this.props;
+        const { updateTableDatasProperty, updateTableDatasColumns, updateSubTableDatasProperty, updateSearchTableDatasProperty } = this.props;
         //验证是有效的数据
         if( user_property.length > 0){
             //匹配赋值
@@ -260,6 +261,10 @@ class Table extends React.Component{
                 pool: {},
                 alarm: {},
                 todo: {}
+            };
+            //航班查询表格配置
+            let searchTableConfigParams = {
+                flightSearch:{}
             };
             for ( let i in user_property) {
                 let userProperty = user_property[i];
@@ -275,9 +280,12 @@ class Table extends React.Component{
                             subTableConfigParams['special']['colStyle'] = value;
                             subTableConfigParams['alarm']['colStyle'] = value;
                             subTableConfigParams['expired']['colStyle'] = value;
+                            searchTableConfigParams['flightSearch']['colStyle'] = value;
                             //将该数据转化为convert需要数据
                             const obj = convertDisplayStyle(value);
                             configParams['displayStyle'] = obj.displayStyle;
+                            //转化样式
+                            searchTableConfigParams['flightSearch']['displayStyle'] = obj.displayStyle;
                             configParams['displayStyleComment'] = obj.displayStyleComment;
                             break;
                         }
@@ -293,10 +301,12 @@ class Table extends React.Component{
                             subTableConfigParams['special']['colTitle'] = value;
                             subTableConfigParams['alarm']['colTitle'] = value;
                             subTableConfigParams['expired']['colTitle'] = value;
+                            searchTableConfigParams['flightSearch']['colTitle'] = value;
                             break;
                         }
                         case 'grid_cdm_col_edit' : {
                             configParams['colEdit'] = value;
+                            searchTableConfigParams['flightSearch']['colEdit'] = value;
                             break;
                         }
                         case 'grid_cdm_col_display' : {
@@ -371,6 +381,18 @@ class Table extends React.Component{
                             subTableConfigParams['expired']['colDisplay'] = value;
                             break;
                         }
+                        case 'grid_flight_search_col_names' : {
+                            searchTableConfigParams['flightSearch']['colNames'] = value;
+                            break;
+                        }
+                        case 'grid_flight_search_col_edit' : {
+                            searchTableConfigParams['flightSearch']['colEdit'] = value;
+                            break;
+                        }
+                        case 'grid_flight_search_col_display' : {
+                            searchTableConfigParams['flightSearch']['colDisplay'] = value;
+                            break;
+                        }
                     }
 
                 }
@@ -379,6 +401,8 @@ class Table extends React.Component{
             updateTableDatasProperty( configParams );
             //存储到redux的 subTableDatas 中
             updateSubTableDatasProperty( subTableConfigParams );
+            //存储到redux的 flightSearchTableData中
+            updateSearchTableDatasProperty(searchTableConfigParams)
             //转换为表头列数据
             const { colDisplay, colNames, colTitle } = configParams;
             const { columns, width } = this.TableColumns( "", colDisplay, colNames, colTitle );

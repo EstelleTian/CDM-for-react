@@ -1635,6 +1635,18 @@ const convertTodoData = function( flight, datatime, statusObj ){
     }
     return resArr;
 };
+//航班查询表格数据转换
+const convertSearchData = function (flight,datatime,flightAuthMap) {
+    let data = {};
+    const thisProxy = this;
+    if (isValidVariable(flight)) {
+        let flightFieldViewMap = flight.flightFieldMap || {};
+        if (isValidObject(flightFieldViewMap)) {
+            data = this.convertData(flightFieldViewMap,flightAuthMap, datatime);
+        }
+    }
+    return data;
+}
 
 export { convertData, convertDisplayStyle, getDisplayStyle, getDisplayStyleZh, getDisplayFontSize,
-    convertAlarmData, convertExpiredData, converSpecialtData, convertTodoData };
+    convertAlarmData, convertExpiredData, converSpecialtData, convertTodoData, convertSearchData };

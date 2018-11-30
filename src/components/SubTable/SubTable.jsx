@@ -3,6 +3,7 @@ import React from 'react';
 import { Row, Table, Icon } from 'antd';
 import DraggableModule from '../DraggableModule/DraggableModule';
 import './SubTable.less';
+import OperationDialogContainer from "components/OperationDialog/OperationDialogContainer";
 
 class SubTable extends React.Component{
     constructor( props ){
@@ -39,8 +40,9 @@ class SubTable extends React.Component{
 
 
     render(){
-        const { titleName, type, tableDatas, tableColumnsObj, x, y, clickCloseBtn} = this.props;
+        const { titleName, type, tableDatas, tableColumnsObj, x, y, clickCloseBtn,dialogName} = this.props;
         const { width } = tableColumnsObj;
+        const isShowOperation = dialogName !='' && dialogName &&'search'&&dialogName !='main';
         return (
             <DraggableModule
                 x = {x}
@@ -48,7 +50,7 @@ class SubTable extends React.Component{
                 bounds = ".root"
             >
             <div className="box no-cursor" style={{ width: width + 50 }}>
-                <div className="sub-table expired-table">
+                <div className={`sub-table ${type}-table`} tablename={type}>
                     <Row className="title drag-target cursor">
                         <span>{ titleName }</span>
                         <div
@@ -82,6 +84,14 @@ class SubTable extends React.Component{
                             }}
                         />
                     </Row>
+                    {
+                        isShowOperation
+                            ? <OperationDialogContainer
+                                requestCallback = { this.requestCallback }
+                                tableName = {type}
+                            />
+                            : ""
+                    }
                 </div>
             </div>
             </DraggableModule>

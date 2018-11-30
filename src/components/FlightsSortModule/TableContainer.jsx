@@ -4,6 +4,7 @@ import { withRouter } from 'react-router-dom';
 import {isValidObject, isValidVariable} from 'utils/basic-verify';
 import { updateTableDatas, updateTableDatasProperty, updateTableDatasColumns, updateTableConditionScrollId, updateGenerateInfo, updateGenerateTime, updateTableConditionRangeByKey, updateTableConditionRange, updateBasicConfigInfo } from './Redux';
 import { updateSubTableDatasProperty, updateSubTableDatas } from '../SubTable/Redux';
+import { updateSearchTableDatasProperty } from '../FlightSearchModule/Redux';
 import { updateOperationDatasShowNameAndPosition, updateOperationDatasAuth } from '../OperationDialog/Redux';
 import { updateDetailModalDatasVisible, updateDetailModalDatasByName } from '../DetailModule/Redux';
 import {updateMultiTableDatas, updateTableConditionScroll} from "components/FlightsSortModule/Redux";
@@ -181,6 +182,7 @@ const mapDispatchToProps = {
     updateGenerateTime,
     updateSubTableDatasProperty,
     updateSubTableDatas,
+    updateSearchTableDatasProperty,
     updateTableConditionRangeByKey,
     updateTableConditionRange,
     updateOperationDatasShowNameAndPosition,

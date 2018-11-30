@@ -17,60 +17,62 @@ class TableHeader extends React.Component{
         this.getDisplayStyle = getDisplayStyle.bind(this);
         this.getDisplayStyleZh = getDisplayStyleZh.bind(this);
         this.getDisplayFontSize = getDisplayFontSize.bind(this);
+        this.TableColumns = TableColumns.bind(this);
         this.state = {
-            expired: {
-                cn: "失效航班",
-                iconType: "icon-expired",
-                show: false,
-                x: 0,
-                y:0
+            table:{
+                expired: {
+                    cn: "失效航班",
+                    iconType: "icon-expired",
+                    show: false,
+                    x: 0,
+                    y:0
+                },
+                special: {
+                    cn: "特殊航班",
+                    iconType: "icon-special",
+                    show: false,
+                    x: 0,
+                    y:0
+                },
+                pool: {
+                    cn: "等待池航班",
+                    iconType: "icon-pool",
+                    show: false,
+                    x: 0,
+                    y:0
+                },
+                alarm: {
+                    cn: "告警航班",
+                    iconType: "icon-alarm",
+                    show: false,
+                    x: 0,
+                    y:0
+                },
+                todo: {
+                    cn: "待办事项",
+                    iconType: "icon-todo",
+                    show: false,
+                    x: 0,
+                    y:0
+                },
             },
-            special: {
-                cn: "特殊航班",
-                iconType: "icon-special",
-                show: false,
-                x: 0,
-                y:0
-            },
-            pool: {
-                cn: "等待池航班",
-                iconType: "icon-pool",
-                show: false,
-                x: 0,
-                y:0
-            },
-            alarm: {
-                cn: "告警航班",
-                iconType: "icon-alarm",
-                show: false,
-                x: 0,
-                y:0
-            },
-            todo: {
-                cn: "待办事项",
-                iconType: "icon-todo",
-                show: false,
-                x: 0,
-                y:0
-            },
+            tableContainer:""
         }
     }
     //导航栏目选中
     onMenuTitleSelect(key, domEvent){
         let { clientX = 0, clientY = 0 }  = domEvent;
-        let show = this.state[key].show;
+        let show = this.state.table[key].show;
+        let newDate = Object.assign({},this.state.table)
         const dom = $(".flight-menu");
         const height = dom.height();
         const domLeft = dom[0].offsetLeft || 0;
         const domTop = dom[0].offsetTop || 0;
-        this.setState({
-            [key]: {
-                ...this.state[key],
-                show: !show,
-                x: clientX - 150,
-                y: height + 18
-            }
-        });
+        this.state.table[key].show = !show;
+        this.state.table[key].x = clientX - 150;
+        this.state.table[key].y = height + 18;
+        this.state.tableContainer = `${key}-table`
+        this.forceUpdate()//防止differ算法循环不到
 
     }
 
@@ -80,26 +82,22 @@ class TableHeader extends React.Component{
 
     //当点击关闭按钮时，type: 表格类型
     onCloseBtn( type ){
-        this.setState({
-            [type]: {
-                ...this.state[type],
-                show: false
-            }
-        });
+        this.state.table[type].show = false;
+        this.forceUpdate()
         //去掉menu的选中状态
         $(".flight-menu li." + type).removeClass("ant-menu-item-selected");
     }
 
     render(){
-        const { subTableDatas = {}} = this.props;
-        const subTableKeys = Object.keys(this.state);
+        const { subTableDatas = {},dialogName} = this.props;
+        const subTableKeys = Object.keys(this.state.table);
 
         return (
             <div className="header">
                 <div className="flight-menu">
                     {
                         subTableKeys.map(( name )=>{
-                            const obj = this.state[name];
+                            const obj = this.state.table[name];
                             return (
                                 <div key={name} className="item" onClick={(e)=>{ this.onMenuTitleSelect(name, e)} }>
                                     <Badge count={ Object.keys( subTableDatas[name].datas || {} ).length } className="badge-icon">
@@ -114,7 +112,7 @@ class TableHeader extends React.Component{
                 </div>
                 {
                     subTableKeys.map(( name )=>{
-                        const obj = this.state[name];
+                        const obj = this.state.table[name];
                         if( obj.show ){
                             const dataMap = subTableDatas[name];
                             return (
@@ -126,10 +124,11 @@ class TableHeader extends React.Component{
                                         key = { name }
                                         type = { name }
                                         tableDatas = { Object.values( dataMap.datas || {} ) }
-                                        tableColumnsObj = { TableColumns( name, dataMap.colDisplay, dataMap.colNames, dataMap.colTitle ) }
+                                        tableColumnsObj = { this.TableColumns( name, dataMap.colDisplay, dataMap.colNames, dataMap.colTitle ) }
                                         x = { obj.x }
                                         y = { obj.y }
                                         clickCloseBtn = { this.onCloseBtn }
+                                        dialogName = {dialogName}
                                     />
                                 </CreateLayer>
                             )
