@@ -23,13 +23,13 @@ const requestGet = ( url, params, resFunc ) => {
  * @param errFunc 失败后的回调函数
  *
  */
-const request = ( url, type, params, resFunc, errFunc ) => {
+const request = ( url, type, params, resFunc, errFunc,headers='application/json; charset=utf-8' ) => {
     axios({
         method: type,
         url,
         data: params,
         headers: {
-            'Content-Type': 'application/json; charset=utf-8'
+            'Content-Type': headers
         }
     }).then( response => {
         const data = response.data;

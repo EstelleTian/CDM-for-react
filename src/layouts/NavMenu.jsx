@@ -6,6 +6,7 @@ import {request} from 'utils/request-actions';
 import {logoutUrl} from 'utils/request-urls';
 import CreateLayer from "components/CreateLayer/CreateLayer";
 import FlowcontrolDialogContainer from "components/FlowcontrolModule/Dialog/FlowcontrolDialog/FlowcontrolDialogContainer";
+import NoticePublisContainer from "../components/NoticeModule/Publish/NoticePublisContainer";
 import { TableColumns } from "utils/table-config";
 import FlightSearchModule from "components/FlightSearchModule/FlightSearchModule";
 import './NavMenu.less';
@@ -39,9 +40,11 @@ class NavMenu extends React.Component {
             },
             apGSDepPublish: {
                 show: false,
-            }, pointPublish: {
+            },
+            pointPublish: {
                 show: false,
-            }, translationPublish: {
+            },
+            translationPublish: {
                 show: false,
             },
             flightSearch: {
@@ -50,7 +53,10 @@ class NavMenu extends React.Component {
                 x: 0,
                 y: 0
             },
-            tableContainer:'search-table'
+            tableContainer:'search-table',
+            noticePublish:{
+                show:false,
+            }
         }
 
     }
@@ -123,6 +129,7 @@ class NavMenu extends React.Component {
             || 'flowcontrol-info' == key // 流控
             || 'restriction-info' == key // 限制信息
             || 'notice-info' == key // 通告信息
+            || 'statistics-info'== key //统计信息
         ) {
             this.handleUpdateSidebar(key);
         }
@@ -173,7 +180,7 @@ class NavMenu extends React.Component {
         const count = this.getFilterCount();
         const {show} = sidebarConfig;
         const {airports} = loginUserInfo;
-        const {apPublish, apGSDepPublish, pointPublish, translationPublish, flightSearch} = this.state;
+        const {apPublish, apGSDepPublish, pointPublish, translationPublish, flightSearch,noticePublish} = this.state;
         return (
             <div className="opt-menu-canvas">
                 <Menu
@@ -303,7 +310,11 @@ class NavMenu extends React.Component {
                         }
                         onTitleClick={ this.onMenuTitleSelect }
                     >
-                        <Menu.Item key="notice-info-publish"><label>发布通告信息</label></Menu.Item>
+                        <Menu.Item key="noticePublish"
+                                   onClick={this.onMenuTitleSelect}
+                        >
+                            <label>发布通告信息</label>
+                        </Menu.Item>
                     </SubMenu>
 
                     <SubMenu
@@ -317,6 +328,18 @@ class NavMenu extends React.Component {
                     >
                         <Menu.Item key="restriction-deice-publish">发布除冰限制</Menu.Item>
                     </SubMenu>
+
+                    <SubMenu
+                        key="statistics-info"
+                        title={
+                            <span title="统计信息">
+                                <i className="iconfont icon-shichanghuodong"></i>
+                            </span>
+                        }
+                        onTitleClick={ this.onMenuTitleSelect }
+                    >
+                    </SubMenu>
+
                     <SubMenu
                         key="setting"
                         title={
@@ -429,6 +452,20 @@ class NavMenu extends React.Component {
                             dialogName = {dialogName}
                         />
                     </CreateLayer> :""
+                }
+                {
+                    (noticePublish.show)?
+                        <CreateLayer
+                            className="notice-publish"
+                        >
+                            <NoticePublisContainer
+                                titleName="发布通告信息"
+                                type="NoticePublish"
+                                dialogName="noticePublish"
+                                clickCloseBtn={ this.onCloseBtn }
+                                x={ 300 }
+                                y={ 60 }/>
+                        </CreateLayer> :""
                 }
             </div>
 

@@ -13,7 +13,17 @@ class NoticeDetail extends React.Component {
         this.getNoticeDetail = this.getNoticeDetail.bind(this);
         this.handleNoticeDetailData = this.handleNoticeDetailData.bind(this);
         this.converDate = this.converDate.bind(this);
-        this.state = {}
+        this.state = {
+            id:'',
+            title:'',
+            text:'',
+            readUsers:[],
+            unReadUsers:[],
+            publishUser:'',
+            publishUserId:'',
+            noticeType:'',
+            lastModifyTime:''
+        }
     }
 
     // 获取通告详情数据
@@ -35,27 +45,34 @@ class NoticeDetail extends React.Component {
         // 取响应结果中的通告数据
         if (res && res.status == 200) {
             const { result = {} } = res;
-            const data = result[id];
             // 转换格式
-            this.converDate(data);
+            this.converDate(result);
         }
     }
     converDate (data) {
-        let id = data.id;
+        const {information,readUsers = [],unReadUsers = []} = data
+        let id = information.id;
         // 标题
-        let title = data.title || '';
+        let title = information.title || '';
         // 内容
-        let text = data.text || '';
+        let text = information.text || '';
         // 发布者
-        let publishUser = data.publishUser || '';
+        let publishUser = information.publishUserZh || '';
+        //发布者id
+        let publishUserId = information.publishUser || '';
+        //通告类型
+        let noticeType = information.type;
         // 发布时间
-        let lastModifyTime = formatTimeString(data.lastModifyTime) || '';
-
+        let lastModifyTime = formatTimeString(information.generateTime) || '';
         this.setState({
             id,
             title,
             text,
+            readUsers,
+            unReadUsers,
             publishUser,
+            publishUserId,
+            noticeType,
             lastModifyTime
         })
     }
@@ -66,10 +83,10 @@ class NoticeDetail extends React.Component {
     }
 
     render() {
-        const {titleName, clickCloseBtn, width = 420, dialogName, x = 300, y} = this.props;
-        const {id, title, text, publishUser, lastModifyTime} = this.state;
+        const {loginUserInfo,titleName, clickCloseBtn, width = 820, dialogName, x = 300, y} = this.props;
+        const {id, title, text,readUsers,unReadUsers, publishUser,publishUserId,noticeType, lastModifyTime} = this.state;
         const Layout24 = {span: 24};
-
+        const { userId } = loginUserInfo;
         return (
             <DraggableModule
                 bounds=".root"
@@ -99,8 +116,45 @@ class NoticeDetail extends React.Component {
                                     </Col>
                                 </Row>
                                 <Row>
+                                    <Col {...Layout24} className="type">
+                                        <label className='user-label'>通告类型：</label>
+                                        <span>{ noticeType == '1'?'重要通告':'普通通告' }</span>
+                                    </Col>
+                                </Row>
+                                <Row>
                                     <Col {...Layout24} className="text">
-                                        <p>{ text }</p>
+                                        <p className='user-label'>通告内容：</p>
+                                        <p className='notice-content'>{ text }</p>
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col {...Layout24} className="userList">
+                                        {
+                                            userId == publishUserId?<label className='user-label'>已读用户：</label>:''
+                                        }
+                                        {
+
+                                            userId == publishUserId?readUsers.map((value,index)=>{
+                                                return(
+                                                    <span key={value.id}>{`${value.description}（${value.username}）`}</span>
+                                                )
+                                            }):''
+                                        }
+                                    </Col>
+                                </Row>
+                                <Row>
+                                    <Col {...Layout24} className="userList">
+                                        {
+                                            userId == publishUserId?<label className='user-label'>未读用户：</label>:''
+                                        }
+
+                                        {
+                                            userId == publishUserId?unReadUsers.map((value,index)=>{
+                                                return(
+                                                    <span key={value.id}>{`${value.description}（${value.username}）`}</span>
+                                                )
+                                            }):''
+                                        }
                                     </Col>
                                 </Row>
                                 <Row>

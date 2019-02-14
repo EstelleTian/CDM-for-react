@@ -4,7 +4,7 @@ import React from 'react';
 import { Row, Col } from 'antd';
 import { getNoticeUrl } from 'utils/request-urls';
 import {  requestGet } from 'utils/request-actions';
-import NoticeItem from "./NoticeItem";
+import NoticeItemContainer from "./NoticeItemContainer";
 import './NoticeList.less';
 
 class NoticeList extends React.Component{
@@ -12,6 +12,7 @@ class NoticeList extends React.Component{
         super(props);
         this.getNoticeDatas = this.getNoticeDatas.bind(this);
         this.handleUpdateNoticeData = this.handleUpdateNoticeData.bind(this);
+        this.convertNoticeData = this.convertNoticeData.bind(this);
         this.state = {
             noticeTimerId : 0
         };
@@ -27,7 +28,15 @@ class NoticeList extends React.Component{
         };
         requestGet(getNoticeUrl,params,this.handleUpdateNoticeData)
     }
-
+    convertNoticeData(result){
+        const{ toMyNotices,myNotices } = result
+        const resultArr = [...toMyNotices.read,...toMyNotices.unRead,...myNotices];
+        let res = {}
+        resultArr.map((value)=>{
+            return res[value.id] = value
+        })
+        return res
+    }
     handleUpdateNoticeData(res) {
         const {updateNoticeDatas, updateNoticeGenerateTime} = this.props;
         // 通告信息数据生成时间
@@ -37,7 +46,8 @@ class NoticeList extends React.Component{
         // 取流控数据
         const {result = {}} = res;
         // 更新流控数据
-        updateNoticeDatas(result);
+        const noticeResData = this.convertNoticeData(result);
+        updateNoticeDatas(noticeResData);
         // 定时30秒后再次获取流控数据并更新
         const noticeTimerId = setTimeout(() => {
             // 获取通告信息数据
@@ -62,18 +72,19 @@ class NoticeList extends React.Component{
     }
 
     render(){
-        const { noticeViewMap, noticeGenerateTime } = this.props;
+        const { noticeViewMap, noticeGenerateTime,userId } = this.props;
         return (
             <Col span={24} className="notice-list">
                 <Row className="notice-item-wrapper">
                     {
                         noticeViewMap.map((item,index) =>{
                             return (
-                                <NoticeItem
+                                <NoticeItemContainer
                                     key={item.id}
                                     data = {item}
+                                    userId={userId}
                                     indexNumber = { (index +1) }
-                                    generateTime = { noticeGenerateTime }
+                                    generateTime = { item.generateTime }
                                 />
                             )
                         })

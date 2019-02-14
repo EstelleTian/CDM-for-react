@@ -41,10 +41,24 @@ const updateFlowcontrolUrl = `${flowcontrolHost}/flow/update.action`;
 // 终止流控
 const terminateFlowcontrolUrl = `${flowcontrolHost}/flow/terminate.action`;
 
+//-----通告模块-------//
+const noticeHost = "http://192.168.243.108:8098";
+//发布通告信息
+const publishNoticeUrl = `${noticeHost}/noticeInformation/publish`
 // 获取通告信息
-const getNoticeUrl = `${host}/retrieveNoticeInformation.bo`;
+const getNoticeUrl = `${noticeHost}/noticeInformation/retrieveAll`;
 // 通告详情
-const getNoticeDetailUrl = `${host}/retrieveNoticeInformationById.bo`;
+const getNoticeDetailUrl = `${noticeHost}/noticeInformation/retrieveById`;
+//更新通告信息
+const updateNoticeUrl = `${noticeHost}/noticeInformation/update`;
+// 终止通告信息
+const terminateNoticeUrl = `${noticeHost}/noticeInformation/terminate`;
+// 阅读重要通告信息
+const readSpecialNoticeUrl = `${noticeHost}/noticeInformation/readSpecialNotice`;
+// 获取接受用户信息列表
+const getUserBySystemUrl = `${noticeHost}/noticeInformation/retrieveUsersBySystem`;
+
+
 // 获取限制信息
 const getRestrictionUrl = `${host}/retrieveRestriction.bo`;
 // 获取限制信息详情
@@ -56,8 +70,8 @@ export {
     loginUrl, logoutUrl,
     getSystemConfigUrl, getUserPropertyUrl,
     getAllAirportsUrl, getSingleAirportUrl, getSingleCollaborateRecordUrl, getSingleFormerFlightUrl, updateFormerFlightUrl,getFlightDetailUrl,
-    getFlowcontrolUrl, getNoticeUrl,
+    getFlowcontrolUrl, getNoticeUrl,terminateNoticeUrl,readSpecialNoticeUrl,getUserBySystemUrl,updateNoticeUrl,
     getPointByAirportUrl, getRestrictionUrl,
     publishFlowcontrolUrl, updateFlowcontrolUrl, getFlowcontrolTemplateUrl, getFlowcontrolByIdUrl,
-    getFlowcontrolDetailUrl, terminateFlowcontrolUrl, retrieveFlowcontrolImpactFlightsUrl, getNoticeDetailUrl, getRestrictionDetailUrl,
+    getFlowcontrolDetailUrl, terminateFlowcontrolUrl, retrieveFlowcontrolImpactFlightsUrl, getNoticeDetailUrl, getRestrictionDetailUrl,publishNoticeUrl
 };

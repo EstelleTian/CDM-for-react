@@ -3,10 +3,17 @@
 //value命名规则： 数据名称 + 操作类型（update,add,delete）+ 操作对象 以左划线分隔,小写
 const UPDATE_NOTICE_DATAS= 'noticeDatas/update/datas';
 
+const DELETE_NOTICE_DATAS = 'noticeDatas/delete/datas';
+
 //action-creator
 //更新通告信息数据集合
 const updateNoticeDatas = dataMap => ({
     type: UPDATE_NOTICE_DATAS,
+    dataMap
+});
+//删除通告信息集合 
+const deleteNoticeDatas = dataMap =>({
+    type:DELETE_NOTICE_DATAS,
     dataMap
 });
 //reducer notice data 通告信息数据
@@ -24,6 +31,15 @@ const noticeDatas = ( state = initData, action) => {
             return {
                 ...state,
                 noticeDataMap: dataMap
+            }
+        }
+        case DELETE_NOTICE_DATAS:{
+            const noticeDataMap = state.noticeDataMap;
+            let dataMap = action.dataMap || {};
+            Reflect.deleteProperty(noticeDataMap, dataMap);
+            return {
+                ...state,
+                noticeDataMap: noticeDataMap
             }
         }
         default:
@@ -61,6 +77,6 @@ const noticeGenerateTime = (state = initNoticeGenerateTime, action) => {
 
 //---------------------------------------------------------------------
 export {
-    noticeDatas, updateNoticeDatas,
+    noticeDatas, updateNoticeDatas,deleteNoticeDatas,
     noticeGenerateTime, updateNoticeGenerateTime,
 };

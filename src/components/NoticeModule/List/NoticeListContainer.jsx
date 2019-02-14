@@ -24,12 +24,12 @@ const filterNoticeDatas = (data) => {
     });
     // 排序
 
-    // 按lastModifyTime降序排序
+    // 按generateTime降序排序
 
     noticeDatas.sort((d1,d2) =>{
         if(isValidObject(d1) && isValidObject(d2)){
-            const d1Time = d1.lastModifyTime || '';
-            const d2Time = d2.lastModifyTime || '';
+            const d1Time = d1.generateTime || '';
+            const d2Time = d2.generateTime || '';
             return (d1Time * 1 > d2Time *1) ? -1 : 1 ;
         }
     });

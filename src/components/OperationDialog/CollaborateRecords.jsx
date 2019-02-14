@@ -4,6 +4,7 @@ import {requestGet} from "utils/request-actions";
 import {getSingleCollaborateRecordUrl} from "utils/request-urls";
 import DraggableModule from "components/DraggableModule/DraggableModule";
 import TableLayoutDetail from "components/DetailModule/TableLayoutDetail";
+import {isValidObject, isValidVariable} from "utils/basic-verify";
 
 
 class CollaborateRecords extends React.Component{
@@ -15,8 +16,13 @@ class CollaborateRecords extends React.Component{
         };
     };
     //请求方法
-    getRecordRequest(){
-        const { id, userId } = this.props;
+    getRecordRequest(nextProps){
+        if(isValidObject(nextProps)){
+            var { id } = nextProps;
+        }else{
+            id = this.props.id
+        }
+        const { userId } = this.props;
         //根据航班id获取协调记录
         const params = {
             userId: userId,
@@ -33,28 +39,31 @@ class CollaborateRecords extends React.Component{
     componentWillMount(){
         this.getRecordRequest();
     };
-    componentWillUpdate(){
-        this.getRecordRequest();
-    };
-    shouldComponentUpdate(nextProps, nextState){
-        if( nextProps.id == this.props.id ){
-            var keysA = Object.keys(this.state.records);
-            var keysB = Object.keys(nextState.records);
-            if (keysA.length !== keysB.length) {
-                return true;
-            }else{
-                for (let idx = 0; idx < keysA.length; idx++) {
-                    let key = keysA[idx];
-                    if( keysB.indexOf(key) == -1 ){
-                        return true;
-                    }
-                }
-                return false;
-            }
-        }else{
-            return true;
-        }
-    };
+    // componentWillUpdate(){
+    //     this.getRecordRequest();
+    // };
+    // shouldComponentUpdate(nextProps, nextState){
+    //     if( nextProps.id == this.props.id ){
+    //         var keysA = Object.keys(this.state.records);
+    //         var keysB = Object.keys(nextState.records);
+    //         if (keysA.length !== keysB.length) {
+    //             return true;
+    //         }else{
+    //             for (let idx = 0; idx < keysA.length; idx++) {
+    //                 let key = keysA[idx];
+    //                 if( keysB.indexOf(key) == -1 ){
+    //                     return true;
+    //                 }
+    //             }
+    //             return false;
+    //         }
+    //     }else{
+    //         return true;
+    //     }
+    // };
+    componentWillReceiveProps(nextProps){
+        this.getRecordRequest(nextProps);
+    }
 
     render(){
         const { width = 1000, flightid, clickCloseBtn, x, y } = this.props;
