@@ -371,7 +371,7 @@ class NavMenu extends React.Component {
                             className="flowcontol-layer"
                         >
                             <FlowcontrolDialogContainer
-                                titleName="发布机场受限"
+                                titleName="机场受限-发布"
                                 type="apPublish"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType='AP'
@@ -388,7 +388,7 @@ class NavMenu extends React.Component {
                             className="flowcontol-layer"
                         >
                             <FlowcontrolDialogContainer
-                                titleName="发布低能见度受限"
+                                titleName="低能见度受限-发布"
                                 type="apGSDepPublish"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType='AP'
@@ -405,7 +405,7 @@ class NavMenu extends React.Component {
                             className="flowcontol-layer"
                         >
                             <FlowcontrolDialogContainer
-                                titleName="发布航路受限"
+                                titleName="航路受限－发布"
                                 type="pointPublish"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType='POINT'
@@ -421,7 +421,7 @@ class NavMenu extends React.Component {
                             className="flowcontol-layer"
                         >
                             <FlowcontrolDialogContainer
-                                titleName="发布大面积延误"
+                                titleName="大面积延误－发布"
                                 type="translationPublish"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType='AP'
