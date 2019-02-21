@@ -194,5 +194,25 @@ const getDayTimeFromString = ( str ) => {
     return "";
 };
 
+/**
+ * 8位字符串时间转换格式(转为YYYY-MM-DD)
+ *
+ * @param str  yyyyMMddHHmm 12位字符串
+ * @param addMillis
+ * @returns {String}
+ */
+const getDateFromString = ( str ) => {
+    if( isValidVariable(str) && ( str.length == 12 || str.length == 14 ) ){
+        // 解析各个值
+        // 解析各个值
+        const year = str.substring(0, 4);
+        const month = str.substring(4, 6);
+        const day = str.substring(6, 8);
+
+        return year + '-' + month + '-' + day;
+    }
+    return "";
+};
+
 export { isValidVariable, isValidObject, calculateStringTimeDiff, addStringTime, getFullTime, formatTimeString,
-    getTimeFromString, getDayTimeFromString };
+    getTimeFromString, getDayTimeFromString, getDateFromString };
