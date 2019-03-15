@@ -2,7 +2,6 @@
 //key命名规则：  操作类型（update,add,delete）+ 数据名称 + 操作对象 以下划线分隔,全部大写
 //value命名规则： 数据名称 + 操作类型（update,add,delete）+ 操作对象 以左划线分隔,小写
 const UPDATE_FLOWCONTROL_DATAS= 'flowcontrolDatas/update/datas';
-const UPDATE_FLOWCONTROL_VIEWMAP= 'flowcontrolDatas/update/viewMap';
 
 //action-creator
 //更新流控数据集合
@@ -14,13 +13,6 @@ const updateFlowcontrolDatas = dataMap => ({
 const initData = {
     flowcontrolDataMap: {}, // 流控数据
 };
-
-// 更新流控显示数据集合
-const updateFlowcontrolViewMap = viewMap => ({
-    type: UPDATE_FLOWCONTROL_VIEWMAP,
-    viewMap
-});
-
 
 //store flowcontrol data 流控数据
 const flowcontrolDatas = ( state = initData, action) => {

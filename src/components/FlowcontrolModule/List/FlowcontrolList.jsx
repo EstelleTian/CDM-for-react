@@ -4,9 +4,9 @@ import React from 'react';
 import { Row, Col } from 'antd';
 import { getFlowcontrolUrl } from 'utils/request-urls';
 import {  request } from 'utils/request-actions';
-
+// 动画
 import QueueAnim from 'rc-queue-anim';
-
+// 引入流控列表项组件
 import FlowcontrolItem from "./FlowcontrolItem";
 import './FlowcontrolList.less';
 
@@ -16,12 +16,19 @@ class FlowcontrolList extends React.Component{
         this.getParams = this.getParams.bind(this);
         this.getFlowcontrolDatas = this.getFlowcontrolDatas.bind(this);
         this.handleUpdateFlowcontrolData = this.handleUpdateFlowcontrolData.bind(this);
-        this.convertData = this.convertData.bind(this);
+        this.connectAuth = this.connectAuth.bind(this);
+        this.getFlowcontrolItems = this.getFlowcontrolItems.bind(this);
+        // 初始化组件state
         this.state = {
             flowcontrolTimerId : 0
         };
     }
-    // 拼接获取流控数据请求中所需参数
+
+    /**
+     * 拼接获取流控数据请求中所需参数
+     *
+     *  return { params } 参数对象
+     * */
     getParams (){
         const { startWaypoints, waypoints, system, systemProgram} = this.props.flowcontrolParams;
         const { userId } = this.props;
@@ -54,18 +61,21 @@ class FlowcontrolList extends React.Component{
         // 发送请求并指定回调方法
         request(getFlowcontrolUrl, 'POST', JSON.stringify(params), this.handleUpdateFlowcontrolData);
     }
-    // 更新流控数据
+    /**
+     * 更新流控数据
+     * @param res 响应数据
+     *
+     * */
     handleUpdateFlowcontrolData(res) {
         const {updateFlowcontrolDatas, updateFlowGenerateTime} = this.props;
         // 流控数据生成时间
         const {generateTime = ''} = res;
         // 更新流控数据生成时间
         updateFlowGenerateTime(generateTime);
-        // 取流控数据
+        // 取流控数据及操作权限
         const {result = {}, authMap = {} } = res;
-        // 合并数据
-        const flowDatas = this.convertData(result, authMap);
-
+        // 将操作权限与流控数据合并
+        const flowDatas = this.connectAuth(result, authMap);
         // 更新流控数据
         updateFlowcontrolDatas(flowDatas);
         // 定时30秒后再次获取流控数据并更新
@@ -77,27 +87,50 @@ class FlowcontrolList extends React.Component{
             flowcontrolTimerId
         });
     }
-    // 将操作权限与流控数据合并
-    convertData(dataMap,authMap) {
+    /**
+     * 将操作权限与流控数据合并
+     * @param dataMap 流控数据集合
+     * @param authMap 流控数据操作权限集合
+     * @return { result } 合并后的流控数据
+     * */
+    connectAuth(dataMap,authMap) {
         let result = {};
         let map = Object.keys(dataMap);
-        map.map((item,index) => {
+        map.map((item) => {
             let auth = authMap[item];
             if(auth){
                 result[item] = {...dataMap[item],auth}
             }
         });
-
         return result
-
     }
 
-    // 立即调用
+    /**
+     * 获取流控列表项
+     *
+     * */
+    getFlowcontrolItems() {
+        // 流控数据
+        const { flowcontrolViewMap = [], flowGenerateTime, systemConfig } = this.props;
+        return flowcontrolViewMap.map((item,index) =>{
+            return (
+                <FlowcontrolItem
+                    key={item.id}
+                    data = {item}
+                    indexNumber = { (index +1) }
+                    generateTime = { flowGenerateTime }
+                    systemConfig = { systemConfig }
+                />
+            )
+        })
+    }
+
+    // 组件挂载完成
     componentDidMount(){
         // 获取流控数据
         this.getFlowcontrolDatas()
     }
-
+    //组件将要挂载
     componentWillUnmount(){
         //清除定时器
         const { flowcontrolTimerId = 0} = this.state;
@@ -105,24 +138,12 @@ class FlowcontrolList extends React.Component{
     }
 
     render(){
-        // 流控数据
-        const { flowcontrolViewMap = [], flowGenerateTime, systemConfig } = this.props;
         return (
             <Col span={24} className="flowcontrol-list">
                 <Row className="flow-item-wrapper">
                     <QueueAnim delay={300} className="queue-simple">
                     {
-                        flowcontrolViewMap.map((item,index) =>{
-                            return (
-                                    <FlowcontrolItem
-                                        key={item.id}
-                                        data = {item}
-                                        indexNumber = { (index +1) }
-                                        generateTime = { flowGenerateTime }
-                                        systemConfig = { systemConfig }
-                                    />
-                            )
-                        })
+                        this.getFlowcontrolItems()
                     }
                     </QueueAnim>
                 </Row>

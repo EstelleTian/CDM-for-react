@@ -118,7 +118,7 @@ const calculateLevelValue = (data) => {
 }
 
 const mapStateToProps = ( state ) => {
-    const { flowcontrolDataMap , flowcontrolViewMap} = state.flowcontrolDatas;
+    const { flowcontrolDataMap } = state.flowcontrolDatas;
     // 流控过滤规则
     const {  shieldLong = false,
         scope = 'EFFECTIVE',
@@ -136,7 +136,7 @@ const mapStateToProps = ( state ) => {
         userId, // 用户id
         flowcontrolParams, // 获取流控数据所需参数
         flowGenerateTime, // 流控数据生成时间
-        flowcontrolDataMap, // 流控数据
+        flowcontrolDataMap, // 全部流控数据
         flowcontrolViewMap :  filterFlowoncontrolDatas(flowcontrolDataMap, flowGenerateTime, shieldLong, scope, placeType, orderBy, quicklyFilters ), // 流控显示数据
         shieldLong,
         scope,
