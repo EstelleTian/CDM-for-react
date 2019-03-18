@@ -61,7 +61,7 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
      * */
     if("TIME" == orderBy){ // 按时间排序
         // 时间排序
-        //失效在下生效在上 ? (原代码未按此规则排序)
+        //失效在下生效在上
         // 失效流控按lastModifyTime 降序排
         // 生效流控按generateTime 降序排
 
@@ -120,11 +120,12 @@ const calculateLevelValue = (data) => {
 const mapStateToProps = ( state ) => {
     const { flowcontrolDataMap } = state.flowcontrolDatas;
     // 流控过滤规则
-    const {  shieldLong = false,
-        scope = 'EFFECTIVE',
-        placeType = 'ALL',
-        orderBy = 'TIME',
-        quicklyFilters = ''
+    const {
+        shieldLong = false, // 是否屏蔽长期
+        scope = 'EFFECTIVE', // 范围
+        placeType = 'ALL', // 类型
+        orderBy = 'TIME', // 排序依据
+        quicklyFilters = '' // 快速过滤
     } = state.flowcontrolCondition;
     // 流控数据生成时间
     const {time:flowGenerateTime} = state.flowGenerateTime;
