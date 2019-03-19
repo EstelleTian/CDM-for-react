@@ -5,7 +5,8 @@ import { withRouter } from 'react-router-dom';
 import FlowcontrolItem from './FlowcontrolItem';
 
 const mapStateToProps = ( state ) => ({
-    flowGenerateTime : state.flowGenerateTime
+    flowGenerateTime : state.flowGenerateTime,
+    systemConfig: state.systemConfig || {},
 });
 
 const mapDispatchToProps = {

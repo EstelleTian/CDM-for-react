@@ -8,7 +8,7 @@ import { updateFlowcontrolDatas,  updateFlowcontrolConditionShieldLong,
 
 import FlowcontrolList from './FlowcontrolList';
 import { isValidVariable, isValidObject } from 'utils/basic-verify';
-import { isEffective, FlowcontrolConstant } from 'utils/flowcontrol-data-util';
+import  { FlowcontrolDataUtil } from 'utils/flowcontrol-data-util';
 
 
 /**
@@ -46,7 +46,7 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
         if('EFFECTIVE' == scope){
             // 过滤正在生效流控数据
             flowcontrolDatas = flowcontrolDatas.filter((item) => {
-                return isEffective(item,flowGenerateTime);
+                return FlowcontrolDataUtil.isEffective(item,flowGenerateTime);
             });
         }
 
@@ -78,8 +78,8 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
         flowcontrolDatas.sort((d1,d2) =>{
             if(isValidObject(d1) && isValidObject(d2)){
                 // LDR 排在最后
-                if(d1.placeType == FlowcontrolConstant.TYPE_LDR
-                    && d2.placeType != FlowcontrolConstant.TYPE_LDR  ){
+                if(d1.placeType == FlowcontrolDataUtil.TYPE_LDR
+                    && d2.placeType != FlowcontrolDataUtil.TYPE_LDR  ){
                     return -1;
                 }
                 // 按程度标记降序排序
@@ -101,15 +101,15 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
 const calculateLevelValue = (data) => {
     const { type, value, assignSlot } = data;
     let res = 0;
-    if(type == FlowcontrolConstant.TYPE_MIT ){ // 距离
+    if(type == FlowcontrolDataUtil.TYPE_MIT ){ // 距离
         res = parseInt( value, 10) / 13;
-    }else if(type == FlowcontrolConstant.TYPE_TIME){ // 时间
+    }else if(type == FlowcontrolDataUtil.TYPE_TIME){ // 时间
         res = value;
-    }else if(type == FlowcontrolConstant.TYPE_GS){ // 地面停止
+    }else if(type ==FlowcontrolDataUtil.TYPE_GS){ // 地面停止
         res = 0;
-    }else if(type == FlowcontrolConstant.TYPE_ASSIGN){ // 指定时隙
+    }else if(type == FlowcontrolDataUtil.TYPE_ASSIGN){ // 指定时隙
         res = assignSlot;
-    }else if(type == FlowcontrolConstant.TYPE_RESERVE){ // 预留时隙
+    }else if(type == FlowcontrolDataUtil.TYPE_RESERVE){ // 预留时隙
         res = assignSlot;
     }
 

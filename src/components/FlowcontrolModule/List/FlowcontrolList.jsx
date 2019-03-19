@@ -116,10 +116,10 @@ class FlowcontrolList extends React.Component{
             return (
                 <FlowcontrolItem
                     key={item.id}
-                    data = {item}
-                    indexNumber = { (index +1) }
-                    generateTime = { flowGenerateTime }
-                    systemConfig = { systemConfig }
+                    singleFlowcontrolData = {item} // 单个流控数据
+                    indexNumber = { (index +1) } // 列表项下标标识
+                    flowGenerateTime = { flowGenerateTime } // 流控列表数据生成时间
+                    systemConfig = { systemConfig } // 系统参数
                 />
             )
         })
