@@ -93,6 +93,10 @@ const FlowcontrolDataUtil = {
     REASON_MILITARY: 'MILITARY',//其他空域用户
     REASON_OTHERS: 'OTHERS',//其他
 
+    STRATEGY_PART : 'PART',
+    STRATEGY_ALL : 'ALL',
+    STRATEGY_NONE : 'NONE',
+
     /***********************************方法*****************************/
 
     /**
@@ -140,6 +144,69 @@ const FlowcontrolDataUtil = {
             default:
                 res = flowcontrolType || '';
                 break;
+        }
+        return res;
+    },
+
+    /**
+     * 获取变更策略
+     * @param data 流控数据
+     * @return string 变更策略
+     * */
+    getStrategyZh: function (data) {
+        const { status, compressAtStartStrategy, compressAtEndStrategy  } = data;
+        // 转换后的结果
+        let res = '';
+        if(status == this.FLOWCONTROL_STATUS_PRE_PUBLISH){
+            res = this.getStrateg(compressAtStartStrategy);
+        }else if(status == this.FLOWCONTROL_STATUS_PRE_TERMINATED
+                || status == this.FLOWCONTROL_STATUS_PRE_UPDATE){
+            res = this.getStrateg(compressAtEndStrategy);
+        }else if( compressAtEndStrategy){
+            res = this.getStrateg(compressAtEndStrategy);
+        }else if(compressAtStartStrategy){
+            res = this.getStrateg(compressAtStartStrategy);
+        }
+        return res;
+    },
+
+    getStrateg: function (strateg) {
+        if(strateg == this.STRATEGY_PART){
+            return '公司申请变更'
+        }else if(strateg == this.STRATEGY_ALL){
+            return '自动压缩'
+        }else if(strateg == this.STRATEGY_NONE){
+            return '不自动压缩'
+        }else {
+            return '';
+        }
+    },
+
+    /**
+     * 获取压缩时间范围
+     * @param data 流控数据
+     * @return string 压缩时间范围
+     * */
+    getCompressTimes: function (data) {
+        const { status,compressAtStartStrategy, compressAtEndStrategy,
+            compressAtStartWinStart, compressAtStartWinEnd, compressAtEndWinStart, compressAtEndWinEnd
+        } = data;
+        let res = '';
+
+        if(status == this.FLOWCONTROL_STATUS_PRE_PUBLISH){
+            if(compressAtStartStrategy){
+                res = getDayTimeFromString(compressAtStartWinStart)+'~'+ getDayTimeFromString(compressAtStartWinEnd);
+            }
+        }else if(status == this.FLOWCONTROL_STATUS_PRE_TERMINATED
+            || status == this.FLOWCONTROL_STATUS_PRE_UPDATE){
+            if(compressAtEndStrategy){
+                res = getDayTimeFromString(compressAtEndWinStart)+'~'+ getDayTimeFromString(compressAtEndWinEnd);
+            }
+        }else if(compressAtEndStrategy){
+            res = getDayTimeFromString(compressAtEndWinStart)+'~'+ getDayTimeFromString(compressAtEndWinEnd);
+
+        }else if(compressAtStartStrategy){
+            res = getDayTimeFromString(compressAtStartWinStart)+'~'+ getDayTimeFromString(compressAtStartWinEnd);
         }
         return res;
     },
@@ -485,9 +552,9 @@ const FlowcontrolDataUtil = {
      * @param systemConfig 系统信息
      * @returns {String}
      */
-    getStatusZhForDetail: function (data, generateTime, systemConfig) {
+    getStatusZhForDetail: function (data, generateTime) {
         // 流控
-        let {status, type, startTime, endTime, value, placeType, relativeStartTime, relativeStatus} = data;
+        let {status, type, endTime, value} = data;
         // 转换后的结果
         let res = '';
         if (status == this.FLOWCONTROL_STATUS_PRE_PUBLISH) {
@@ -519,16 +586,66 @@ const FlowcontrolDataUtil = {
         } else if (!endTime) {
             res = '已取消';
         }
-        // 相对状态
-        if (this.isRelative(data)) {
-            // 系统名
-            const {systemElem} = systemConfig;
-            if (relativeStatus == this.FLOWCONTROL_STATUS_RUNNING) {
-                res += ` ${systemElem}(正在执行)`
-            } else if (relativeStatus == this.FLOWCONTROL_STATUS_FINISHED) {
-                res += ` ${systemElem}(正常结束)`
-            }
+        // // 相对状态
+        // if (this.isRelative(data)) {
+        //     // 系统名
+        //     const {systemElem} = systemConfig;
+        //     if (relativeStatus == this.FLOWCONTROL_STATUS_RUNNING) {
+        //         res += ` ${systemElem}(正在执行)`
+        //     } else if (relativeStatus == this.FLOWCONTROL_STATUS_FINISHED) {
+        //         res += ` ${systemElem}(正常结束)`
+        //     }
+        // }
+        return res;
+    },
+
+    /**
+     * 获取流控相对状态下的状态 ---用于流控详情页
+     * @param data  流控数据
+     * @param generateTime 数据生成时间
+     * @param systemConfig 系统信息
+     * @returns {String}
+     * */
+
+    getRelativeStatusZhForDetail: function (data) {
+        // 流控
+        let {relativeStatus, type, endTime, value} = data;
+        // 转换后的结果
+        let res = '';
+        // 若不是相对状态则返回空
+        if(!this.isRelative(data)){
+            return res;
         }
+        if (relativeStatus == this.FLOWCONTROL_STATUS_PRE_PUBLISH) {
+            res = '将要发布';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_FUTURE
+            || relativeStatus == this.FLOWCONTROL_STATUS_PUBLISH) {
+            res = '将要执行';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_RUNNING) {
+            res = '正在执行';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_STOP) {
+            res = '系统终止';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_TERMINATED) {
+            res = '人工终止';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_PRE_TERMINATED
+            || relativeStatus == this.FLOWCONTROL_STATUS_PRE_UPDATE
+        ) {
+            res = '将要终止';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_DISCARD) {
+            res = '已废弃';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_FINISHED) {
+            res = '正常结束';
+            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 大规模延误
+                // 求得终止时间
+                let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
+                if (tempEndTime * 1 > generateTime * 1) { // 若数据生成时间早于终止时间,则显示"恢复中"
+                    res = '恢复中';
+                }
+            }
+        } else if (!endTime) {
+            res = '已取消';
+        }
+
         return res;
     },
 
@@ -543,6 +660,7 @@ const FlowcontrolDataUtil = {
         let {status, type, endTime, value} = data;
         // 转换后的结果
         let res = '';
+
         if (status == this.FLOWCONTROL_STATUS_PRE_PUBLISH) { // 将要发布
             res = 'running';
         } else if (status == this.FLOWCONTROL_STATUS_FUTURE
@@ -576,6 +694,54 @@ const FlowcontrolDataUtil = {
     },
 
     /**
+     * 获取流控状态对应的class名称
+     * @param data 数据对象
+     * @param generateTime 数据生成时间
+     * @returns {String}
+     * */
+    getRelativeStatusClassName: function (data, generateTime) {
+        // 流控
+        let {relativeStatus, type, endTime, value} = data;
+        // 转换后的结果
+        let res = '';
+        // 若不是相对状态则返回空
+        if(!this.isRelative(data)){
+            return res;
+        }
+        if (relativeStatus == this.FLOWCONTROL_STATUS_PRE_PUBLISH) { // 将要发布
+            res = 'running';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_FUTURE
+            || relativeStatus == this.FLOWCONTROL_STATUS_PUBLISH) { // 将要执行
+            res = 'future';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_RUNNING) { // 正在执行
+            res = 'running';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_STOP) { // 系统终止
+            res = 'terminated';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_TERMINATED) { // 人工终止
+            res = 'terminated';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_PRE_TERMINATED
+            || relativeStatus == this.FLOWCONTROL_STATUS_PRE_UPDATE
+        ) { // 将要终止
+            res = 'terminated';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_DISCARD) { // 已废弃
+            res = 'cancel';
+        } else if (relativeStatus == this.FLOWCONTROL_STATUS_FINISHED) { // 正常结束
+            res = 'finished';
+            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大规模延误
+                // 求得终止时间
+                let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
+                if (tempEndTime * 1 > generateTime * 1) {  // 恢复中
+                    res = 'finished';
+                }
+            }
+        } else if (!endTime) { // 已取消
+            res = 'cancel';
+        }
+        return res;
+    },
+
+
+    /**
      * 获取流控计算状态 ---用于流控列表
      * @param data  流控数据
      * @param generateTime 数据生成时间
@@ -601,7 +767,7 @@ const FlowcontrolDataUtil = {
             }
         }
 
-        if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大规模延误
+        if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 大规模延误
             // 求得终止时间
             let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
             if (tempEndTime * 1 > generateTime * 1 && status == this.FLOWCONTROL_STATUS_FINISHED) { // 若数据生成时间早于终止时间,
@@ -618,7 +784,7 @@ const FlowcontrolDataUtil = {
     },
 
     /**
-     * 计算流控生效时间
+     * 计算流控生效时间---- 用于流控详情页面顶部信息
      * @param data  流控数据
      *
      * */
@@ -725,78 +891,9 @@ const FlowcontrolDataUtil = {
         }
     },
 
-    /**
-     * 流控数据转换
-     * @param data  流控数据
-     * @param generateTime 数据生成时间
-     * @param systemConfig 系统信息数据
-     * @returns {Object}
-     */
-    convertFlowcontrolData: function (data, generateTime, systemConfig) {
-        // 校验数据
-        if (!isValidObject(data)) {
-            return {};
-        }
-        // 转换后的结果对象
-        let result = {};
-
-        // 流控id
-        result.id = data.id || '';
-        // 流控名称
-        result.name = data.name || '';
-        // 发布者
-        result.publishUser = data.publishUser || '';
-        // 发布者中文名称
-        result.publishUserZh = data.publishUserZh || '';
-        // 来源
-        result.source = data.source || '';
-        // 原发布单位
-        result.originalPublishUnit = data.originalPublishUnit || '';
-        // 备注信息
-        result.comments = data.comments || '';
-        // 受控航路点
-        result.controlPoints = data.controlPoints || '';
-        // 受控方向
-        result.flowcontrolDirection = data.flowcontrolDirection || '';
-        // 受控起飞机场
-        result.controlDepDirection = data.controlDepDirection || '';
-        // 受控降落机场
-        result.controlDirection = data.controlDirection || '';
-        // 豁免起飞机场
-        result.exemptDepDirection = data.exemptDepDirection || '';
-        // 豁免降落机场
-        result.exemptDirection = data.exemptDirection || '';
-        //限制高度
-        result.controlLevel = data.controlLevel || '';
-        // 流控类型 长期/非长期
-        result.flowcontrolTypeZh = this.getFlowcontrolTypeZh(data);
-        // 流控类型
-        result.placeTypeZh = this.getPlaceTypeZh(data);
-        // 限制类型
-        result.litmitTypeZh = this.getLimitTypeZh(data);
-        // 限制数值
-        result.litmitValue = this.getLimitValue(data);
-        // 限制数值单位
-        result.litmitValueUnit = this.getLimitValueUnit(data);
-        // 状态
-        result.statusZh = this.getStatusZh(data);
-        // 状态class
-        result.statusClassName = this.getStatusClassName(data, generateTime);
-        // 计算状态
-        result.casaStatus = this.getCasaStatusZh(data);
-        // 限制原因
-        result.reasonZh = this.getReasonZh(data);
-        // 生效时间
-        result.effectiveTime = this.getEffectiveTime(data);
-        // 操作选项
-        result.operations = this.getOperations(data);
-
-
-        return result;
-    },
 
     /**
-     * 流控数据转换
+     * 流控数据转换----用于流控列表项
      * @param data  流控数据
      * @param generateTime 数据生成时间
      * @param systemConfig 系统信息数据
@@ -808,9 +905,7 @@ const FlowcontrolDataUtil = {
             return {};
         }
         const {
-            id, name, controlPoints, flowcontrolDirection,
-            controlDepDirection, controlDirection, exemptDepDirection,
-            exemptDirection,
+            id, name, controlPoints, controlDirection,
         } = data;
         // 流控类型
         const placeTypeZh = this.getPlaceTypeZh(data);
@@ -821,15 +916,13 @@ const FlowcontrolDataUtil = {
         // 限制数值单位
         const limitValueUnit = this.getLimitValueUnit(data);
         // 状态
-        const statusZh = this.getStatusZhForList(data);
+        const statusZh = this.getStatusZhForList(data, generateTime, systemConfig);
         // 状态class
         const statusClassName = this.getStatusClassName(data, generateTime);
         // 计算状态
-        const casaStatusZh = this.getCasaStatusZh(data);
+        const casaStatusZh = this.getCasaStatusZh(data, generateTime);
         // 限制原因
         const reasonZh = this.getReasonZh(data);
-        // 生效时间
-        const effectiveTime = this.getEffectiveTime(data);
         // 操作选项
         const operations = this.getOperations(data);
         // 开始时间
@@ -840,11 +933,6 @@ const FlowcontrolDataUtil = {
             name, // 流控名称
             controlPoints: controlPoints || '',  // 受控航路点
             controlDirection : controlDirection || '',  // 受控降落机场
-            flowcontrolDirection,
-            controlDepDirection,
-            controlDirection,
-            exemptDepDirection,
-            exemptDirection,
             placeTypeZh,
             limitTypeZh,
             limitValue,
@@ -853,25 +941,107 @@ const FlowcontrolDataUtil = {
             statusClassName,
             casaStatusZh,
             reasonZh,
-            effectiveTime,
             operations,
 
         };
 
         return result;
+    },
 
+    /**
+     * 流控数据转换-----用于流控详情页面
+     * @param data  流控数据
+     * @param generateTime 数据生成时间
+     * @param systemConfig 系统信息数据
+     * @returns {Object}
+     */
+    convertSingleFlowcontrolDataForDetail: function (data, generateTime, systemConfig) {
+        // 校验数据
+        if (!isValidObject(data)) {
+            return {};
+        }
+        const {
+            id, name, publishUser, publishUserZh, source,  controlPoints, flowcontrolDirection,
+            controlDepDirection, controlDirection, exemptDepDirection, originalPublishUnit,
+            exemptDirection, controlLevel, comments, reserveSlots, startTime, endTime,
+            lastModifyTime, startFlowCasaTime, relativeStartTime, relativeEndTime,
+        } = data;
+        // 创建时间
+        const creationTime = data.generateTime;
 
+        // 流控类型
+        const placeTypeZh = this.getPlaceTypeZh(data);
+        // 限制类型
+        const limitTypeZh = this.getLimitTypeZh(data);
+        // 限制数值
+        const limitValue = this.getLimitValue(data);
+        // 限制数值单位
+        const limitValueUnit = this.getLimitValueUnit(data);
+        // 状态
+        const statusZh = this.getStatusZhForDetail(data, generateTime);
+        // 状态className
+        const statusClassName = this.getStatusClassName(data, generateTime);
+        // 相对状态
+        const relativeStatusZh = this.getRelativeStatusZhForDetail(data);
+        // 相对状态className
+        const relativeStatusClassName = this.getRelativeStatusClassName(data);
+        // 计算状态
+        const casaStatusZh = this.getCasaStatusZh(data, generateTime);
+        // 限制原因
+        const reasonZh = this.getReasonZh(data);
+        // 生效时间
+        const effectiveTime = this.getEffectiveTime(data);
+        // 操作选项
+        const operations = this.getOperations(data);
+        // 流控类型 长期/非长期
+        const flowcontrolTypeZh = this.getFlowcontrolTypeZh(data);
+        // 是否为相对状态
+        const isRelative = this.isRelative(data);
+        // 变更策略
+        const strategyZh = this.getStrategyZh(data);
+        // 压缩时间范围
+        const compressTimes = this.getCompressTimes(data);
 
-        // 受控方向
-        result.flowcontrolDirection = data.flowcontrolDirection || '';
-        // 受控起飞机场
-        result.controlDepDirection = data.controlDepDirection || '';
-        // 受控降落机场
-        result.controlDirection = data.controlDirection || '';
-        // 豁免起飞机场
-        result.exemptDepDirection = data.exemptDepDirection || '';
-        // 豁免降落机场
-        result.exemptDirection = data.exemptDirection || '';
+        const result = {
+            id: id || '', // 流控id
+            name: name || '', // 流控名称
+            placeTypeZh : placeTypeZh, // 流控类型
+            publishUser: publishUser || '', // 发布者英文名
+            publishUserZh: publishUserZh || '', // 发布者中文名
+            source: source || '', // 数据来源
+            originalPublishUnit : originalPublishUnit || '', // 原发布单位
+            startTime : startTime || '', // 开始时间
+            endTime : endTime || '', // 结束时间
+            creationTime : creationTime || '', // 创建时间
+            lastModifyTime : lastModifyTime || '', // 修改时间
+            startFlowCasaTime : startFlowCasaTime || '', //纳入计算时间
+            relativeStartTime : relativeStartTime || '', // 相对开始时间
+            relativeEndTime : relativeEndTime || '', // 相对结束时间
+            flowcontrolTypeZh : flowcontrolTypeZh, // 流控类型
+            controlPoints: controlPoints || '',  // 受控航路点
+            controlDirection : controlDirection || '',  // 受控降落机场
+            flowcontrolDirection: flowcontrolDirection || '', // 受控方向
+            controlDepDirection: controlDepDirection || '', // 受控起飞机场
+            exemptDepDirection: exemptDepDirection || '', // 豁免起飞机场
+            exemptDirection: exemptDirection || '', // 豁免降落机场
+            controlLevel : controlLevel || '', // 限制高度
+            reserveSlots : reserveSlots || '',
+            comments : comments || '', // 备注
+            limitTypeZh, // 限制类型
+            limitValue, // 限制数值
+            limitValueUnit, // 限制数值单位
+            statusZh, // 状态
+            statusClassName, // 状态className
+            relativeStatusZh, // 相对状态
+            relativeStatusClassName, // 相对状态className
+            casaStatusZh, // 计算状态
+            reasonZh, // 限制原因
+            effectiveTime, // 生效时间
+            operations, // 操作项
+            isRelative, // 是否为相对状态
+            strategyZh, // 变更策略
+            compressTimes, // 压缩时间范围
+        };
 
         return result;
     }

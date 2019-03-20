@@ -3,8 +3,9 @@ import React from 'react';
 import {Row, Col, Icon, Card, Table} from 'antd';
 import DraggableModule from "components/DraggableModule/DraggableModule";
 import {getFlowcontrolDetailUrl} from 'utils/request-urls';
-import {FlowcontrolUtil} from 'utils/flowcontrol-data-util';
+import { FlowcontrolDataUtil } from 'utils/flowcontrol-data-util';
 import {formatTimeString, getDayTimeFromString} from "utils/basic-verify";
+import Loader from 'components/Loader/Loader';
 import {request} from 'utils/request-actions';
 import { convertFlowcontrolData } from 'utils/flowcontrol-data-util';
 import './FlowcontrolDetail.less';
@@ -16,17 +17,18 @@ class FlowcontrolDetail extends React.Component {
         this.handleFlowcontrolDetailData = this.handleFlowcontrolDetailData.bind(this);
         this.converFlowRecords = this.converFlowRecords.bind(this);
         this.getColums = this.getColums.bind(this);
-        this.batchFormattingTime = this.batchFormattingTime.bind(this);
+        this.getDayTimes = this.getDayTimes.bind(this);
 
-        this.state = {}
+        this.state = {
+            loading : true, // 加载
+        }
     }
 
     // 获取流控详情数据
     getFlowcontrolDetail() {
         const {loginUserInfo, id, placeType} = this.props;
         const {userId} = loginUserInfo;
-
-        // 获取参数
+        // 拼接参数
         let params = {
             userId,
             flowcontrol: {
@@ -42,24 +44,34 @@ class FlowcontrolDetail extends React.Component {
     handleFlowcontrolDetailData(res) {
         // 取响应结果中的流控数据
         if (res) {
-            const { flow, flowRecords } = res;
+            const { flow, flowRecords, generateTime } = res;
             const {  systemConfig } = this.props;
             // 转换流控信息数据
-            const flowFormatDatas = convertFlowcontrolData( flow, null,  systemConfig);
-            this.setState({
-                ...flowFormatDatas
-            });
+            const flowFormatDatas = FlowcontrolDataUtil.convertSingleFlowcontrolDataForDetail( flow, generateTime,  systemConfig);
             // 转换流控协调记录数据
-            this.converFlowRecords( flowRecords );
+            const records = this.converFlowRecords(flowRecords);
+            this.setState({
+                ...flowFormatDatas,
+                flowRecords: records,
+                loading: false,
+            });
         }
     }
 
     //批量格式化
-    batchFormattingTime(array) {
-        if(!array){
+    /**
+     *
+     * */
+    getDayTimes(data) {
+        if(!data){
             return '';
         }
-        let arr = array.split(',');
+        let arr = [];
+        if(typeof data === 'string'){
+            arr = data.split(',');
+        }else if(data instanceof Array){
+            arr = data;
+        }
         arr = arr.map((item) => {
             return getDayTimeFromString(item)
         });
@@ -117,9 +129,12 @@ class FlowcontrolDetail extends React.Component {
            let res = '';
            if(type == 'COMPRESS_STRATEGY' ){ // 压缩窗口
                 if(originalValue){
-                    const val = originalValue.split('#')[0];
+                    const originalValues = originalValue.split('#');
+                    const val = originalValues[0];
+                    const start = originalValues[1];
+                    const end = originalValues[2];
                     if(val == 'PART'){
-                        res = '公司申请变更'
+                        res = `公司申请变更 ${start} ~ ${end}`;
                     }else if(val == 'ALL'){
                         res = '公司申请变更'
                     }else if(val == 'NONE'){
@@ -129,9 +144,9 @@ class FlowcontrolDetail extends React.Component {
            }else if(type == 'UPDATE'){ // 修改
                res = `${originalValue}(${originalId})`
            }else if(type == 'RESERVE_SLOT'){ // 预留时隙
-               res = this.batchFormattingTime(originalValue);
+               res = this.getDayTimes(originalValue);
            }else if(type == 'TIME_SEGMENT'){ // 二类放行
-               res = this.batchFormattingTime(originalValue);
+               res = this.getDayTimes(originalValue);
            }else if(originalValue == 'PUBLISH'){ //
                res = '已发布'
            }else if(originalValue == 'FUTURE'){
@@ -155,22 +170,26 @@ class FlowcontrolDetail extends React.Component {
            const { type, value, imitativeId } = record;
            let res = '';
            if(type == 'COMPRESS_STRATEGY' ){ // 压缩窗口
+               debugger
                if(value){
-                   const val = value.split('#')[0];
+                   const values = value.split('#');
+                   const val = values[0];
+                   const start = values[1];
+                   const end = values[2];
                    if(val == 'PART'){
-                       res = '公司申请变更'
+                       res = `公司申请变更 ${start} ~ ${end}`;
                    }else if(val == 'ALL'){
-                       res = '公司申请变更'
+                       res = '自动压缩'
                    }else if(val == 'NONE'){
-                       res = '公司申请变更'
+                       res = '不自动压缩'
                    }
                }
            }else if(type == 'PUBLISH' || type == 'UPDATE'){ // 发布或修改
                res =  `${value}(${imitativeId})`
            }else if(type == 'RESERVE_SLOT'){ // 预留时隙
-               res = this.batchFormattingTime(value);
+               res = this.getDayTimes(value);
            }else if(type == 'TIME_SEGMENT'){ // 二类放行
-               res = this.batchFormattingTime(value);
+               res = this.getDayTimes(value);
            }else if(value == 'STOP'){ //
                res = '系统终止'
            }else if(value == 'FINISHED'){
@@ -197,7 +216,12 @@ class FlowcontrolDetail extends React.Component {
            return res;
        };
 
-
+        /**
+         * 流控协调记录数据转换
+         * @param record 单条协调记录数据
+         * @return { object }
+         *
+         * */
         const converRecord = (record) => {
             // id
             let id = record.id;
@@ -241,9 +265,7 @@ class FlowcontrolDetail extends React.Component {
             });
         }
 
-        this.setState({
-            flowRecords : records
-        })
+        return records;
     };
     // 协调记录表格列
     getColums(){
@@ -315,7 +337,7 @@ class FlowcontrolDetail extends React.Component {
                width: 100
             },
         ];
-        return columns;
+       return columns;
     }
     componentDidMount() {
         // 获取流控详情数据
@@ -323,13 +345,28 @@ class FlowcontrolDetail extends React.Component {
     }
 
     render() {
-        const {titleName, clickCloseBtn, width = 800, dialogName, x, y } = this.props;
+        const {systemConfig, titleName, clickCloseBtn, width = 800, dialogName, x, y } = this.props;
+        // 系统名
+        const {systemElem} = systemConfig;
         const {
-            name, id, effectiveTime, flowStatus, flowStatusClassName, source, placeType, publishUser, originalPublishUnit,
-            type, value, reason, controlPoints, flowcontrolDirection, controlDepDirection,controlDirection, flowcontrolType,
-            exemptDepDirection, exemptDirection, controlLevel, reserveSlots, startTime, endTime, generateTime,
-            lastModifyTime, startFlowCasaTime, compressAtStartStrategy, compressAtStartWinStart, compressAtEndWinEnd,
-            comments, flowRecords} = this.state;
+            name, id, effectiveTime, statusZh, statusClassName,relativeStatusZh, relativeStatusClassName,
+            source, placeTypeZh, publishUser, publishUserZh, originalPublishUnit, limitTypeZh, limitValue,
+            limitValueUnit, reasonZh, controlPoints, flowcontrolDirection, controlDepDirection,
+            controlDirection, flowcontrolTypeZh, exemptDepDirection, exemptDirection, controlLevel,
+            reserveSlots, startTime, endTime, creationTime, lastModifyTime, startFlowCasaTime,
+            relativeStartTime, relativeEndTime,  strategyZh, compressTimes, comments, flowRecords,
+            isRelative} = this.state;
+        const value = limitValue ? `${limitValue} ${limitValueUnit}`: '';
+        const startDayTimeFromString = getDayTimeFromString(startTime);
+        const endDayTimeFromString = getDayTimeFromString(endTime);
+        const creationDayTimeFromString = getDayTimeFromString(creationTime);
+        const lastModifyDayTimeFromString = getDayTimeFromString(lastModifyTime);
+        const startFlowCasaDayTimeFromString = getDayTimeFromString(startFlowCasaTime);
+        const relativeStartDayTimeFromString = getDayTimeFromString(relativeStartTime);
+        const relativeEndDayTimeFromString = getDayTimeFromString(relativeEndTime);
+
+        const reserveSlotDayTime = this.getDayTimes(reserveSlots);
+
         const Layout1 = {span: 1};
         const Layout2 = {span: 2};
         const Layout3 = {span: 3};
@@ -367,7 +404,18 @@ class FlowcontrolDetail extends React.Component {
                                     <Col {...Layout24} className="head">
                                         <h1 className="name">{ name }</h1>
                                         <div className="effective-time">生效时间:{effectiveTime}</div>
-                                        <div className={ flowStatusClassName ? `status ${flowStatusClassName}` : 'status'}>{flowStatus}</div>
+                                        <div className="status" >
+                                            <span className={ statusClassName ? `status ${statusClassName}` : 'status'}> {statusZh} </span>
+                                            {
+                                                relativeStatusZh ?
+                                                    <span className="relative-status">
+                                                        { ` ( ${systemElem}: ` }
+                                                        <label className={ relativeStatusClassName ? `status ${relativeStatusClassName}` : 'status'} >{relativeStatusZh}</label>
+                                                        { ` )`}
+                                                    </span> : ''
+                                            }
+
+                                        </div>
                                     </Col>
                                 </Row>
                                 <Row>
@@ -381,7 +429,7 @@ class FlowcontrolDetail extends React.Component {
                                                     <div className="trem">流控名称</div>
                                                 </Col>
                                                 <Col {...Layout8}>
-                                                    <div className="detail">{ `${name}(${id})` }</div>
+                                                    <div className="detail">{ id ?  `${name}(${id})` : '' }</div>
                                                 </Col>
                                                 <Col {...Layout4}>
                                                     <div className="trem">来源</div>
@@ -393,7 +441,7 @@ class FlowcontrolDetail extends React.Component {
                                                     <div className="trem">类型</div>
                                                 </Col>
                                                 <Col {...Layout2}>
-                                                    <div className="detail">{placeType}</div>
+                                                    <div className="detail">{placeTypeZh}</div>
                                                 </Col>
                                             </Col>
                                             <Col {...Layout24}>
@@ -401,7 +449,7 @@ class FlowcontrolDetail extends React.Component {
                                                     <div className="trem">发布用户</div>
                                                 </Col>
                                                 <Col {...Layout8}>
-                                                    <div className="detail">{ publishUser }</div>
+                                                    <div className="detail">{ publishUser ? `${publishUserZh}( ${publishUser})` : publishUserZh }</div>
                                                 </Col>
                                                 <Col {...Layout4}>
                                                     <div className="trem">原发布单位</div>
@@ -413,7 +461,7 @@ class FlowcontrolDetail extends React.Component {
                                                     <div className=""></div>
                                                 </Col>
                                                 <Col {...Layout3}>
-                                                    <div className="detail">{ flowcontrolType }</div>
+                                                    <div className="detail">{ flowcontrolTypeZh }</div>
                                                 </Col>
                                             </Col>
                                         </Row>
@@ -429,31 +477,51 @@ class FlowcontrolDetail extends React.Component {
                                                 <div className="trem">开始时间</div>
                                             </Col>
                                             <Col {...Layout8}>
-                                                <div className="detail">{ startTime }</div>
+                                                <div className="detail">
+                                                    { startDayTimeFromString }
+                                                    { isRelative ?
+                                                        <span>
+                                                            {
+                                                                ` ( ${ systemElem }: ${relativeStartDayTimeFromString} )`
+                                                            }
+                                                        </span> : ''
+
+                                                    }
+                                                    </div>
                                             </Col>
                                             <Col {...Layout4}>
                                                 <div className="trem">结束时间</div>
                                             </Col>
                                             <Col {...Layout8}>
-                                                <div className="detail">{ endTime }</div>
+                                                <div className="detail">
+                                                    { endDayTimeFromString }
+                                                    { isRelative ?
+                                                        <span>
+                                                            {
+                                                                ` ( ${ systemElem }: ${relativeEndDayTimeFromString} )`
+                                                            }
+                                                        </span> : ''
+
+                                                    }
+                                                    </div>
                                             </Col>
                                             <Col {...Layout4}>
                                                 <div className="trem">创建时间</div>
                                             </Col>
                                             <Col {...Layout8}>
-                                                <div className="detail">{ generateTime }</div>
+                                                <div className="detail">{ creationDayTimeFromString }</div>
                                             </Col>
                                             <Col {...Layout4}>
                                                 <div className="trem">修改时间</div>
                                             </Col>
                                             <Col {...Layout8}>
-                                                <div className="detail">{ lastModifyTime }</div>
+                                                <div className="detail">{ lastModifyDayTimeFromString }</div>
                                             </Col>
                                             <Col {...Layout4}>
                                                 <div className="trem">纳入计算时间</div>
                                             </Col>
                                             <Col {...Layout8}>
-                                                <div className="detail">{ startFlowCasaTime }</div>
+                                                <div className="detail">{ startFlowCasaDayTimeFromString }</div>
                                             </Col>
                                         </Row>
                                     </Col>
@@ -468,7 +536,7 @@ class FlowcontrolDetail extends React.Component {
                                                 <div className="trem">限制类型</div>
                                             </Col>
                                             <Col {...Layout8}>
-                                                <div className="detail">{ type }</div>
+                                                <div className="detail">{ limitTypeZh }</div>
                                             </Col>
                                             <Col {...Layout4}>
                                                 <div className="trem">限制数值</div>
@@ -549,7 +617,7 @@ class FlowcontrolDetail extends React.Component {
                                                 <div className="trem">限制原因</div>
                                             </Col>
                                             <Col {...Layout18}>
-                                                <div className="detail">{ reason }</div>
+                                                <div className="detail">{ reasonZh }</div>
                                             </Col>
                                         </Row>
                                     </Col>
@@ -564,7 +632,7 @@ class FlowcontrolDetail extends React.Component {
                                                 <div className="trem">时隙时间</div>
                                             </Col>
                                             <Col {...Layout18}>
-                                                <div className="detail">{ reserveSlots }</div>
+                                                <div className="detail">{ reserveSlotDayTime }</div>
                                             </Col>
                                         </Row>
                                     </Col>
@@ -579,13 +647,13 @@ class FlowcontrolDetail extends React.Component {
                                                 <div className="trem">变更策略</div>
                                             </Col>
                                             <Col {...Layout8}>
-                                                <div className="detail">{ compressAtStartStrategy }</div>
+                                                <div className="detail">{ strategyZh }</div>
                                             </Col>
                                             <Col {...Layout4}>
                                                 <div className="trem">压缩时间范围</div>
                                             </Col>
                                             <Col {...Layout8}>
-                                                <div className="detail">{ compressAtStartWinStart ? `${compressAtStartWinStart} ~ ${compressAtEndWinEnd}` : '' }</div>
+                                                <div className="detail">{ compressTimes }</div>
                                             </Col>
                                         </Row>
                                     </Col>
@@ -624,6 +692,9 @@ class FlowcontrolDetail extends React.Component {
                                 </Row>
 
                             </Col>
+                            {
+                                this.state.loading ? <Loader/> : ''
+                            }
                         </Row>
                     </div>
                 </div>

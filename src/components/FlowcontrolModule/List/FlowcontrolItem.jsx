@@ -1,7 +1,7 @@
 //流控信息---菜单操作功能
 import React from 'react';
 import { Row, Col, Icon, Modal } from 'antd';
-import {isValidVariable, getTimeFromString } from "utils/basic-verify";
+import {isValidVariable, getTimeFromString, getDateFromString } from "utils/basic-verify";
 import  { FlowcontrolDataUtil }  from 'utils/flowcontrol-data-util';
 import CreateLayer from "components/CreateLayer/CreateLayer";
 import FlowcontrolDetailContainer from "components/FlowcontrolModule/Detail/FlowcontrolDetailContainer";
@@ -19,8 +19,8 @@ class FlowcontrolItem extends React.Component{
         this.getOperations = this.getOperations.bind(this);
         this.getStartTime = this.getStartTime.bind(this);
         this.getEndTime = this.getEndTime.bind(this);
-
-
+        this.getStartDateFromString = this.getStartDateFromString.bind(this);
+        this.getEndDateFromString = this.getEndDateFromString.bind(this);
         this.state = {
             flowcontrolDetail: { //流控详情
                 show: false,
@@ -50,7 +50,11 @@ class FlowcontrolItem extends React.Component{
             return getTimeFromString(startTime);
         }
     }
-
+    /**
+     * 获取流控结束时间 HH:MM
+     * @param data  流控数据
+     * @returns {String}
+     * */
     getEndTime(data) {
         const { endTime, relativeEndTime } = data;
         const relative = FlowcontrolDataUtil.isRelative(data);
@@ -61,7 +65,34 @@ class FlowcontrolItem extends React.Component{
         }
     }
 
-
+    /**
+     * 获取流控开始日期 yyyy-mm-dd
+     * @param data  流控数据
+     * @returns {String}
+     * */
+    getStartDateFromString(data){
+        const { startTime, relativeStartTime } = data;
+        const relative = FlowcontrolDataUtil.isRelative(data);
+        if(relative){
+            return `( ${ getDateFromString(relativeStartTime)} )`
+        }else {
+            return getDateFromString(startTime);
+        }
+    }
+    /**
+     * 获取流控结束日期 yyyy-mm-dd
+     * @param data  流控数据
+     * @returns {String}
+     * */
+    getEndDateFromString(data) {
+        const { endTime, relativeEndTime } = data;
+        const relative = FlowcontrolDataUtil.isRelative(data);
+        if(relative){
+            return (isValidVariable(relativeEndTime)) ? `( ${ getDateFromString(relativeStartTime)} )` : ''
+        }else {
+            return (isValidVariable(endTime)) ?  getDateFromString(endTime) : ''
+        }
+    }
 
 
     //操作列--根据key开启操作模块（详情、修改页面、流控影响航班、终止等）
@@ -127,6 +158,8 @@ class FlowcontrolItem extends React.Component{
         } = formatData;
         const startTime = this.getStartTime(singleFlowcontrolData);
         const endTime = this.getEndTime(singleFlowcontrolData);
+        const startDate = this.getStartDateFromString(singleFlowcontrolData);
+        const endDate = this.getEndDateFromString(singleFlowcontrolData);
         const { flowcontrolDetail, flowcontrolEdit, flowcontrolImpactFlights, terminateFlowControl } = this.state;
         return (
             <Col span={24} className="flow-item">
@@ -140,7 +173,7 @@ class FlowcontrolItem extends React.Component{
                     <Col  span={1} ></Col>
                     <Col  span={6} className="effective-time"  >
                         <i className="iconfont icon-time" title="生效时间" />
-                        <span>{startTime}-{endTime}</span>
+                        <span title={`${startDate}/${endDate}`}>{startTime}-{endTime}</span>
                     </Col>
                 </Row>
                 <Row className="row value-title">
@@ -153,7 +186,7 @@ class FlowcontrolItem extends React.Component{
                 <Row className="row value">
                     <Col span={4} className="type" title={limitTypeZh ? `限制类型:${limitTypeZh}` : ''}>{limitTypeZh}</Col>
                     <Col span={4} className="value" title={ limitValue ? `限制数值:${limitValue} ${limitValueUnit}` : '' }> { `${limitValue} ${limitValueUnit}` } </Col>
-                    <Col span={6} className="points" title={controlPoints ? `受控航路点${controlPoints}` : ''}>{controlPoints}</Col>
+                    <Col span={6} className="points" title={controlPoints ? `受控航路点:${controlPoints}` : ''}>{controlPoints}</Col>
                     <Col span={6} className="control-direction" title={controlDirection ? `受控降落机场:${controlDirection}`: '' }>{controlDirection}</Col>
                     <Col span={4} className="reason" title={reasonZh ? `原因:${reasonZh}` : ''}>{reasonZh}</Col>
                 </Row>
@@ -177,10 +210,11 @@ class FlowcontrolItem extends React.Component{
                             <FlowcontrolDetailContainer
                                 titleName="流控信息详情"
                                 type="flowcontrolDetail"
+                                singleFlowcontrolData = { singleFlowcontrolData }
+                                placeType={singleFlowcontrolData.placeType}
                                 id = {id}
                                 x = { 360 }
                                 y = { 60 }
-                                placeType = { data.placeType }
                                 clickCloseBtn={ this.onCloseBtn }
                             />
                         </CreateLayer> : ''
