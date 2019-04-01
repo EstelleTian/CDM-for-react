@@ -1,7 +1,7 @@
 //流控信息---菜单操作功能
 
 import React from 'react';
-import { Col, Icon, Input, Select, Checkbox, Radio, Menu   } from 'antd';
+import { Col, Icon, Input, Checkbox, Radio, Menu   } from 'antd';
 import { isValidVariable } from 'utils/basic-verify';
 
 import './FlowcontrolHeader.less';
@@ -9,8 +9,6 @@ import './FlowcontrolHeader.less';
 const SubMenu = Menu.SubMenu;
 const MenuItemGroup = Menu.ItemGroup;
 const RadioGroup = Radio.Group;
-const CheckboxGroup = Checkbox.Group;
-const Search = Input.Search;
 
 class FlowcontrolHeader extends React.Component{
     constructor( props ){
@@ -19,6 +17,7 @@ class FlowcontrolHeader extends React.Component{
         this.onChangeShieldLong = this.onChangeShieldLong.bind(this);
         this.onChangeScope = this.onChangeScope.bind(this);
         this.onChangeOrder = this.onChangeOrder.bind(this);
+        this.onChangeKeyword = this.onChangeKeyword.bind(this);
     }
 
     // 流控类型变更
@@ -45,6 +44,12 @@ class FlowcontrolHeader extends React.Component{
         let value = e.target.value;
         updateFlowcontrolConditionOrderBy(value);
     }
+    // 流控快速过滤关键字变更
+    onChangeKeyword (e){
+        const { updateFlowcontrolConditionQuicklyFilters } = this.props;
+        let value = e.target.value;
+        updateFlowcontrolConditionQuicklyFilters(value);
+    }
 
     render(){
         const { placeType, shieldLong, scope, orderBy} = this.props;
@@ -60,14 +65,18 @@ class FlowcontrolHeader extends React.Component{
                     <Menu
                         mode="horizontal"
                         theme="dark"
-                        selectable={false}
+                        triggerSubMenuAction="click"
                     >
                         <SubMenu
                             key="flowcontrol-filter"
                             title={<i className="iconfont icon-filter" title="快速过滤"/>}
                         >
                             <MenuItemGroup title="屏蔽">
-                                <Menu.Item>
+                                <Menu.Item
+                                    key="shield"
+                                    className="filter-item"
+                                    disabled={true}
+                                >
                                     <Checkbox
                                         checked={ shieldLong }
                                         onChange={this.onChangeShieldLong}
@@ -77,7 +86,11 @@ class FlowcontrolHeader extends React.Component{
                             </MenuItemGroup>
 
                             <MenuItemGroup title="范围">
-                                <Menu.Item>
+                                <Menu.Item
+                                    key="scope"
+                                    className="filter-item"
+                                    disabled={true}
+                                >
                                     <RadioGroup
                                         onChange={this.onChangeScope}
                                         value={ scope }
@@ -90,7 +103,11 @@ class FlowcontrolHeader extends React.Component{
                             </MenuItemGroup>
 
                             <MenuItemGroup title="类型">
-                                <Menu.Item>
+                                <Menu.Item
+                                    key="place_type"
+                                    className="filter-item"
+                                    disabled={true}
+                                >
                                     <RadioGroup
                                         onChange={this.onChangePlaceType}
                                         value={placeType}
@@ -103,7 +120,11 @@ class FlowcontrolHeader extends React.Component{
                             </MenuItemGroup>
 
                             <MenuItemGroup title="排序">
-                                <Menu.Item>
+                                <Menu.Item
+                                    key="order"
+                                    className="filter-item"
+                                    disabled={true}
+                                >
                                     <RadioGroup
                                         onChange={this.onChangeOrder}
                                         value={orderBy}
@@ -111,6 +132,18 @@ class FlowcontrolHeader extends React.Component{
                                         <Radio value={'TIME'}>时间</Radio>
                                         <Radio value={'LEVEL'}>程度</Radio>
                                     </RadioGroup>
+                                </Menu.Item>
+                            </MenuItemGroup>
+                            <MenuItemGroup title="快速过滤">
+                                <Menu.Item
+                                    key="order"
+                                    className="filter-item quick-filter"
+                                    disabled={true}
+                                >
+                                    <Input
+                                        size="small"
+                                        onChange= {this.onChangeKeyword}
+                                    />
                                 </Menu.Item>
                             </MenuItemGroup>
 

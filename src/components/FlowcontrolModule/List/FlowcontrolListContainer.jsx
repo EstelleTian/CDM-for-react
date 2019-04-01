@@ -91,6 +91,22 @@ const  filterFlowoncontrolDatas = (flowcontrolDataMap, flowGenerateTime, shieldL
         });
 
     }
+    //条件过滤查询
+    if( isValidVariable(quicklyFilters) ){
+        flowcontrolDatas = flowcontrolDatas.filter( ( item ) => {
+            let flag = false;
+            for(let i in item){
+                const itemVal = item[i] + "" || "";
+                //若值包含过滤条件，则中，否则不显示
+                if( isValidVariable(itemVal) ){
+                    if( itemVal.toLowerCase().indexOf( quicklyFilters.toLowerCase() ) > -1 ){
+                        flag = true;
+                    }
+                }
+            }
+            return flag;
+        })
+    }
 
     return flowcontrolDatas;
 }
