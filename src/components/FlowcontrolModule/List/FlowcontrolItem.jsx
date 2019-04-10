@@ -153,7 +153,7 @@ class FlowcontrolItem extends React.Component{
     render(){
         const { singleFlowcontrolData, flowGenerateTime, systemConfig, indexNumber } = this.props;
         const formatData = FlowcontrolDataUtil.convertSingleFlowcontrolDataForList( singleFlowcontrolData, flowGenerateTime, systemConfig);
-        const { name, id, placeTypeZh, dialogName, statusZh,  statusClassName, controlPoints, limitTypeZh, limitValue,
+        const { name, id, placeTypeZh, dialogName, category, statusZh,  statusClassName, controlPoints, limitTypeZh, limitValue,
             limitValueUnit,  controlDirection, casaStatusZh, reasonZh,  operations,
         } = formatData;
         const startTime = this.getStartTime(singleFlowcontrolData);
@@ -225,11 +225,11 @@ class FlowcontrolItem extends React.Component{
                             className="flowcontol-layer"
                         >
                             <FlowcontrolDialogContainer
-                                titleName= { dialogName}
+                                titleName= { dialogName+'-修改' }
                                 type="flowcontrolEdit"
                                 clickCloseBtn={ this.onCloseBtn }
-                                placeType = {data.placeType}
-                                limitType = {data.typeSubclass || data.type}
+                                placeType = {singleFlowcontrolData.placeType}
+                                category = { category }
                                 id = {id}
                                 x = { 300 }
                                 y = { 60 }

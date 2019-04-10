@@ -14,7 +14,8 @@ class FlowcontrolDialog extends React.Component{
         super(props);
     }
     render(){
-        const { titleName, clickCloseBtn, width = 1050, dialogName, x, y, loginUserInfo, systemConfig, generateTime, id, placeType, limitType} = this.props;
+        const { titleName, clickCloseBtn, width = 1050, dialogName, x, y, loginUserInfo, systemConfig, generateTime, id, category, placeType} = this.props;
+        console.log(this.props);
         return (
             <DraggableModule
                 bounds = ".root"
@@ -37,7 +38,7 @@ class FlowcontrolDialog extends React.Component{
                         </Row>
                         {/*机场流控*/}
                         {
-                            (placeType == 'AP' && (limitType !=='GS_DEP' && !limitType !=='TRANSLATION')) ? <APContent
+                            (category == 'AP' ) ? <APContent
                                 clickCloseBtn = {clickCloseBtn}
                                 dialogName = {dialogName}
                                 loginUserInfo = {loginUserInfo}
@@ -50,7 +51,7 @@ class FlowcontrolDialog extends React.Component{
                         {/*低能见度受限*/}
                         {
 
-                            (placeType == 'AP' && limitType =='GS_DEP') ? <APGSDepContent
+                            ( category =='GS_DEP') ? <APGSDepContent
                                 clickCloseBtn = {clickCloseBtn}
                                 dialogName = {dialogName}
                                 loginUserInfo = {loginUserInfo}
@@ -62,7 +63,7 @@ class FlowcontrolDialog extends React.Component{
                         }
                         {
 
-                            (placeType == 'AP' && limitType =='TRANSLATION') ? <TRANSLATIONContent
+                            ( category =='TRANSLATION') ? <TRANSLATIONContent
                                 clickCloseBtn = {clickCloseBtn}
                                 dialogName = {dialogName}
                                 loginUserInfo = {loginUserInfo}
@@ -73,7 +74,7 @@ class FlowcontrolDialog extends React.Component{
                             /> : ''
                         }
                         {
-                            placeType == 'POINT' ? <POINTContent
+                            category == 'POINT' ? <POINTContent
                                 clickCloseBtn = {clickCloseBtn}
                                 dialogName = {dialogName}
                                 loginUserInfo = {loginUserInfo}

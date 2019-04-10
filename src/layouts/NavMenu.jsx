@@ -375,6 +375,7 @@ class NavMenu extends React.Component {
                                 type="apPublish"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType='AP'
+                                category='AP'
                                 x={ 300 }
                                 y={ 60 }
                             />
@@ -392,7 +393,7 @@ class NavMenu extends React.Component {
                                 type="apGSDepPublish"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType='AP'
-                                limitType='GS_DEP'
+                                category='GS_DEP'
                                 x={ 300 }
                                 y={ 60 }
                             />
@@ -409,6 +410,7 @@ class NavMenu extends React.Component {
                                 type="pointPublish"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType='POINT'
+                                category='POINT'
                                 x={ 300 }
                                 y={ 60 }
                             />
@@ -425,7 +427,7 @@ class NavMenu extends React.Component {
                                 type="translationPublish"
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType='AP'
-                                limitType='TRANSLATION'
+                                category='TRANSLATION'
                                 x={ 300 }
                                 y={ 60 }
                             />

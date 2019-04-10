@@ -833,6 +833,56 @@ const FlowcontrolDataUtil = {
         }
         return authMap;
     },
+    /**
+     * 获取分类
+     *  @param data 流控数据
+     *  @returns String
+     * */
+    getCategory: function (data) {
+        const { placeType,  type, typeSubclass} = data;
+
+        let res = '';
+
+        if(placeType == this.PLACE_TYPE_AP){
+            res =  'AP';
+            if(type == this.TYPE_LDR){
+                res =  'LDR';
+            }else if(type == this.TYPE_TRANSLATION){
+                res = 'TRANSLATION'
+            }else if(type == this.TYPE_GS && typeSubclass == "GS_DEP"){
+                res = 'GS_DEP';
+            }
+        }else if(placeType == this.PLACE_TYPE_POINT){
+            res = 'POINT';
+        }
+        return res;
+
+    },
+    /**
+     * 获取弹框名称
+     *  @param data 流控数据
+     *  @returns String
+     * */
+    getTitleName: function (data) {
+        const { placeType,  type, typeSubclass} = data;
+
+        let res = '';
+
+        if(placeType == this.PLACE_TYPE_AP){
+            res =  '机场流控';
+            if(type == this.TYPE_LDR){
+                res =  '大规模延误恢复';
+            }else if(type == this.TYPE_TRANSLATION){
+                res = '大规模延误'
+            }else if(type == this.TYPE_GS && typeSubclass == "GS_DEP"){
+                res = '低能见度';
+            }
+        }else if(placeType == this.PLACE_TYPE_POINT){
+            res = '航路';
+        }
+        return res;
+
+    },
 
     /**
      * 校验流控是否为正在生效状态
@@ -925,8 +975,11 @@ const FlowcontrolDataUtil = {
         const reasonZh = this.getReasonZh(data);
         // 操作选项
         const operations = this.getOperations(data);
-        // 开始时间
 
+        // 弹框名称
+        const dialogName = this.getTitleName(data);
+        // 分类类型
+        const category = this.getCategory(data);
 
         const result = {
             id, // 流控id
@@ -941,6 +994,8 @@ const FlowcontrolDataUtil = {
             statusClassName,
             casaStatusZh,
             reasonZh,
+            dialogName,
+            category,
             operations,
 
         };
