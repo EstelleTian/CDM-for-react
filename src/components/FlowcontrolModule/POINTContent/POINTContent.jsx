@@ -8,6 +8,7 @@ import moment from 'moment';
 import './POINTContent.less';
 import {isValidVariable, isValidObject} from "utils/basic-verify";
 import {AuthorizationUtil} from "utils/authorization-util";
+import  { FlowcontrolDataUtil }  from 'utils/flowcontrol-data-util';
 
 const FormItem = Form.Item;
 const Search = Input.Search;
@@ -69,6 +70,7 @@ class POINTContent extends React.Component{
         this.handleSubmit = this.handleSubmit.bind(this);
         this.handleConvertFormData = this.handleConvertFormData.bind(this);
         this.handleSubmitCallback = this.handleSubmitCallback.bind(this);
+        this.updateFlowcontrolData = this.updateFlowcontrolData.bind(this);
         this.state = {
             // 高度选项
             levelValues: [600,900,1200,1500,1800,2100,2400,2700,3000,3300,3600,3900,4200,4500,4800,5100,5400,5700,6000,
@@ -1298,6 +1300,8 @@ class POINTContent extends React.Component{
                     clickCloseBtn(dialogName);
                 },
             });
+            // 更新流控数据
+            this.updateFlowcontrolData(res);
         }else if(status != 200 && res.error){
             Modal.error({
                 title: `流控${pageType}失败`,
@@ -1306,6 +1310,30 @@ class POINTContent extends React.Component{
                 onOk(){ },
             });
         }
+    }
+
+    /**
+     * 更新流控数据
+     * @param res 流控接口数据
+     * */
+    updateFlowcontrolData(res){
+        const {updateMultiFlowcontrolDatas} = this.props;
+        const {flowcontrol, flowcontrolList, authMap} = res;
+        const flowcontrolDataMap = {};
+
+        if(flowcontrol){
+            const flowcontrolID = flowcontrol.id;
+            flowcontrolDataMap[flowcontrolID] = flowcontrol;
+        }else if(flowcontrolList){
+            flowcontrolList.map((item)=> {
+                const flowcontrolID = item.id;
+                flowcontrolDataMap[flowcontrolID] = item;
+            })
+        }
+        // 转换数据
+        const data = FlowcontrolDataUtil.connectAuth(flowcontrolDataMap, authMap);
+        // 更新到流控列表数据集合
+        updateMultiFlowcontrolDatas(data);
     }
 
     //

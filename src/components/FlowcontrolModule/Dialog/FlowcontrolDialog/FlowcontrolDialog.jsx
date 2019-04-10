@@ -61,6 +61,7 @@ class FlowcontrolDialog extends React.Component{
                                 generateTime = {generateTime}
                                 id = {id}
                                 placeType = {placeType}
+                                updateMultiFlowcontrolDatas = { updateMultiFlowcontrolDatas }
                             /> : ''
                         }
                         {
@@ -73,6 +74,7 @@ class FlowcontrolDialog extends React.Component{
                                 generateTime = {generateTime}
                                 id = {id}
                                 placeType = {placeType}
+                                updateMultiFlowcontrolDatas = { updateMultiFlowcontrolDatas }
                             /> : ''
                         }
                         {
@@ -84,6 +86,7 @@ class FlowcontrolDialog extends React.Component{
                                 generateTime = {generateTime}
                                 id = {id}
                                 placeType = {placeType}
+                                updateMultiFlowcontrolDatas = { updateMultiFlowcontrolDatas }
                             />  : ''
                         }
 
