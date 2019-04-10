@@ -941,6 +941,32 @@ const FlowcontrolDataUtil = {
         }
     },
 
+    /**
+     * 合并流控数据和操作权限
+     *
+     * @param flowcontrol  流控数据
+     * @param auth  流控数据
+     * @returns {Object}
+     *
+     * */
+    connectAuth: function (dataMap,authMap) {
+        if(!isValidObject(dataMap)){
+            return;
+        }
+        let result = {};
+        let map = Object.keys(dataMap);
+        map.map((item) => {
+            if(isValidObject(authMap)&& isValidObject(authMap[item])) {
+                let auth = authMap[item];
+                result[item] = {...dataMap[item],auth}
+            }else {
+                result[item] = dataMap[item]
+            }
+
+        });
+        return result
+    },
+
 
     /**
      * 流控数据转换----用于流控列表项

@@ -2,7 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import Terminate from "./Terminate";
-
+import { updateMultiFlowcontrolDatas } from 'components/FlowcontrolModule/List/Redux';
 const mapStateToProps = ( state, nextProps ) =>({
     loginUserInfo: state.loginUserInfo || {},
     systemConfig: state.systemConfig || {},
@@ -19,8 +19,8 @@ const mapStateToProps = ( state, nextProps ) =>({
 });
 
 const mapDispatchToProps = {
-
-}
+    updateMultiFlowcontrolDatas
+};
 
 const TerminateContainer = connect(
     mapStateToProps,

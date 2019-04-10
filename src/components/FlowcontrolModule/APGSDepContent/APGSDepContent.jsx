@@ -451,7 +451,6 @@ class APGSDepContent extends React.Component{
                 startDate : moment( standardDate, dateFormat ),
                 startTime:moment(standardTime, timeFormat),
             });
-            debugger
             // 勾选流控点
             if(templateData.controlPoints ){
                 // 将模板数据中的流控点转为数组

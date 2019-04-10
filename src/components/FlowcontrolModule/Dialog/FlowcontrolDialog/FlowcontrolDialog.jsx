@@ -14,6 +14,7 @@ class FlowcontrolDialog extends React.Component{
         super(props);
     }
     render(){
+        const { updateMultiFlowcontrolDatas } = this.props;
         const { titleName, clickCloseBtn, width = 1050, dialogName, x, y, loginUserInfo, systemConfig, generateTime, id, category, placeType} = this.props;
         console.log(this.props);
         return (
@@ -46,6 +47,7 @@ class FlowcontrolDialog extends React.Component{
                                 generateTime = {generateTime}
                                 id = {id}
                                 placeType = {placeType}
+                                updateMultiFlowcontrolDatas = { updateMultiFlowcontrolDatas }
                             /> : ''
                         }
                         {/*低能见度受限*/}

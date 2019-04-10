@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
 import FlowcontrolDialog from "./FlowcontrolDialog";
+import { updateMultiFlowcontrolDatas } from 'components/FlowcontrolModule/List/Redux';
 
 const mapStateToProps = ( state, nextProps ) =>({
     loginUserInfo: state.loginUserInfo || {},
@@ -17,8 +18,8 @@ const mapStateToProps = ( state, nextProps ) =>({
 });
 
 const mapDispatchToProps = {
-
-}
+    updateMultiFlowcontrolDatas
+};
 
 const FlowcontrolDialogContainer = connect(
     mapStateToProps,

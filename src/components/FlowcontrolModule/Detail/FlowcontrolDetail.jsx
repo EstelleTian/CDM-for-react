@@ -170,7 +170,6 @@ class FlowcontrolDetail extends React.Component {
            const { type, value, imitativeId } = record;
            let res = '';
            if(type == 'COMPRESS_STRATEGY' ){ // 压缩窗口
-               debugger
                if(value){
                    const values = value.split('#');
                    const val = values[0];

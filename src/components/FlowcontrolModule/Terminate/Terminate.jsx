@@ -6,6 +6,7 @@ import {terminateFlowcontrolUrl} from 'utils/request-urls';
 import {request, requestGet} from 'utils/request-actions';
 import {isValidVariable, isValidObject} from "utils/basic-verify";
 import {AuthorizationUtil} from "utils/authorization-util";
+import  { FlowcontrolDataUtil }  from 'utils/flowcontrol-data-util';
 
 const FormItem = Form.Item;
 const RadioGroup = Radio.Group;
@@ -19,7 +20,8 @@ class Terminate extends React.Component {
         this.handleSubmit = this.handleSubmit.bind(this);
         this.confirmSubmit = this.confirmSubmit.bind(this);
         this.handleConvertFormData = this.handleConvertFormData.bind(this);
-        this.handleSubmitCallback = this.handleSubmitCallback.bind(this)
+        this.handleSubmitCallback = this.handleSubmitCallback.bind(this);
+        this.updateFlowcontrolData = this.updateFlowcontrolData.bind(this);
     }
 
     //时间窗数值--校验规则
@@ -130,7 +132,7 @@ class Terminate extends React.Component {
 
     // 表单提交回调函数
     handleSubmitCallback(res) {
-        const {status, flowcontrol} = res;
+        const {status} = res;
         // 组件关闭方法和名称
         const {clickCloseBtn, dialogName} = this.props;
         // 关闭加载
@@ -146,6 +148,8 @@ class Terminate extends React.Component {
                     clickCloseBtn(dialogName);
                 },
             });
+            // 更新流控数据
+            this.updateFlowcontrolData(res);
         } else if (status != 200 && res.error) {
             Modal.error({
                 title: `流控$终止失败`,
@@ -156,6 +160,30 @@ class Terminate extends React.Component {
                 },
             });
         }
+    }
+
+    /**
+     * 更新流控数据
+     * @param res 流控接口数据
+     * */
+    updateFlowcontrolData(res){
+        const {updateMultiFlowcontrolDatas} = this.props;
+        const {flowcontrol, flowcontrolList, authMap} = res;
+        const flowcontrolDataMap = {};
+
+        if(flowcontrol){
+            const flowcontrolID = flowcontrol.id;
+            flowcontrolDataMap[flowcontrolID] = flowcontrol;
+        }else if(flowcontrolList){
+            flowcontrolList.map((item)=> {
+                const flowcontrolID = item.id;
+                flowcontrolDataMap[flowcontrolID] = item;
+            })
+        }
+        // 转换数据
+        const data = FlowcontrolDataUtil.connectAuth(flowcontrolDataMap, authMap);
+        // 更新到流控列表数据集合
+        updateMultiFlowcontrolDatas(data);
     }
 
     // 组件挂载完成回调

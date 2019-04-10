@@ -2,6 +2,7 @@
 //key命名规则：  操作类型（update,add,delete）+ 数据名称 + 操作对象 以下划线分隔,全部大写
 //value命名规则： 数据名称 + 操作类型（update,add,delete）+ 操作对象 以左划线分隔,小写
 const UPDATE_FLOWCONTROL_DATAS= 'flowcontrolDatas/update/datas';
+const UPDATE_MULTI_FLOWCONTROL_DATAS= 'flowcontrolDatas/update/multidatas';
 
 //action-creator
 //更新流控数据集合
@@ -9,6 +10,13 @@ const updateFlowcontrolDatas = dataMap => ({
     type: UPDATE_FLOWCONTROL_DATAS,
     dataMap
 });
+
+//更新流控列表单条或多条数据
+const updateMultiFlowcontrolDatas = multiDataMap => ({
+    type: UPDATE_MULTI_FLOWCONTROL_DATAS,
+    multiDataMap
+});
+
 //reducer flowcontrol data 流控数据
 const initData = {
     flowcontrolDataMap: {}, // 流控数据
@@ -18,13 +26,21 @@ const initData = {
 const flowcontrolDatas = ( state = initData, action) => {
     switch ( action.type ){
         case UPDATE_FLOWCONTROL_DATAS: {
-            const flowcontrolDataMap = state.flowcontrolDataMap;
+            // 全部替换
             let dataMap = action.dataMap || {};
-            dataMap = { ...flowcontrolDataMap, ...dataMap};
             return {
-                ...state,
                 flowcontrolDataMap: dataMap
             }
+        }
+        case UPDATE_MULTI_FLOWCONTROL_DATAS: {
+            let multiDataMap = action.multiDataMap || {};
+            // 复制state
+            let stateCopy= JSON.parse(JSON.stringify(state));
+            for(let id in multiDataMap){
+                //若有该航班，更新;没有添加
+                stateCopy.flowcontrolDataMap[id] = multiDataMap[id];
+            }
+            return stateCopy
         }
         default:
             return state;
@@ -153,7 +169,7 @@ const flowGenerateTime = (state = initFlowGenerateTime, action) => {
 
 //---------------------------------------------------------------------
 export {
-    flowcontrolDatas, updateFlowcontrolDatas,
+    flowcontrolDatas, updateFlowcontrolDatas, updateMultiFlowcontrolDatas,
     flowcontrolCondition, updateFlowcontrolConditionShieldLong,
     updateFlowcontrolConditionScope, updateFlowcontrolConditionPlaceType,
     updateFlowcontrolConditionOrderBy, updateFlowcontrolConditionQuicklyFilters,

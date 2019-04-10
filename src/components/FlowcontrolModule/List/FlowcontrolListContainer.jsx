@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router-dom';
-import { updateFlowcontrolDatas,  updateFlowcontrolConditionShieldLong,
+import { updateFlowcontrolDatas, updateMultiFlowcontrolDatas, updateFlowcontrolConditionShieldLong,
     updateFlowcontrolConditionScope, updateFlowcontrolConditionPlaceType,
     updateFlowcontrolConditionOrderBy, updateFlowcontrolConditionQuicklyFilters,
     updateFlowGenerateTime, } from './Redux';
@@ -166,7 +166,7 @@ const mapStateToProps = ( state ) => {
 };
 
 const mapDispatchToProps = {
-    updateFlowcontrolDatas, updateFlowcontrolConditionShieldLong,
+    updateFlowcontrolDatas, updateMultiFlowcontrolDatas, updateFlowcontrolConditionShieldLong,
     updateFlowcontrolConditionScope, updateFlowcontrolConditionPlaceType,
     updateFlowcontrolConditionOrderBy, updateFlowcontrolConditionQuicklyFilters,
     updateFlowGenerateTime,
