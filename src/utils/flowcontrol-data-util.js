@@ -81,8 +81,8 @@ const FlowcontrolDataUtil = {
     TYPE_REQ: 'REQ', // 开车申请
     TYPE_ASSIGN: 'ASSIGN', // 指定时隙
     TYPE_RESERVE: 'RESERVE',//预留时隙
-    TYPE_LDR: 'LDR', // 大规模延误恢复
-    TYPE_TRANSLATION: 'TRANSLATION', // 成都版大规模延误
+    TYPE_LDR: 'LDR', // 大面积延误恢复
+    TYPE_TRANSLATION: 'TRANSLATION', // 成都版大面积延误
 
     //==========================================================
     REASON_ACC: 'ACC',//空管
@@ -283,10 +283,10 @@ const FlowcontrolDataUtil = {
                 res = '预留时隙';
                 break;
             case this.TYPE_LDR:
-                res = '大规模延误恢复';
+                res = '大面积延误恢复';
                 break;
             case this.TYPE_TRANSLATION:
-                res = '大规模延误';
+                res = '大面积延误';
                 break;
             default:
                 res = type || '';
@@ -523,7 +523,7 @@ const FlowcontrolDataUtil = {
             res = '已废弃';
         } else if (status == this.FLOWCONTROL_STATUS_FINISHED) {
             res = '正常结束';
-            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大规模延误
+            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大面积延误
                 // 求得终止时间
                 let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
                 if (tempEndTime * 1 > generateTime * 1) { // 若数据生成时间早于终止时间,则显示"恢复中"
@@ -576,7 +576,7 @@ const FlowcontrolDataUtil = {
             res = '已废弃';
         } else if (status == this.FLOWCONTROL_STATUS_FINISHED) {
             res = '正常结束';
-            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 大规模延误
+            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 大面积延误
                 // 求得终止时间
                 let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
                 if (tempEndTime * 1 > generateTime * 1) { // 若数据生成时间早于终止时间,则显示"恢复中"
@@ -635,7 +635,7 @@ const FlowcontrolDataUtil = {
             res = '已废弃';
         } else if (relativeStatus == this.FLOWCONTROL_STATUS_FINISHED) {
             res = '正常结束';
-            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 大规模延误
+            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 大面积延误
                 // 求得终止时间
                 let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
                 if (tempEndTime * 1 > generateTime * 1) { // 若数据生成时间早于终止时间,则显示"恢复中"
@@ -680,7 +680,7 @@ const FlowcontrolDataUtil = {
             res = 'cancel';
         } else if (status == this.FLOWCONTROL_STATUS_FINISHED) { // 正常结束
             res = 'finished';
-            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大规模延误
+            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大面积延误
                 // 求得终止时间
                 let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
                 if (tempEndTime * 1 > generateTime * 1) {  // 恢复中
@@ -727,7 +727,7 @@ const FlowcontrolDataUtil = {
             res = 'cancel';
         } else if (relativeStatus == this.FLOWCONTROL_STATUS_FINISHED) { // 正常结束
             res = 'finished';
-            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大规模延误
+            if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大面积延误
                 // 求得终止时间
                 let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
                 if (tempEndTime * 1 > generateTime * 1) {  // 恢复中
@@ -767,7 +767,7 @@ const FlowcontrolDataUtil = {
             }
         }
 
-        if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 大规模延误
+        if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 大面积延误
             // 求得终止时间
             let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
             if (tempEndTime * 1 > generateTime * 1 && status == this.FLOWCONTROL_STATUS_FINISHED) { // 若数据生成时间早于终止时间,
@@ -871,9 +871,9 @@ const FlowcontrolDataUtil = {
         if(placeType == this.PLACE_TYPE_AP){
             res =  '机场流控';
             if(type == this.TYPE_LDR){
-                res =  '大规模延误恢复';
+                res =  '大面积延误恢复';
             }else if(type == this.TYPE_TRANSLATION){
-                res = '大规模延误'
+                res = '大面积延误'
             }else if(type == this.TYPE_GS && typeSubclass == "GS_DEP"){
                 res = '低能见度';
             }
@@ -899,7 +899,7 @@ const FlowcontrolDataUtil = {
             return flag;
         }
 
-        if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大规模延误
+        if (type == this.TYPE_TRANSLATION && isValidVariable(endTime)) { // 成都版大面积延误
             // 求得终止时间
             let tempEndTime = addStringTime(endTime, value * 60 * 60 * 1000);
             // 若终止时间早于数据生成时间或 状态为人工终止、系统终止,则不是正在生效状态

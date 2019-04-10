@@ -44,6 +44,9 @@ class NavMenu extends React.Component {
             pointPublish: {
                 show: false,
             },
+            LDRPublish: {
+                show: false,
+            },
             translationPublish: {
                 show: false,
             },
@@ -180,7 +183,7 @@ class NavMenu extends React.Component {
         const count = this.getFilterCount();
         const {show} = sidebarConfig;
         const {airports} = loginUserInfo;
-        const {apPublish, apGSDepPublish, pointPublish, translationPublish, flightSearch,noticePublish} = this.state;
+        const {apPublish, apGSDepPublish, pointPublish, translationPublish,LDRPublish, flightSearch,noticePublish} = this.state;
         return (
             <div className="opt-menu-canvas">
                 <Menu
@@ -230,8 +233,12 @@ class NavMenu extends React.Component {
                         >
                             <label>发布航路受限</label>
                         </Menu.Item>
-                        <Menu.Item key="composite-publish"><label>发布复合航路受限</label></Menu.Item>
-                        <Menu.Item key="ldr-publish"><label>发布大面积延误恢复</label></Menu.Item>
+                        <Menu.Item
+                            key="LDRPublish"
+                            onClick={this.onMenuTitleSelect}
+                        >
+                            <label>发布大面积延误恢复</label>
+                        </Menu.Item>
                         <Menu.Item
                             key="translationPublish"
                             onClick={this.onMenuTitleSelect}
@@ -428,6 +435,23 @@ class NavMenu extends React.Component {
                                 clickCloseBtn={ this.onCloseBtn }
                                 placeType='AP'
                                 category='TRANSLATION'
+                                x={ 300 }
+                                y={ 60 }
+                            />
+                        </CreateLayer>
+                        : ''
+                }
+                {
+                    (LDRPublish.show) ?
+                        <CreateLayer
+                            className="flowcontol-layer"
+                        >
+                            <FlowcontrolDialogContainer
+                                titleName="大面积延误恢复－发布"
+                                type="translationPublish"
+                                clickCloseBtn={ this.onCloseBtn }
+                                placeType='AP'
+                                category='LDR'
                                 x={ 300 }
                                 y={ 60 }
                             />

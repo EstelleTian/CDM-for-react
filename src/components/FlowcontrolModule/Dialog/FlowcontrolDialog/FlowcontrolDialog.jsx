@@ -16,7 +16,6 @@ class FlowcontrolDialog extends React.Component{
     render(){
         const { updateMultiFlowcontrolDatas } = this.props;
         const { titleName, clickCloseBtn, width = 1050, dialogName, x, y, loginUserInfo, systemConfig, generateTime, id, category, placeType} = this.props;
-        console.log(this.props);
         return (
             <DraggableModule
                 bounds = ".root"
